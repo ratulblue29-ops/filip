@@ -2,6 +2,7 @@ import React from 'react';
 import {View, ScrollView} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Header from '../components/Header';
+import RecommendedSection from '../components/RecommendedSection';
 import {styles} from '../styles/FeedScreenStyles';
 
 const FeedScreen = (): React.JSX.Element => {
@@ -13,6 +14,7 @@ const FeedScreen = (): React.JSX.Element => {
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}>
         <Header />
+        <RecommendedSection />
         {/* continue */}
       </ScrollView>
     </View>

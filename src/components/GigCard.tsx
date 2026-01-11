@@ -48,55 +48,19 @@ const GigCard = ({gig}: GigCardProps): React.JSX.Element => {
             />
           </TouchableOpacity>
         </View>
-
-        {/* <View style={styles.detailsRow}>
-          {gig.rate && (
-            <View style={styles.rateBox}>
-              <Text style={styles.rateText}>
-                {gig.currency}
-                {gig.rate}
-              </Text>
-            </View>
-          )}
-          {gig.hours && (
-            <View style={styles.hoursBox}>
-              <Text style={styles.hoursText}>{gig.hours}</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.dateTimeRow}>
-          <Text style={styles.dateText}>
-            {gig.date} {gig.time && `• ${gig.time}`}
-          </Text>
-          {gig.duration && (
-            <Text style={styles.durationText}> • {gig.duration}</Text>
-          )}
-        </View>
-
-        {gig.tags.length > 0 && (
-          <View style={styles.tagsContainer}>
-            {gig.tags.map((tag, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{tag}</Text>
-              </View>
-            ))}
-          </View>
-        )} */}
-
         <View style={styles.middleRow}>
-  <View style={styles.rateBox}>
-    <Text style={styles.rateText}>{gig.rate}</Text>
-  </View>
-  <View style={styles.dateTimeColumn}>
-    <Text style={styles.dateText}>
-      {gig.date} {gig.time && `• ${gig.time}`}
-    </Text>
-    {gig.duration && (
-      <Text style={styles.durationText}>{gig.duration}</Text>
-    )}
-  </View>
-</View>
+          <View style={styles.rateBox}>
+            <Text style={styles.rateText}>{gig.rate}</Text>
+          </View>
+          <View style={styles.dateTimeColumn}>
+            <Text style={styles.dateText}>
+              {gig.date} {gig.time && `• ${gig.time}`}
+            </Text>
+            {gig.duration && (
+              <Text style={styles.durationText}>{gig.duration}</Text>
+            )}
+          </View>
+        </View>
 
 <View style={styles.bottomRow}>
   {gig.tags.length > 0 && (

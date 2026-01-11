@@ -2,12 +2,12 @@ import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: '94%',
     backgroundColor: '#2a2a2a',
     borderRadius: 10,
-    marginRight: 20,
     overflow: 'hidden',
     marginBottom: 12,
+    alignSelf: 'center',
   },
   imageContainer: {
     position: 'relative',

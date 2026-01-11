@@ -2,11 +2,13 @@ import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
+    width: '94%',
     flexDirection: 'row',
     backgroundColor: '#2a2a2a',
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
+    alignSelf: 'center',
   },
   avatar: {
     width: 48,

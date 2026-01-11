@@ -101,7 +101,7 @@ export const newestGigs: NewestGig[] = [
     spotsLeft: '5 spots left',
     user: {
       name: 'John Doe',
-      avatar: require('../../assets/images/user3.png'),
+      avatar: require('../../assets/images/image1.png'),
     },
     bookmarked: true,
   },
@@ -117,7 +117,7 @@ export const newestGigs: NewestGig[] = [
     spotsLeft: '5 spots left',
     user: {
       name: 'Jane Smith',
-      avatar: require('../../assets/images/user4.png'),
+      avatar: require('../../assets/images/image1.png'),
     },
     bookmarked: true,
   },

@@ -21,64 +21,79 @@ const BottomNavigation = (): React.JSX.Element => {
       ]}>
       <View style={styles.container}>
         <TouchableOpacity
-          style={styles.tabButton}
+          style={[
+            styles.tabButton,
+            activeTab === 'feed' && styles.activeTabButton,
+          ]}
           onPress={() => handleTabPress('feed')}
           activeOpacity={0.7}>
           <Icon
-            name={activeTab === 'feed' ? 'home' : 'home-outline'}
-            size={22}
-            color={activeTab === 'feed' ? '#FFD700' : '#999'}
+            name="home-outline"
+            size={25}
+            color={activeTab === 'feed' ? '#fff' : '#999'}
           />
-          <Text
-            style={[
-              styles.tabLabel,
-              activeTab === 'feed' && styles.activeLabel,
-            ]}>
-            Feed
-          </Text>
+          {activeTab === 'feed' && (
+            <Text style={styles.activeTabLabel}>Feed</Text>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.tabButton}
-          onPress={() => handleTabPress('notifications')}
+          style={[
+            styles.tabButton,
+            activeTab === 'findjobs' && styles.activeTabButton,
+          ]}
+          onPress={() => handleTabPress('findjobs')}
           activeOpacity={0.7}>
           <Icon
-            name={
-              activeTab === 'notifications'
-                ? 'notifications'
-                : 'notifications-outline'
-            }
-            size={22}
-            color={activeTab === 'notifications' ? '#FFD700' : '#999'}
+            name="compass-outline"
+            size={27}
+            color={activeTab === 'findjobs' ? '#fff' : '#999'}
           />
+          {activeTab === 'findjobs' && (
+            <Text style={styles.activeTabLabel}>Find Jobs</Text>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.tabButton}
-          onPress={() => handleTabPress('search')}
+          style={[
+            styles.tabButton,
+            activeTab === 'fulltime' && styles.activeTabButton,
+          ]}
+          onPress={() => handleTabPress('fulltime')}
           activeOpacity={0.7}>
-          <Icon
-            name="briefcase-outline"
-            size={22}
-            color={activeTab === 'search' ? '#FFD700' : '#999'}
-          />
-          <Icon
-            name="search-outline"
-            size={14}
-            color={activeTab === 'search' ? '#FFD700' : '#999'}
-            style={styles.searchOverlay}
-          />
+          <View style={styles.iconContainer}>
+            <Icon
+              name="briefcase-outline"
+              size={25}
+              color={activeTab === 'fulltime' ? '#fff' : '#999'}
+            />
+            <Icon
+              name="search-outline"
+              size={17}
+              color={activeTab === 'fulltime' ? '#fff' : '#999'}
+              style={styles.searchOverlay}
+            />
+          </View>
+          {activeTab === 'fulltime' && (
+            <Text style={styles.activeTabLabel}>Full-Time</Text>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.tabButton}
+          style={[
+            styles.tabButton,
+            activeTab === 'profile' && styles.activeTabButton,
+          ]}
           onPress={() => handleTabPress('profile')}
           activeOpacity={0.7}>
           <Icon
-            name={activeTab === 'profile' ? 'person' : 'person-outline'}
-            size={22}
-            color={activeTab === 'profile' ? '#FFD700' : '#999'}
+            name="person-outline"
+            size={25}
+            color={activeTab === 'profile' ? '#fff' : '#999'}
           />
+          {activeTab === 'profile' && (
+            <Text style={styles.activeTabLabel}>Profile</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

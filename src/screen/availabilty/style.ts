@@ -7,11 +7,11 @@ const COLORS = {
   border: '#333333',
   green: '#84CC16',
   white: '#FFFFFF',
-  disabled: '#F3F4F6',
+  disabled: '#7C7D7E',
 };
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background, paddingBottom: 40 },
-  scrollContent: { padding: 20, paddingBottom: 40 },
+  scrollContent: { padding: 20, paddingBottom: 60 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

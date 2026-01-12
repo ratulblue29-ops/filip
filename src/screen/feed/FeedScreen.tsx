@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './style';
-import { Bell, Search } from 'lucide-react-native';
+import { BadgeCheck, Bell, Bookmark, Clock, Heart, Search } from 'lucide-react-native';
 
 const COLORS = {
   secondaryText: '#9E9E9E',
@@ -73,13 +73,21 @@ const FeedScreen = () => {
       <StatusBar barStyle="light-content" />
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Find Workers</Text>
+        <View style={ styles.topRow}>
+          <View>
+            <Image source={{ uri: 'https://i.pravatar.cc/150?u=a' }} style={styles.avatar} />
+          </View>
+          <View>
+            <Text style={styles.greetingText}>good morning</Text>
+            <Text style={styles.nameText}>Alex</Text>
+          </View>
+        </View>
         <View>
           <Bell width={24} height={24} color="white" />
           <View style={styles.notifDot} />
         </View>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView>
         {/* Search Bar */}
         <View style={styles.searchContainer}>
           <Search width={24} height={24} color="white" />
@@ -103,13 +111,13 @@ const FeedScreen = () => {
             <ImageBackground
               source={{ uri: item.image }}
               style={styles.cardImage}
-              imageStyle={{ borderTopLeftRadius: 16, borderTopRightRadius: 16 }}
             >
-              <View style={styles.badgeContainer}>
-                <Text style={styles.badgeText}>• {item.badge}</Text>
-              </View>
-              <Text style={styles.heartIcon}>♡</Text>
-
+              <View style={styles.MainbadgeContainer}>
+                 <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>• {item.badge}</Text>
+                </View>
+                <Heart height={24} width={24} color="white" />
+             </View>
               <View style={styles.profileRow}>
                 <View style={styles.avatarCircle}>
                   <Text style={styles.avatarInitial}>
@@ -118,9 +126,12 @@ const FeedScreen = () => {
                 </View>
                 <View>
                   <Text style={styles.profileName}>
-                    {item.name} <Text style={{ color: COLORS.yellow }}>✓</Text>
+                    {item.name} 
                   </Text>
+                  <View style={styles.verifiedContainer}>
+                    <BadgeCheck width={16} height={16} color='#FFD900'/>
                   <Text style={styles.verifiedText}>Verified</Text>
+                  </View>
                 </View>
               </View>
             </ImageBackground>
@@ -137,7 +148,7 @@ const FeedScreen = () => {
               <Text style={styles.locationText}>{item.location}</Text>
 
               <View style={styles.availabilityBox}>
-                <Text style={styles.clockIcon}>🕒</Text>
+                <Clock width={24} height={24} color="#FFD900" />
                 <View>
                   <Text style={styles.availLabel}>
                     {item.subAvailability ? 'Availability' : 'Next Available'}
@@ -165,7 +176,7 @@ const FeedScreen = () => {
         ))}
 
         {/* --- SECTION: NEWEST GIGS --- */}
-        <Text style={[styles.sectionTitle, { marginLeft: 16, marginTop: 20 }]}>
+        <Text style={styles.sectionTitle}>
           Newest Gigs
         </Text>
 
@@ -173,14 +184,14 @@ const FeedScreen = () => {
           <View key={gig.id} style={styles.gigCard}>
             <View style={styles.row}>
               <Image source={{ uri: gig.avatar }} style={styles.gigAvatar} />
-              <View style={{ flex: 1, marginLeft: 12 }}>
+              <View style={styles.gigInfo}>
                 <View style={styles.rowBetween}>
                   <Text style={styles.gigTitle}>{gig.title}</Text>
-                  <Text style={styles.bookmarkIcon}>🔖</Text>
+                  <Bookmark width={24} height={24} color="#fff" />
                 </View>
-                <Text style={styles.locationText}>{gig.company}</Text>
+                <Text style={styles.locationText_gig}>{gig.company}</Text>
 
-                <View style={[styles.rowBetween, { marginTop: 10 }]}>
+                <View style={styles.rowBetween}>
                   <View style={styles.priceChip}>
                     <Text style={styles.priceChipText}>{gig.price}</Text>
                   </View>
@@ -188,12 +199,7 @@ const FeedScreen = () => {
                 </View>
 
                 {gig.tags && (
-                  <View
-                    style={[
-                      styles.tag,
-                      { alignSelf: 'flex-start', marginTop: 8 },
-                    ]}
-                  >
+                  <View style={styles.tag}>
                     <Text style={styles.tagText}>{gig.tags[0]}</Text>
                   </View>
                 )}

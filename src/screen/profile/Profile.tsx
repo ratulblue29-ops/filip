@@ -5,6 +5,8 @@ const Profile = () => {
   return (
     <View>
       <Text>Profile</Text>
+      <Text>Profile</Text>
+      <Text>Profile</Text>
     </View>
   );
 };

@@ -8,15 +8,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigator/RootNavigator';
 import styles from './style';
 import { ArrowLeft, Check } from 'lucide-react-native';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const MemberShipScreen = () => {
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation<any>();
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>(
     'monthly',
   );
@@ -26,7 +23,7 @@ const MemberShipScreen = () => {
   };
 
   const handleGoPremium = () => {
-    console.log('Premium plan selected');
+    navigation.navigate('purchase');
   };
 
   const handleRestore = () => {

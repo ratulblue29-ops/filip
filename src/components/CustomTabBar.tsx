@@ -9,7 +9,7 @@ import ProfileIcon from '../components/svg/ProfileIcon';
 const ICONS: any = {
   Feed: HomeIcon,
   FindJobs: ExploreIcon,
-  Chat: ChatIcon,
+  fulltime: ChatIcon,
   Profile: ProfileIcon,
 };
 
@@ -36,7 +36,7 @@ export default function CustomTabBar({ state, navigation }: any) {
                     <Text style={styles.label}>
                       {route.name === 'FindJobs'
                         ? 'Find Jobs'
-                        : route.name === 'Chat'
+                        : route.name === 'fulltime'
                         ? 'Full-Time'
                         : route.name}
                     </Text>

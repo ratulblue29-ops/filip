@@ -10,7 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MessageItem, { MessageData } from '../../components/message/MessageItem';
 import styles from './style';
-import { Search } from 'lucide-react-native';
+import { ArrowLeft, ChevronLeft, Search } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 
 // Sample data
 const DATA: MessageData[] = [
@@ -69,31 +70,57 @@ const DATA: MessageData[] = [
     time: 'Oct 27',
     image: 'https://randomuser.me/api/portraits/men/46.jpg',
   },
+  {
+    id: '6',
+    name: 'Apex Jonsson',
+    role: '',
+    status: 'Canceled',
+    statusColor: '#9CA3AF',
+    statusTextColor: '#fff',
+    message: 'Sorry, I Found Another Gig.',
+    time: 'Oct 27',
+    image: 'https://randomuser.me/api/portraits/men/46.jpg',
+  },
+  {
+    id: '7',
+    name: 'Apex Jonsson',
+    role: '',
+    status: 'Canceled',
+    statusColor: '#9CA3AF',
+    statusTextColor: '#fff',
+    message: 'Sorry, I Found Another Gig.',
+    time: 'Oct 27',
+    image: 'https://randomuser.me/api/portraits/men/46.jpg',
+  },
 ];
 
 const ChatScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('All');
-  const [searchText, setSearchText] = useState<string>('');
+  const navigation = useNavigation<any>();
+  // const [activeTab, setActiveTab] = useState<string>('All');
+  // const [searchText, setSearchText] = useState<string>('');
 
   // Filter messages based on tab + search text
-  const filteredData = DATA.filter(item => {
-    const matchTab =
-      activeTab === 'All'
-        ? true
-        : activeTab === 'Employers'
-        ? item.role !== ''
-        : item.role === '';
+  // const filteredData = DATA.filter(item => {
+  //   const matchTab =
+  //     activeTab === 'All'
+  //       ? true
+  //       : activeTab === 'Employers'
+  //       ? item.role !== ''
+  //       : item.role === '';
 
-    const matchSearch = item.name.toLowerCase().includes(searchText.toLowerCase());
+  //   const matchSearch = item.name.toLowerCase().includes(searchText.toLowerCase());
 
-    return matchTab && matchSearch;
-  });
+  //   return matchTab && matchSearch;
+  // });
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+         <ChevronLeft width={24} height={24} color="white" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Messages</Text>
       </View>
       {/* Search Bar */}
@@ -107,7 +134,7 @@ const ChatScreen: React.FC = () => {
         </View>
 
       {/* Tabs */}
-      <View style={styles.tabContainer}>
+      {/* <View style={styles.tabContainer}>
         {['All', 'Employers', 'Workers'].map(tab => (
           <TouchableOpacity
             key={tab}
@@ -121,14 +148,14 @@ const ChatScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </View> */}
 
       {/* Message list */}
       <ScrollView
         contentContainerStyle={styles.listPadding}
         showsVerticalScrollIndicator={false}
       >
-        {filteredData.map(item => (
+        {DATA.map(item => (
           <MessageItem key={item.id} item={item} />
         ))}
       </ScrollView>

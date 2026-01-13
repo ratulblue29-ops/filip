@@ -10,6 +10,9 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 10,
     paddingBottom: 20,
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
   },
   headerTitle: {
     color: '#FFF',

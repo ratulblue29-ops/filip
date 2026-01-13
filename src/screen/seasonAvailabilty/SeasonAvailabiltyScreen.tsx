@@ -173,7 +173,7 @@ const SeasonAvailabiltyScreen = () => {
             <Text style={styles.lockButtonText}>Upgrade To Contact</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity style={styles.engageButton}>
+          <TouchableOpacity style={styles.engageButton} onPress={() => navigation.navigate('chat')}>
             <Text style={styles.engageButtonText}>Engage Candidate</Text>
 
                           <SendHorizontal width={18} height={18} color="#1F2937"/>

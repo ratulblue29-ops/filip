@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Text,
   View,
@@ -8,10 +8,11 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MessageItem, { MessageData } from '../../components/message/MessageItem';
+import MessageItem from '../../components/message/MessageItem';
 import styles from './style';
-import { ArrowLeft, ChevronLeft, Search } from 'lucide-react-native';
+import { ChevronLeft, Search } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import { MessageData } from '../../@types/MessageData.type';
 
 // Sample data
 const DATA: MessageData[] = [

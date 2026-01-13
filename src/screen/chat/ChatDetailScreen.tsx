@@ -75,7 +75,7 @@ const ChatDetailScreen = () => {
     return (
       <View style={styles.otherMessageWrapper}>
         <Text style={styles.senderName}>{item.sender}, {item.time}</Text>
-        <View style={styles.otherMessageContainer}>
+        <View>
            <View style={styles.otherMessageRow}>
             <Image source={{ uri: item.avatar }} style={styles.chatAvatar} />
             <View style={styles.otherBubble}>

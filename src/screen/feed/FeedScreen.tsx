@@ -11,7 +11,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './style';
-import { BadgeCheck, Bell, Bookmark, Clock, Heart, Search } from 'lucide-react-native';
+import {
+  BadgeCheck,
+  Bell,
+  Bookmark,
+  Clock,
+  Heart,
+  Search,
+} from 'lucide-react-native';
 
 const COLORS = {
   secondaryText: '#9E9E9E',
@@ -73,9 +80,12 @@ const FeedScreen = () => {
       <StatusBar barStyle="light-content" />
       {/* Header */}
       <View style={styles.header}>
-        <View style={ styles.topRow}>
+        <View style={styles.topRow}>
           <View>
-            <Image source={{ uri: 'https://i.pravatar.cc/150?u=a' }} style={styles.avatar} />
+            <Image
+              source={{ uri: 'https://i.pravatar.cc/150?u=a' }}
+              style={styles.avatar}
+            />
           </View>
           <View>
             <Text style={styles.greetingText}>good morning</Text>
@@ -88,14 +98,14 @@ const FeedScreen = () => {
         </View>
       </View>
       {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Search width={24} height={24} color="white" />
-          <TextInput
-            placeholder="Search"
-            placeholderTextColor={COLORS.secondaryText}
-            style={styles.input}
-          />
-        </View>
+      <View style={styles.searchContainer}>
+        <Search width={24} height={24} color="white" />
+        <TextInput
+          placeholder="Search"
+          placeholderTextColor={COLORS.secondaryText}
+          style={styles.input}
+        />
+      </View>
       <ScrollView>
         <View style={styles.headerRow}>
           <Text style={styles.sectionTitle}>Recommended For You</Text>
@@ -112,11 +122,11 @@ const FeedScreen = () => {
               style={styles.cardImage}
             >
               <View style={styles.MainbadgeContainer}>
-                 <View style={styles.badgeContainer}>
+                <View style={styles.badgeContainer}>
                   <Text style={styles.badgeText}>• {item.badge}</Text>
                 </View>
                 <Heart height={24} width={24} color="white" />
-             </View>
+              </View>
               <View style={styles.profileRow}>
                 <View style={styles.avatarCircle}>
                   <Text style={styles.avatarInitial}>
@@ -124,12 +134,10 @@ const FeedScreen = () => {
                   </Text>
                 </View>
                 <View>
-                  <Text style={styles.profileName}>
-                    {item.name} 
-                  </Text>
+                  <Text style={styles.profileName}>{item.name}</Text>
                   <View style={styles.verifiedContainer}>
-                    <BadgeCheck width={16} height={16} color='#FFD900'/>
-                  <Text style={styles.verifiedText}>Verified</Text>
+                    <BadgeCheck width={16} height={16} color="#FFD900" />
+                    <Text style={styles.verifiedText}>Verified</Text>
                   </View>
                 </View>
               </View>
@@ -175,9 +183,7 @@ const FeedScreen = () => {
         ))}
 
         {/* --- SECTION: NEWEST GIGS --- */}
-        <Text style={styles.sectionTitle}>
-          Newest Gigs
-        </Text>
+        <Text style={styles.sectionTitle}>Newest Gigs</Text>
 
         {GIGS_DATA.map(gig => (
           <View key={gig.id} style={styles.gigCard}>

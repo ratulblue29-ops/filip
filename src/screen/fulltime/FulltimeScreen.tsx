@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import {
   View,
@@ -11,7 +9,6 @@ import {
   StatusBar,
 } from 'react-native';
 import {
-  ArrowLeft,
   Bell,
   Search,
   ChevronDown,
@@ -23,7 +20,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from './style';
-
 
 /* =======================
    Types
@@ -99,57 +95,48 @@ const CANDIDATES: Candidate[] = [
 const FulltimeScreen = () => {
   const navigation = useNavigation<any>();
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
-
   /* =======================
      Candidate Card Renderer
   ======================= */
   const renderCandidate = (item: Candidate) => (
     <View style={styles.card}>
-     <Image source={{ uri: item.image }} style={styles.candidateImage} />
+      <Image source={{ uri: item.image }} style={styles.candidateImage} />
 
+      <View
+        style={[
+          styles.statusBadge,
+          item.status === 'Available' ? styles.statusYellow : styles.statusDark,
+        ]}
+      >
         <View
           style={[
-            styles.statusBadge,
-            item.status === 'Available'
-              ? styles.statusYellow
-              : styles.statusDark,
+            styles.dot,
+            {
+              backgroundColor:
+                item.status === 'Available' ? '#F59E0B' : '#4ADE80',
+            },
+          ]}
+        />
+        <Text
+          style={[
+            styles.statusText,
+            { color: item.status === 'Available' ? '#000' : '#FFF' },
           ]}
         >
-          <View
-            style={[
-              styles.dot,
-              {
-                backgroundColor:
-                  item.status === 'Available' ? '#F59E0B' : '#4ADE80',
-              },
-            ]}
-          />
-          <Text
-            style={[
-              styles.statusText,
-              { color: item.status === 'Available' ? '#000' : '#FFF' },
-            ]}
-          >
-            {item.statusText}
-          </Text>
-        </View>
+          {item.statusText}
+        </Text>
+      </View>
 
-        <View style={styles.profileRow}>
-            <Image
-              source={{ uri: item.image }}
-              style={styles.avatarPlaceholder}
-            />
-            <View>
-              <Text style={styles.candidateName}>{item.name}</Text>
-              <View style={styles.locationRow}>
-                <MapPin size={12} color="#FFF" />
-                <Text style={styles.locationText}>{item.location}</Text>
-              </View>
-            </View>
+      <View style={styles.profileRow}>
+        <Image source={{ uri: item.image }} style={styles.avatarPlaceholder} />
+        <View>
+          <Text style={styles.candidateName}>{item.name}</Text>
+          <View style={styles.locationRow}>
+            <MapPin size={12} color="#FFF" />
+            <Text style={styles.locationText}>{item.location}</Text>
           </View>
+        </View>
+      </View>
 
       <View style={styles.cardContent}>
         <View style={styles.tagContainer}>
@@ -171,15 +158,21 @@ const FulltimeScreen = () => {
         </View>
 
         {item.isLocked ? (
-          <TouchableOpacity style={styles.lockButton} onPress={() => navigation.navigate('membership')}>
+          <TouchableOpacity
+            style={styles.lockButton}
+            onPress={() => navigation.navigate('membership')}
+          >
             <Lock size={18} color="#FFF" />
             <Text style={styles.lockButtonText}>Upgrade To Contact</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity style={styles.engageButton} onPress={() => navigation.navigate('chat')}>
+          <TouchableOpacity
+            style={styles.engageButton}
+            onPress={() => navigation.navigate('chat')}
+          >
             <Text style={styles.engageButtonText}>Engage Candidate</Text>
 
-                          <SendHorizontal width={18} height={18} color="#1F2937"/>
+            <SendHorizontal width={18} height={18} color="#1F2937" />
           </TouchableOpacity>
         )}
       </View>
@@ -195,7 +188,6 @@ const FulltimeScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
-
         <Text style={styles.headerTitle}>Full-Time roles</Text>
 
         <View>
@@ -220,9 +212,7 @@ const FulltimeScreen = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filterScroll}
       >
-        <TouchableOpacity
-          style={[styles.filterBtn, styles.filterBtnActive]}
-        >
+        <TouchableOpacity style={[styles.filterBtn, styles.filterBtnActive]}>
           <Text style={styles.filterBtnTextActive}>Position</Text>
           <ChevronDown size={20} color="#000" />
         </TouchableOpacity>
@@ -235,12 +225,11 @@ const FulltimeScreen = () => {
         <TouchableOpacity style={styles.filterBtn}>
           <Text style={styles.filterBtnText}>Location</Text>
           <ChevronDown size={20} color="#FFF" />
-              </TouchableOpacity>
-               <TouchableOpacity style={styles.filterBtn}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.filterBtn}>
           <Text style={styles.filterBtnText}>Period</Text>
           <ChevronDown size={20} color="#FFF" />
         </TouchableOpacity>
-
       </ScrollView>
 
       {/* List Header */}

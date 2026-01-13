@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     paddingBottom: 100,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   header: {
     flexDirection: 'row',
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginBottom:20
+    marginBottom: 20,
   },
   avatar: {
     width: 36,
@@ -87,13 +87,13 @@ const styles = StyleSheet.create({
     color: COLORS.yellow,
     fontSize: 16,
     fontFamily: 'InterDisplayMedium',
-    fontWeight:500
+    fontWeight: 500,
   },
   seeAllText: {
     color: COLORS.yellow,
     fontSize: 12,
     fontFamily: 'InterDisplayRegular',
-    fontWeight:400
+    fontWeight: 400,
   },
 
   // Recommended Card Styling
@@ -108,9 +108,9 @@ const styles = StyleSheet.create({
     padding: 8,
     justifyContent: 'space-between',
     borderTopLeftRadius: 12,
-    borderTopRightRadius: 12
+    borderTopRightRadius: 12,
   },
-  MainbadgeContainer:{
+  MainbadgeContainer: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
@@ -129,11 +129,11 @@ const styles = StyleSheet.create({
     color: COLORS.yellow,
     fontSize: 12,
     fontFamily: 'InterDisplayRegular',
-    fontWeight:400
+    fontWeight: 400,
   },
   profileRow: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   avatarCircle: {
     width: 40,
@@ -157,30 +157,30 @@ const styles = StyleSheet.create({
     fontWeight: 600,
     fontSize: 16,
     fontFamily: 'InterDisplaySemiBold',
-    marginBottom:4
+    marginBottom: 4,
   },
   verifiedContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4
+    gap: 4,
   },
   verifiedText: {
     color: COLORS.white,
     fontSize: 12,
     fontFamily: 'InterDisplayRegular',
-    fontWeight: 400
+    fontWeight: 400,
   },
 
   cardInfo: {
-    paddingHorizontal:10,
-    paddingVertical: 15,   
-    backgroundColor: COLORS.cardBg
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    backgroundColor: COLORS.cardBg,
   },
   rowBetween: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop:10
+    marginTop: 10,
   },
   roleTitle: {
     color: '#fff',
@@ -200,18 +200,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
     fontFamily: 'InterDisplayRegular',
-    fontWeight: 400
+    fontWeight: 400,
   },
 
   availabilityBox: {
     backgroundColor: COLORS.inputBg,
-    paddingHorizontal:17,
-    paddingVertical:15,
+    paddingHorizontal: 17,
+    paddingVertical: 15,
     borderRadius: 12,
     marginVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    gap:8
+    gap: 8,
   },
   availLabel: {
     color: COLORS.textSecondary,
@@ -219,11 +219,11 @@ const styles = StyleSheet.create({
     fontFamily: 'InterDisplayRegular',
     fontWeight: 400,
     marginBottom: 4,
-    opacity:0.84
+    opacity: 0.84,
   },
   availValue: {
     color: '#F5F5F5',
-    lineHeight:16,
+    lineHeight: 16,
     fontSize: 14,
     fontWeight: 500,
     fontFamily: 'InterDisplayMedium',
@@ -244,13 +244,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2A2A2A',
     alignSelf: 'flex-start',
-    marginTop:8,
+    marginTop: 8,
   },
   tagText: {
     color: '#fff',
     fontSize: 12,
     fontFamily: 'InterDisplayRegular',
-    fontWeight: 400
+    fontWeight: 400,
   },
 
   viewProfileBtn: {
@@ -275,9 +275,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 16,
   },
-  gigInfo:{
+  gigInfo: {
     flex: 1,
-    marginLeft: 12
+    marginLeft: 12,
   },
   locationText_gig: {
     color: '#fff',
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 100,
-    objectFit: 'cover'
+    objectFit: 'cover',
   },
   gigTitle: {
     color: '#fff',
@@ -313,13 +313,13 @@ const styles = StyleSheet.create({
     color: '#FFD900',
     fontSize: 12,
     fontFamily: 'InterDisplayRegular',
-    fontWeight: 400
+    fontWeight: 400,
   },
   gigTime: {
     color: '#fff',
     fontSize: 14,
     fontFamily: 'InterDisplayRegular',
-    fontWeight: 400
+    fontWeight: 400,
   },
   spotsText: {
     color: COLORS.yellow,

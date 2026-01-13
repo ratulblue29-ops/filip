@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
@@ -12,9 +12,9 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 15,
-    marginBottom:24,
-    },
-    notifDot: {
+    marginBottom: 24,
+  },
+  notifDot: {
     position: 'absolute',
     top: 0,
     right: 0,
@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#FF3D00',
     borderWidth: 1,
-    },
+  },
   input: {
     flex: 1,
     color: '#9CA3AF',
@@ -46,9 +46,9 @@ export const styles = StyleSheet.create({
   },
 
   filterScroll: {
-      alignItems: 'center',
-      height: 90,
-      marginBottom:10,
+    alignItems: 'center',
+    height: 90,
+    marginBottom: 10,
   },
   filterBtn: {
     flexDirection: 'row',
@@ -57,10 +57,10 @@ export const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 24,
     marginRight: 12,
-    backgroundColor:'#121212',
-    borderWidth:1,
-      borderColor: '#2A2A2A',
-    gap:8
+    backgroundColor: '#121212',
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+    gap: 8,
   },
   filterBtnActive: {
     backgroundColor: '#FFD900',
@@ -114,7 +114,7 @@ export const styles = StyleSheet.create({
     width: '100%',
     height: 120,
     objectFit: 'cover',
-    position:'relative'
+    position: 'relative',
   },
   statusBadge: {
     position: 'absolute',
@@ -240,7 +240,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#D4AF37'
+    borderColor: '#D4AF37',
   },
   lockButtonText: {
     color: '#FFF',

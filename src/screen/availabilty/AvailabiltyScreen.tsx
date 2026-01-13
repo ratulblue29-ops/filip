@@ -89,7 +89,8 @@ const AvailabilityScreen = () => {
           <TouchableOpacity style={[styles.chip, styles.activeChip]}>
             <Text style={styles.activeChipText}>Anytime</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.chip}>
+          <TouchableOpacity style={styles.chip}
+          onPress={() => navigator.navigate('Seasonal')}>
             <Text style={styles.chipText}>Seasonal</Text>
           </TouchableOpacity>
         </View>

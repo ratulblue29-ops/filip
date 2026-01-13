@@ -1,26 +1,26 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-    container: {
+  container: {
     flex: 1,
     backgroundColor: '#111',
-        paddingHorizontal: 20,
-    paddingBottom:60
+    paddingHorizontal: 20,
+    paddingBottom: 60
   },
   header: {
     paddingTop: 10,
     paddingBottom: 20,
   },
   headerTitle: {
-   color: '#FFF',
-fontFamily: 'InterDisplayMedium',
-fontSize: 16,
-fontWeight: 500,
-lineHeight: 22,
-letterSpacing: -0.18,
-textTransform: 'capitalize',
+    color: '#FFF',
+    fontFamily: 'InterDisplayMedium',
+    fontSize: 16,
+    fontWeight: 500,
+    lineHeight: 22,
+    letterSpacing: -0.18,
+    textTransform: 'capitalize',
   },
-searchContainer: {
+  searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1D1D1D',

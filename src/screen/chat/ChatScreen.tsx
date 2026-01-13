@@ -123,7 +123,7 @@ const ChatScreen: React.FC = () => {
         ))}
       </View>
 
-      {/* Message List */}
+      {/* Message list */}
       <ScrollView
         contentContainerStyle={styles.listPadding}
         showsVerticalScrollIndicator={false}

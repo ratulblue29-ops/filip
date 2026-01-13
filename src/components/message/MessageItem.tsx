@@ -1,18 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-
-// Interface for each message
-export interface MessageData {
-  id: string;
-  name: string;
-  role: string;
-  status: 'Offer Pending' | 'Hired' | 'Completed' | 'Inquiry' | 'Canceled';
-  statusColor: string;
-  statusTextColor: string;
-  message: string;
-  time: string;
-  image: string;
-}
+import { MessageData } from '../../@types/MessageData.type';
 
 interface MessageItemProps {
   item: MessageData;

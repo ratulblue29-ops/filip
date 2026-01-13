@@ -12,6 +12,7 @@ export type RootStackParamList = {
   BottomTabs: undefined;
   membership: undefined;
   purchase: undefined;
+  Seasonal: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

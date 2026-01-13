@@ -19,23 +19,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 500,
-    color: COLORS.white,
-    fontFamily: 'InterDisplayMedium',
-  },
-  notifDot: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 10,
-    height: 10,
-    borderRadius: 4,
-    backgroundColor: '#FF3D00',
-    borderWidth: 1,
-  },
-  searchContainer: {
+   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1D1D1D',
@@ -54,6 +38,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'InterDisplayRegular',
     fontWeight: 400,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 500,
+    color: COLORS.white,
+    fontFamily: 'InterDisplayMedium',
+  },
+  notifDot: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 4,
+    backgroundColor: '#FF3D00',
+    borderWidth: 1,
   },
   filterRow: { flexDirection: 'row', marginBottom: 24 },
   chip: {

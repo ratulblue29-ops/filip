@@ -17,7 +17,8 @@ import {
   Info, 
   Coffee, 
   Plus, 
-  SendHorizonal 
+  SendHorizonal, 
+  Send
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from './chatDetailStyle';
@@ -90,7 +91,7 @@ const ChatDetailScreen = () => {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ChevronLeft color="#fff" size={28} />
+            <ChevronLeft color="#fff" size={24} />
           </TouchableOpacity>
           <Image 
             source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} 
@@ -98,7 +99,7 @@ const ChatDetailScreen = () => {
           />
           <View>
             <Text style={styles.headerName}>Alex</Text>
-            <Text style={styles.headerStatus}>Barista. <Text style={{color: '#C5A35E'}}>Online</Text></Text>
+            <Text style={styles.headerStatus}>Barista. <Text>Online</Text></Text>
           </View>
         </View>
         <TouchableOpacity>
@@ -116,7 +117,7 @@ const ChatDetailScreen = () => {
           <Text style={styles.shiftSubtitle}>Today, 6:00 PM-10:00PM . $22/Hr</Text>
         </View>
         <TouchableOpacity>
-          <Info color="#C5A35E" size={24} />
+          <Info color="#F59E0B" size={24} />
         </TouchableOpacity>
       </View>
 
@@ -157,7 +158,7 @@ const ChatDetailScreen = () => {
           />
 
           <TouchableOpacity style={styles.sendButton}>
-            <SendHorizonal color="#000" size={20} />
+            <Send width={14} height={14} color="#fff" />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

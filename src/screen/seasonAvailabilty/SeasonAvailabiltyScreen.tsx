@@ -146,7 +146,7 @@ const SeasonAvailabiltyScreen = () => {
                 <Text style={styles.locationText}>{item.location}</Text>
               </View>
             </View>
-          </View>
+        </View>
 
       <View style={styles.cardContent}>
         <View style={styles.tagContainer}>

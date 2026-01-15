@@ -15,10 +15,12 @@ import NotificationScreen from '../screen/Notification/NotificationScreen';
 import HelpSupportScreen from '../screen/support/HelpSupportScreen';
 import TermsConditionsScreen from '../screen/termsCondition/TearmsConditionScreen';
 import SendOfferScreen from '../screen/offer/SendOfferScreen';
+import SignUpScreen from '../screen/login/SignUpScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
+  signup: undefined;
   BottomTabs: undefined;
   membership: undefined;
   purchase: undefined;
@@ -46,6 +48,7 @@ const RootNavigator: React.FC = () => {
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="signup" component={SignUpScreen} />
       <Stack.Screen name="membership" component={MemberShipScreen} />
       <Stack.Screen name="purchase" component={PurchaseScreen} />
       <Stack.Screen name="fulltime" component={ChatScreen} />

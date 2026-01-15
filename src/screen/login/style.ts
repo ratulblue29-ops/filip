@@ -4,6 +4,10 @@ const bgColor = '#111';
 const buttonColor = '#FFD900';
 
 const styles = StyleSheet.create({
+  signupContainer: {
+    justifyContent: 'flex-start',
+    paddingTop: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: bgColor,
@@ -11,7 +15,14 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     justifyContent: 'center',
   },
-
+  SignupTittle: {
+    fontSize: 24,
+    fontWeight: 500,
+    fontFamily: 'InterDisplayMedium',
+    textAlign: 'center',
+    marginBottom: 32,
+    color: 'white',
+  },
   title: {
     color: '#fff',
     fontSize: 32,
@@ -20,7 +31,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 8,
   },
-
+  signDoyouHave: {
+    marginTop: 32,
+  },
   span: {
     fontStyle: 'italic',
   },
@@ -31,6 +44,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 64,
+  },
+  signupSubtext: {
+    fontSize: 16,
+    color: '#fff',
   },
 
   label: {
@@ -86,6 +103,9 @@ const styles = StyleSheet.create({
     fontFamily: 'InterDisplayBold',
     fontSize: 16,
     fontWeight: 700,
+  },
+  signupBtn: {
+    marginTop: 72,
   },
   button: {
     paddingVertical: 12,
@@ -154,6 +174,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
     justifyContent: 'center',
+  },
+
+  radioWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    marginTop: 15,
+  },
+  signupWrapper: {
+    marginBottom: 16,
+  },
+  radio: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderRadius: 4,
+    borderColor: '#999',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  radioSelected: {
+    borderColor: '#D1D5DB',
+  },
+  radioInner: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    backgroundColor: '#D1D5DB',
+  },
+  text: {
+    color: '#fff',
+    flex: 1,
+    fontSize: 12,
+    fontFamily: 'InterDisplayRegular',
+    fontWeight: 400,
+    maxWidth: 280,
+    lineHeight: 16,
+  },
+  link: {
+    textDecorationLine: 'underline',
   },
 });
 

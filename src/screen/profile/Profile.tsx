@@ -94,7 +94,7 @@ const Profile = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Settings</Text>
@@ -104,7 +104,9 @@ const Profile = () => {
         {/* Profile Section */}
         <View style={styles.profileSection}>
           <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=800' }}
+            source={{
+              uri: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=800',
+            }}
             style={styles.profileImage}
           />
           <Text style={styles.userName}>Daniel Martinez</Text>
@@ -113,7 +115,7 @@ const Profile = () => {
 
         {/* Menu Items */}
         <View style={styles.menuSection}>
-          {menuItems.map((item) => {
+          {menuItems.map(item => {
             const IconComponent = item.icon;
             return (
               <TouchableOpacity

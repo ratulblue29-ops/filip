@@ -14,6 +14,7 @@ import EngagementScreen from '../screen/Engagement/EngagementScreen';
 import NotificationScreen from '../screen/Notification/NotificationScreen';
 import HelpSupportScreen from '../screen/support/HelpSupportScreen';
 import TermsConditionsScreen from '../screen/termsCondition/TearmsConditionScreen';
+import SendOfferScreen from '../screen/offer/SendOfferScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -27,11 +28,12 @@ export type RootStackParamList = {
   ChatDetailScreen: undefined;
   credit: undefined;
   offer: undefined;
-  language: undefined;  
+  language: undefined;
   engagement: undefined;
   notification: undefined;
   HelpSupport: undefined;
   TermsConditions: undefined;
+  sendoffer: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -56,6 +58,7 @@ const RootNavigator: React.FC = () => {
       <Stack.Screen name="notification" component={NotificationScreen} />
       <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
       <Stack.Screen name="TermsConditions" component={TermsConditionsScreen} />
+      <Stack.Screen name="sendoffer" component={SendOfferScreen} />
       <Stack.Screen name="BottomTabs" component={BottomTabs} />
     </Stack.Navigator>
   );

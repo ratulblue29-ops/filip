@@ -17,7 +17,6 @@ import BadgeIcon from '../../components/svg/BadgeIcon';
 const EngagementScreen = () => {
   const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('received');
-
   const handleGoBack = () => {
     navigation.goBack();
   };
@@ -168,8 +167,7 @@ const EngagementScreen = () => {
                           styles.statusTextActionNeeded,
                         offer.status === 'accepted' &&
                           styles.statusTextAccepted,
-                        offer.status === 'pending' &&
-                          styles.statusTextPending,
+                        offer.status === 'pending' && styles.statusTextPending,
                         offer.status === 'rejected' &&
                           styles.statusTextRejected,
                       ]}

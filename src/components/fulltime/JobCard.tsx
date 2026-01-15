@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   applyButton: {
-    backgroundColor: '#FBBF24',
+    backgroundColor: '#FFD900',
     paddingVertical: 8,
     borderRadius: 8,
     alignItems: 'center',

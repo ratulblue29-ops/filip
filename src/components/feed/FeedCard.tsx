@@ -3,8 +3,10 @@ import { Text, View, TouchableOpacity, ImageBackground } from 'react-native';
 import { BadgeCheck, Clock, Heart } from 'lucide-react-native';
 import styles from '../../screen/feed/style';
 import { feedData } from '../../@types/FeedData.type';
+import { useNavigation } from '@react-navigation/native';
 
 const FeedCard = ({ item }: { item: feedData }) => {
+  const navigation = useNavigation<any>()
   return (
     <View key={item.id} style={styles.recCard}>
       <ImageBackground source={{ uri: item.image }} style={styles.cardImage}>
@@ -59,7 +61,7 @@ const FeedCard = ({ item }: { item: feedData }) => {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.viewProfileBtn}>
+        <TouchableOpacity style={styles.viewProfileBtn} onPress={() => navigation.navigate('viewprofile')}>
           <Text style={styles.viewProfileText}>View Profile</Text>
         </TouchableOpacity>
       </View>

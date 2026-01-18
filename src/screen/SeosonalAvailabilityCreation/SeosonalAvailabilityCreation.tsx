@@ -20,7 +20,7 @@ import {
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './style';
-
+import { Alert } from 'react-native';
 type MarkedDates = {
     [key: string]: {
         selected?: boolean;
@@ -109,16 +109,23 @@ const SeosonalAvailabilityCreationScreen = () => {
         return `${month} ${day},\n${year}`;
     };
 
+    const handlePost = () => {
+        Alert.alert(
+            'Success',
+            'Availability posted successfully',
+            [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" />
-
             <View style={styles.header}>
                 <TouchableOpacity onPress={handleGoBack} activeOpacity={0.7}>
                     <Text style={styles.cancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <Text style={styles.title}>Create Availability</Text>
-                <TouchableOpacity activeOpacity={0.7}>
+                <TouchableOpacity onPress={handlePost} activeOpacity={0.7}>
                     <Text style={styles.postText}>Post</Text>
                 </TouchableOpacity>
             </View>

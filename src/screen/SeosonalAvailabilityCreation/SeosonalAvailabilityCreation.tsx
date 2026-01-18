@@ -269,7 +269,9 @@ const SeosonalAvailabilityCreationScreen = () => {
                     <Text style={styles.sectionTitle}>Resume/CV</Text>
                     <View style={styles.fileCard}>
                         <View style={styles.fileLeft}>
-                            <File width={20} height={20} color="#FFD900" />
+                            <View style={styles.fileIcon}>
+                                <File width={24} height={24} color="#fff" />
+                            </View>
                             <View>
                                 <Text style={styles.fileName}>Alex_mixologist_cv_2025.Pdf</Text>
                                 <Text style={styles.fileSubtext}>Uploaded 2 days ago</Text>
@@ -284,7 +286,9 @@ const SeosonalAvailabilityCreationScreen = () => {
                 <View style={styles.section}>
                     <View style={styles.toggleCard}>
                         <View style={styles.toggleLeft}>
-                            <Eye width={20} height={20} color="#FFD900" />
+                            <View style={styles.fileIcon}>
+                                <Eye width={24} height={24} color="#fff" />
+                            </View>
                             <View>
                                 <Text style={styles.toggleTitle}>Active Post</Text>
                                 <Text style={styles.toggleSubtext}>

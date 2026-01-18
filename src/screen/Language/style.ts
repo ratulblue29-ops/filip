@@ -76,11 +76,20 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
     backgroundColor: '#1A1A1A',
   },
+  skillItem: {
+    borderColor: '#374151',
+    borderRadius: 8,
+  },
+  skillleft: {
+    gap: 12,
+    paddingVertical: 8
+  },
   languageLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
+
   flagIcon: {
     height: 25,
     marginRight: 12,
@@ -95,6 +104,18 @@ const styles = StyleSheet.create({
     fontFamily: 'InterDisplaySemiBold',
     letterSpacing: -0.18,
     textTransform: 'capitalize',
+  },
+  skilltext: {
+    paddingHorizontal: 20,
+    fontSize: 14,
+    fontWeight: 400,
+    color: COLORS.white,
+    fontFamily: 'InterDisplayRegular',
+    letterSpacing: 0,
+    textTransform: 'capitalize',
+    maxWidth: 300,
+    paddingVertical: 32,
+    lineHeight: 20
   },
   defaultText: {
     fontSize: 12,
@@ -117,6 +138,9 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     gap: 8,
   },
+  saverole: {
+    paddingVertical: 14,
+  },
   saveButtonText: {
     fontSize: 16,
     fontWeight: 900,
@@ -125,6 +149,26 @@ const styles = StyleSheet.create({
     letterSpacing: -0.18,
     textTransform: 'capitalize',
   },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderWidth: 2,
+    borderColor: '#FFD900',
+    borderRadius: 4, // square with slight curve
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  checkboxChecked: {
+    backgroundColor: '#FFD900',
+  },
+
+  checkmark: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+
 });
 
 export default styles;

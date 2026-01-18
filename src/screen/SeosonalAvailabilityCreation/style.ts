@@ -252,10 +252,19 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     fileName: {
-        fontSize: 14,
-        fontWeight: '500',
+        fontSize: 16,
+        fontWeight: 600,
         color: COLORS.white,
-        fontFamily: 'InterDisplayMedium',
+        fontFamily: 'InterDisplay-SemiBold',
+        marginBottom: 8
+    },
+    fileIcon: {
+        width: 44,
+        height: 44,
+        backgroundColor: '#000',
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     fileSubtext: {
         fontSize: 12,

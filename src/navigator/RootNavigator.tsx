@@ -18,6 +18,8 @@ import SendOfferScreen from '../screen/offer/SendOfferScreen';
 import SignUpScreen from '../screen/login/SignUpScreen';
 import ReferralScreen from '../screen/referral/ReferralScreen ';
 import SettingScreen from '../screen/profile/SettingScreen';
+import PostedAvailabilitiesScreen from '../screen/mypost/PostedAvailabilitiesScreen';
+import SeosonalAvailabilityCreation from '../screen/SeosonalAvailabilityCreation/SeosonalAvailabilityCreation';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -40,6 +42,8 @@ export type RootStackParamList = {
   sendoffer: undefined;
   referral: undefined;
   profile: undefined;
+  postAvailabilites: undefined;
+  SeosonalAvailabilityCreation: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -68,6 +72,8 @@ const RootNavigator: React.FC = () => {
       <Stack.Screen name="sendoffer" component={SendOfferScreen} />
       <Stack.Screen name="referral" component={ReferralScreen} />
       <Stack.Screen name="profile" component={SettingScreen} />
+      <Stack.Screen name="postAvailabilites" component={PostedAvailabilitiesScreen} />
+      <Stack.Screen name="SeosonalAvailabilityCreation" component={SeosonalAvailabilityCreation} />
       <Stack.Screen name="BottomTabs" component={BottomTabs} />
     </Stack.Navigator>
   );

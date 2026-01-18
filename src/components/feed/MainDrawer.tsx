@@ -96,12 +96,12 @@ const MainDrawer = () => {
               <View style={styles.iconCircle}>
                 <PlusCircleIcon width={20} height={18} color="#FFF" />
               </View>
-              <View>
+              <TouchableOpacity onPress={() => navigation.navigate('postAvailabilites')}>
                 <Text style={styles.menuText}>My Posted Availability</Text>
                 <Text style={styles.menuSubtext}>
                   Post & See Availabilities
                 </Text>
-              </View>
+              </TouchableOpacity>
             </View>
             <ChevronRight width={20} height={20} color="#9CA3AF" />
           </TouchableOpacity>

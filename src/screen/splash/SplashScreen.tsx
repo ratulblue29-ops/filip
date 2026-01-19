@@ -10,7 +10,7 @@ const SplashScreen = ({ navigation }: Props) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.replace('Login');
-    }, 3000);
+    }, 300000000000000);
 
     return () => clearTimeout(timer);
   }, [navigation]);
@@ -19,7 +19,7 @@ const SplashScreen = ({ navigation }: Props) => {
     <SafeAreaView style={styles.container}>
       <Image
         style={styles.logo}
-        source={require('../../../assets/images/GoldShift.png')}
+        source={require('../../../assets/images/logofinal.png')}
       />
       <View style={styles.text_wrapper}>
         <Text style={styles.title}>Find the Best Talent</Text>

@@ -9,10 +9,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 290,
-    height: 98,
+    width: 110,
+    height: 110,
     objectFit: 'contain',
-    marginBottom: 45,
+    marginBottom: 24,
   },
   text_wrapper: {},
   title: {

@@ -4,12 +4,25 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigator/RootNavigator';
 import styles from './style';
+import auth from '@react-native-firebase/auth';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
 const SplashScreen = ({ navigation }: Props) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Login');
+      const user = auth().currentUser;
+      if (user) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'BottomTabs' }]
+        });
+      }
+      else {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }]
+        })
+      }
     }, 2000);
 
     return () => clearTimeout(timer);

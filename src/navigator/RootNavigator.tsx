@@ -1,7 +1,12 @@
+
 import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginScreen from '../screen/login/LoginScreen';
+import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { getAuth } from '@react-native-firebase/auth';
+
+
 import SplashScreen from '../screen/splash/SplashScreen';
+import LoginScreen from '../screen/login/LoginScreen';
+import SignUpScreen from '../screen/login/SignUpScreen';
 import BottomTabs from './Buttomtabs';
 import MemberShipScreen from '../screen/membership/MemberShipScreen';
 import PurchaseScreen from '../screen/purchase/PurchaseScreen';
@@ -15,13 +20,12 @@ import NotificationScreen from '../screen/Notification/NotificationScreen';
 import HelpSupportScreen from '../screen/support/HelpSupportScreen';
 import TermsConditionsScreen from '../screen/termsCondition/TearmsConditionScreen';
 import SendOfferScreen from '../screen/offer/SendOfferScreen';
-import SignUpScreen from '../screen/login/SignUpScreen';
-import ReferralScreen from '../screen/referral/ReferralScreen ';
 import SettingScreen from '../screen/profile/SettingScreen';
 import PostedAvailabilitiesScreen from '../screen/mypost/PostedAvailabilitiesScreen';
 import SeosonalAvailabilityCreation from '../screen/SeosonalAvailabilityCreation/SeosonalAvailabilityCreation';
 import ViewProfile from '../screen/profile/ViewProfileScreen';
 import RoleScreen from '../screen/profile/RoleScreen';
+import ReferralScreen from '../screen/referral/ReferralScreen ';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -52,35 +56,59 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+type PrivateScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList>;
+  children: React.ReactNode;
+};
+
+const PrivateScreen: React.FC<PrivateScreenProps> = ({ navigation, children }) => {
+  const user = getAuth().currentUser; // modular API
+
+  if (!user) {
+    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    return null;
+  }
+
+  return <>{children}</>;
+};
+
+const withPrivate = <T extends object>(Screen: React.ComponentType<T>) => {
+  return (props: T & { navigation: NativeStackNavigationProp<RootStackParamList> }) => (
+    <PrivateScreen navigation={props.navigation}>
+      <Screen {...props} />
+    </PrivateScreen>
+  );
+};
+
 const RootNavigator: React.FC = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="Splash"
-      screenOptions={{ headerShown: false }}
-    >
+    <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      {/* Public screens */}
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="signup" component={SignUpScreen} />
-      <Stack.Screen name="membership" component={MemberShipScreen} />
-      <Stack.Screen name="purchase" component={PurchaseScreen} />
-      <Stack.Screen name="fulltime" component={ChatScreen} />
-      <Stack.Screen name="chat" component={ChatScreen} />
-      <Stack.Screen name="ChatDetailScreen" component={ChatDetailScreen} />
-      <Stack.Screen name="credit" component={CreditsScreen} />
-      <Stack.Screen name="offer" component={OfferScreen} />
-      <Stack.Screen name="language" component={LanguageScreen} />
-      <Stack.Screen name="engagement" component={EngagementScreen} />
-      <Stack.Screen name="notification" component={NotificationScreen} />
-      <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
-      <Stack.Screen name="TermsConditions" component={TermsConditionsScreen} />
-      <Stack.Screen name="sendoffer" component={SendOfferScreen} />
-      <Stack.Screen name="referral" component={ReferralScreen} />
-      <Stack.Screen name="profile" component={SettingScreen} />
-      <Stack.Screen name="postAvailabilites" component={PostedAvailabilitiesScreen} />
-      <Stack.Screen name="SeosonalAvailabilityCreation" component={SeosonalAvailabilityCreation} />
-      <Stack.Screen name="viewprofile" component={ViewProfile} />
-      <Stack.Screen name="role" component={RoleScreen} />
-      <Stack.Screen name="BottomTabs" component={BottomTabs} />
+
+      {/* Private screens */}
+      <Stack.Screen name="BottomTabs" component={withPrivate(BottomTabs)} />
+      <Stack.Screen name="membership" component={withPrivate(MemberShipScreen)} />
+      <Stack.Screen name="purchase" component={withPrivate(PurchaseScreen)} />
+      <Stack.Screen name="fulltime" component={withPrivate(ChatScreen)} />
+      <Stack.Screen name="chat" component={withPrivate(ChatScreen)} />
+      <Stack.Screen name="ChatDetailScreen" component={withPrivate(ChatDetailScreen)} />
+      <Stack.Screen name="credit" component={withPrivate(CreditsScreen)} />
+      <Stack.Screen name="offer" component={withPrivate(OfferScreen)} />
+      <Stack.Screen name="language" component={withPrivate(LanguageScreen)} />
+      <Stack.Screen name="engagement" component={withPrivate(EngagementScreen)} />
+      <Stack.Screen name="notification" component={withPrivate(NotificationScreen)} />
+      <Stack.Screen name="HelpSupport" component={withPrivate(HelpSupportScreen)} />
+      <Stack.Screen name="TermsConditions" component={withPrivate(TermsConditionsScreen)} />
+      <Stack.Screen name="sendoffer" component={withPrivate(SendOfferScreen)} />
+      <Stack.Screen name="referral" component={withPrivate(ReferralScreen)} />
+      <Stack.Screen name="profile" component={withPrivate(SettingScreen)} />
+      <Stack.Screen name="postAvailabilites" component={withPrivate(PostedAvailabilitiesScreen)} />
+      <Stack.Screen name="SeosonalAvailabilityCreation" component={withPrivate(SeosonalAvailabilityCreation)} />
+      <Stack.Screen name="viewprofile" component={withPrivate(ViewProfile)} />
+      <Stack.Screen name="role" component={withPrivate(RoleScreen)} />
     </Stack.Navigator>
   );
 };

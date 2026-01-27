@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Text,
     View,
@@ -9,13 +9,32 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Bell, ChevronRight, CookingPot, Martini, CircleSlash, Calendar } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { getAuth } from '@react-native-firebase/auth';
 import TrophyIcon from '../../components/svg/TrophyIcon';
 import styles from './style';
-
+import { getFirestore, doc, getDoc } from '@react-native-firebase/firestore';
 const PostedAvailabilitiesScreen = () => {
     const navigation = useNavigation<any>();
     const [activeTab, setActiveTab] = useState('all');
+    const [userRole, setUserRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const user = getAuth().currentUser;
+            if (!user) return;
+
+            const userRef = doc(getFirestore(), 'users', user.uid);
+            const userDoc = await getDoc(userRef);
+
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                setUserRole(data?.role);
+            }
+        };
+
+        fetchUserRole();
+    }, []);
+
     const availabilities = [
         {
             id: '1',
@@ -232,14 +251,15 @@ const PostedAvailabilitiesScreen = () => {
                     </TouchableOpacity>
                 ))}
             </ScrollView>
-
-            <TouchableOpacity
-                style={styles.addButton}
-                activeOpacity={0.7}
-                onPress={handleAddNew}
-            >
-                <Text style={styles.addButtonText}>+ Post New</Text>
-            </TouchableOpacity>
+            {userRole !== 'worker' && (
+                <TouchableOpacity
+                    style={styles.addButton}
+                    activeOpacity={0.7}
+                    onPress={handleAddNew}
+                >
+                    <Text style={styles.addButtonText}>+ Post New</Text>
+                </TouchableOpacity>
+            )}
         </SafeAreaView>
     );
 };

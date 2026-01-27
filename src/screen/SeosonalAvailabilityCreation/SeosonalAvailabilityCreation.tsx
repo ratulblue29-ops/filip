@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
     Text,
@@ -6,76 +7,65 @@ import {
     TouchableOpacity,
     StatusBar,
     TextInput,
-    Switch,
-    Alert,
-    ToastAndroid,
-    Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Calendar } from 'react-native-calendars';
-import {
-    X,
-    BriefcaseBusiness,
-    CircleCheck,
-    Calendar as CalendarIcon,
-    Eye,
-    File
-} from 'lucide-react-native';
+import { X, Calendar as CalendarIcon } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './style';
-import { getAuth } from '@react-native-firebase/auth';
-import { getFirestore, collection, addDoc, serverTimestamp } from '@react-native-firebase/firestore';
 
-type MarkedDates = {
-    [key: string]: {
-        selected?: boolean;
-        startingDay?: boolean;
-        endingDay?: boolean;
-        color?: string;
-        textColor?: string;
-    };
-};
+import { getAuth } from '@react-native-firebase/auth';
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp,
+} from '@react-native-firebase/firestore';
+
+import CalenderCompo from '../../components/availiability/CalendarCompo';
+// import Resume from '../../components/availiability/Resume';
+import Active from '../../components/availiability/Active';
+import AvailiablityHeading from '../../components/availiability/AvailiablityHeading';
+import Toast from 'react-native-toast-message';
+import AvilabilityLocation from '../../components/availiability/AvilabilityLocation';
+import AvailiabilityCategory from '../../components/availiability/AvailiabilityCategory';
+import { addItemToList, removeItemFromList } from '../../helper/listHelper';
+import UploadBanner from '../../components/availiability/UploadBanner';
 
 const SeosonalAvailabilityCreationScreen = () => {
     const navigation = useNavigation<any>();
+    const [bannerImage, setBannerImage] = useState<string | null>(null);
     const [startDate, setStartDate] = useState('2025-02-03');
     const [endDate, setEndDate] = useState('2025-02-07');
-    const [locations, setLocations] = useState(['New York, NY']);
+
+    const [locations, setLocations] = useState<string[]>([]);
     const [newLocation, setNewLocation] = useState('');
+
+    const [categoryInput, setCategoryInput] = useState('');
+    const [categories, setCategories] = useState<string[]>([]);
+
     const [aboutText, setAboutText] = useState('');
     const [isActive, setIsActive] = useState(true);
+    const [title, setTitle] = useState('');
+
     const authInstance = getAuth();
     const db = getFirestore();
-    const handleGoBack = () => {
-        navigation.goBack();
-    };
 
-    const removeLocation = (index: number) => {
-        const updatedLocations = locations.filter((_, i) => i !== index);
-        setLocations(updatedLocations);
-    };
+    const handleGoBack = () => navigation.goBack();
 
-    const getMarkedDates = (): MarkedDates => {
-        const marked: MarkedDates = {};
-        if (!startDate || !endDate) return marked;
+    /* LOCATION */
+    const addLocation = () =>
+        addItemToList(newLocation, setNewLocation, setLocations);
 
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const current = new Date(start);
+    const removeLocation = (index: number) =>
+        removeItemFromList(index, setLocations);
 
-        while (current <= end) {
-            const dateStr = current.toISOString().split('T')[0];
-            marked[dateStr] = {
-                selected: true,
-                color: '#FFD900',
-                textColor: '#111111',
-                startingDay: dateStr === startDate,
-                endingDay: dateStr === endDate,
-            };
-            current.setDate(current.getDate() + 1);
-        }
-        return marked;
-    };
+
+    /*CATEGORY */
+    const addCategory = () =>
+        addItemToList(categoryInput, setCategoryInput, setCategories);
+
+    const removeCategory = (index: number) =>
+        removeItemFromList(index, setCategories);
 
 
     const formatDateDisplay = (dateStr: string) => {
@@ -86,65 +76,92 @@ const SeosonalAvailabilityCreationScreen = () => {
         return `${month} ${day},\n${year}`;
     };
 
-    const addLocation = () => {
-        if (newLocation.trim() !== '') {
-            setLocations([...locations, newLocation.trim()]);
-            setNewLocation('');
-        }
-    };
-
+    /* FIREBASE JOB POST*/
     const handleTost = async () => {
         try {
             const user = authInstance.currentUser;
+
             if (!user) {
-                Alert.alert('Error', 'User not authenticated');
+                Toast.show({
+                    type: 'error',
+                    text1: 'User not authenticated',
+                });
                 return;
             }
+
+            if (!title.trim()) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Title required',
+                });
+                return;
+            }
+
+            if (categories.length === 0) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Please add a category',
+                });
+                return;
+            }
+
             const jobPost = {
                 userId: user.uid,
-                title: 'Event Server',
-                category: 'Hospitality',
+                title: title,
+                category: categories[0],
+
                 type: 'seasonal',
-                description:
-                    'Serve guests during a private event. Experience preferred.',
+
+                description: aboutText || 'No description provided.',
+                bannerImage: bannerImage || '',
+
                 schedule: {
                     start: `${startDate}T18:00:00Z`,
                     end: `${endDate}T02:00:00Z`,
                 },
-                location: 'New York, NY',
+
+                location: locations,
+
                 rate: {
                     amount: 25,
                     unit: 'hour',
                 },
+
                 requiredSkills: ['Serving', 'Wine Knowledge'],
+
                 positions: {
                     total: 5,
                     filled: 0,
                 },
-                status: isActive ? 'open' : 'inactive',
+
+                status: isActive ? 'open' : 'cancelled',
+
                 visibility: {
                     priority: false,
                     creditUsed: 0,
                 },
+
                 applicationsCount: 0,
+
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             };
 
             await addDoc(collection(db, 'jobs'), jobPost);
 
-            const message = 'Job posted successfully';
-
-            if (Platform.OS === 'android') {
-                ToastAndroid.showWithGravity(message, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
-            } else {
-                Alert.alert('Success', message);
-            }
+            Toast.show({
+                type: 'success',
+                text1: 'Job Posted',
+                text2: 'Your job has been posted successfully.',
+            });
 
             navigation.goBack();
         } catch (error) {
-            console.error(error);
-            Alert.alert('Error', 'Something went wrong. Please try again.');
+            Toast.show({
+                type: 'error',
+                text1: 'Error posting job',
+                text2: (error as Error).message,
+            });
         }
     };
 
@@ -168,37 +185,25 @@ const SeosonalAvailabilityCreationScreen = () => {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Job Details</Text>
-                    <Text style={styles.subsectionTitle}>Target Position</Text>
-                    <View style={styles.jobCard}>
-                        <BriefcaseBusiness width={24} height={24} color="hsla(220, 13%, 91%, 0.85)" />
-                        <TextInput
-                            style={styles.jobText}
-                            placeholder="Enter job title"
-                            placeholderTextColor='hsla(220, 13%, 91%, 0.85)'
-                        />
-                        <CircleCheck width={24} height={24} color="#FFD900" />
-                    </View>
-                </View>
+                {/* Title */}
+                <AvailiablityHeading setTitle={setTitle} />
+                {/* Banner Upload */}
+                <UploadBanner bannerImage={bannerImage} setBannerImage={setBannerImage} />
 
+                {/* Availability */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Availability</Text>
-                    <View style={styles.labeldateRow}>
-                        <Text style={styles.dateLabel}>Start Date</Text>
-                        <Text style={styles.dateLabel}>End Date</Text>
-                    </View>
 
                     <View style={styles.dateRow}>
                         <View style={styles.dateCard}>
-                            <CalendarIcon width={24} height={24} color="#ffffff" />
+                            <CalendarIcon color="#fff" size={24} />
                             <Text style={styles.dateValue}>
                                 {formatDateDisplay(startDate)}
                             </Text>
                         </View>
 
                         <View style={styles.dateCard}>
-                            <CalendarIcon width={24} height={24} color="#ffffff" />
+                            <CalendarIcon color="#fff" size={24} />
                             <Text style={styles.dateValue}>
                                 {formatDateDisplay(endDate)}
                             </Text>
@@ -206,71 +211,33 @@ const SeosonalAvailabilityCreationScreen = () => {
                     </View>
                 </View>
 
-                <Calendar
-                    current="2025-02-01"
-                    markingType="period"
-                    markedDates={getMarkedDates()}
-                    onDayPress={(day) => {
-                        if (!startDate || (startDate && endDate)) {
-                            setStartDate(day.dateString);
-                            setEndDate('');
-                        } else {
-                            if (new Date(day.dateString) < new Date(startDate)) {
-                                setStartDate(day.dateString);
-                            } else {
-                                setEndDate(day.dateString);
-                            }
-                        }
-                    }}
-                    theme={{
-                        calendarBackground: '#1E1E1E',
-                        textSectionTitleColor: '#FFD900',
-                        selectedDayBackgroundColor: '#FFD900',
-                        selectedDayTextColor: '#111111',
-                        todayTextColor: '#FFD900',
-                        dayTextColor: '#FFFFFF',
-                        textDisabledColor: '#666666',
-                        monthTextColor: '#FFFFFF',
-                        textMonthFontFamily: 'InterDisplayMedium',
-                        textDayFontFamily: 'InterDisplayRegular',
-                        textMonthFontWeight: '500' as any,
-                        textDayFontWeight: '400' as any,
-                        textDayHeaderFontFamily: 'InterDisplayMedium',
-                        arrowColor: '#FFD900',
-                        textDayHeaderFontSize: 18,
-                    }}
-                    style={{
-                        borderRadius: 16,
-                        padding: 10,
-                    }}
+                <CalenderCompo
+                    startDate={startDate}
+                    endDate={endDate}
+                    setStartDate={setStartDate}
+                    setEndDate={setEndDate}
                 />
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Preferences</Text>
-                    <Text style={styles.subsectionTitle}>Preferred Location</Text>
-                    <View style={styles.addLocationRow}>
-                        <TextInput
-                            style={[styles.jobText, { flex: 1 }]}
-                            placeholder="Add location..."
-                            placeholderTextColor="#9CA3AF"
-                            value={newLocation}
-                            onChangeText={setNewLocation}
-                        />
-                        <TouchableOpacity onPress={addLocation} style={styles.addLocationButton} activeOpacity={0.7}>
-                            <Text>Add</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.locationsContainer}>
-                        {locations.map((location, index) => (
-                            <View key={index} style={styles.locationChip}>
-                                <Text style={styles.locationText}>{location}</Text>
-                                <TouchableOpacity onPress={() => removeLocation(index)} activeOpacity={0.7}>
-                                    <X width={16} height={16} color="#FFFFFF" />
-                                </TouchableOpacity>
-                            </View>
-                        ))}
-                    </View>
-                </View>
 
+                {/* Category */}
+                <AvailiabilityCategory
+                    categoryInput={categoryInput}
+                    setCategoryInput={setCategoryInput}
+                    categories={categories}
+                    removeCategory={removeCategory}
+                    addCategory={addCategory}
+                />
+
+                {/* Locations */}
+                <AvilabilityLocation
+                    newLocation={newLocation}
+                    setNewLocation={setNewLocation}
+                    locations={locations}
+                    removeLocation={removeLocation}
+                    addLocation={addLocation}
+                />
+
+
+                {/* About */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>About You</Text>
                     <TextInput
@@ -284,43 +251,8 @@ const SeosonalAvailabilityCreationScreen = () => {
                     />
                 </View>
 
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Resume/CV</Text>
-                    <View style={styles.fileCard}>
-                        <View style={styles.fileLeft}>
-                            <View style={styles.fileIcon}>
-                                <File width={24} height={24} color="#fff" />
-                            </View>
-                            <View>
-                                <Text style={styles.fileName}>Alex_mixologist_cv_2025.Pdf</Text>
-                                <Text style={styles.fileSubtext}>Uploaded 2 days ago</Text>
-                            </View>
-                        </View>
-                        <TouchableOpacity activeOpacity={0.7}>
-                            <X width={20} height={20} color="#9CA3AF" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.section}>
-                    <View style={styles.toggleCard}>
-                        <View style={styles.toggleLeft}>
-                            <View style={styles.fileIcon}>
-                                <Eye width={24} height={24} color="#fff" />
-                            </View>
-                            <View>
-                                <Text style={styles.toggleTitle}>Active Post</Text>
-                                <Text style={styles.toggleSubtext}>
-                                    Immediately Visible To Employers
-                                </Text>
-                            </View>
-                        </View>
-                        <Switch
-                            value={isActive}
-                            onValueChange={setIsActive}
-                            trackColor={{ false: '#2A2A2A', true: '#FFD900' }}
-                        />
-                    </View>
-                </View>
+                {/* <Resume /> */}
+                <Active isActive={isActive} setIsActive={setIsActive} />
             </ScrollView>
         </SafeAreaView>
     );

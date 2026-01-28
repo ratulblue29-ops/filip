@@ -9,10 +9,9 @@ import {
     Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CameraIcon, MapPin, Plus, } from 'lucide-react-native';
+import { CameraIcon, MapPin, } from 'lucide-react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import styles from './mainProfileStyle';
-import { useNavigation } from '@react-navigation/native';
 import SkillInput from '../../components/profile/SkillInput';
 
 
@@ -37,7 +36,6 @@ const MainProfile: React.FC = () => {
         setSkills(prev => [...prev, skillInput.trim()]);
         setSkillInput('');
     };
-    const navigation = useNavigation<any>();
 
     return (
         <SafeAreaView style={styles.safeArea}>

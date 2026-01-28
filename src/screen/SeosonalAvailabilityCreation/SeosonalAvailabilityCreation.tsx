@@ -16,7 +16,6 @@ import Toast from 'react-native-toast-message';
 import styles from './style';
 
 import CalenderCompo from '../../components/availiability/CalendarCompo';
-import Active from '../../components/availiability/Active';
 import AvailiablityHeading from '../../components/availiability/AvailiablityHeading';
 import AvilabilityLocation from '../../components/availiability/AvilabilityLocation';
 import AvailiabilityCategory from '../../components/availiability/AvailiabilityCategory';
@@ -28,7 +27,6 @@ import { createJob } from '../../services/jobs';
 const SeasonalAvailabilityCreationScreen = () => {
     const navigation = useNavigation<any>();
     const queryClient = useQueryClient();
-
     // States
     const [bannerImage, setBannerImage] = useState<string | null>(null);
     const [startDate, setStartDate] = useState('');
@@ -61,12 +59,10 @@ const SeasonalAvailabilityCreationScreen = () => {
     };
 
     const handleGoBack = () => navigation.goBack();
-
-    // Determine current priority based on end date
+    // priority status based on end date
     const getPriorityStatus = () => {
         const now = new Date();
         const end = new Date(endDate);
-
         if (now > end) return 'expired';
         return 'active';
     };
@@ -91,7 +87,7 @@ const SeasonalAvailabilityCreationScreen = () => {
                 requiredSkills: categories,
                 positions: { total: 5, filled: 0 },
                 visibility: {
-                    priority: getPriorityStatus(), // 'active' | 'expired'
+                    priority: getPriorityStatus(),
                     creditUsed: 0,
                     consumed: 0,
                     withdrawn: 0,
@@ -118,6 +114,11 @@ const SeasonalAvailabilityCreationScreen = () => {
     const handlePost = () => {
         if (!title.trim()) {
             Toast.show({ type: 'error', text1: 'Title required' });
+            return;
+        }
+
+        if (!startDate || !endDate) {
+            Toast.show({ type: 'error', text1: 'Please select start and end dates' });
             return;
         }
         if (categories.length === 0) {
@@ -210,12 +211,6 @@ const SeasonalAvailabilityCreationScreen = () => {
                         textAlignVertical="top"
                     />
                 </View>
-
-                {/* Active toggle (read-only now, shows status) */}
-                {/* <Active
-                    isActive={getPriorityStatus() === 'active'}
-                    setIsActive={() => { }}
-                /> */}
             </ScrollView>
         </SafeAreaView>
     );

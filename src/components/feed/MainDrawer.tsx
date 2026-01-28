@@ -9,29 +9,53 @@ import {
   X,
   PlusCircleIcon,
 } from 'lucide-react-native';
-import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
 import styles from '../../screen/feed/style';
 import { useNavigation } from '@react-navigation/native';
 import UsersAddIcon from '../svg/UsersAddIcon';
 import UpgradeIcon from '../svg/UpgradeIcon';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCurrentUser } from '../../services/user';
 
 const MainDrawer = () => {
   const navigation = useNavigation<any>();
   const [showBanner, setShowBanner] = useState(true);
+  const { data: user, isLoading, isError } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: fetchCurrentUser,
+  });
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
+  if (isError || !user) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Error loading user data</Text>
+      </View>
+    );
+  }
+
+  console.log(user);
   return (
     <View style={styles.drawerContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.drawerHeader}>
           <Image
-            source={{ uri: 'https://i.pravatar.cc/150?u=a' }}
+            source={{ uri: user?.profile?.photo || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png' }}
             style={styles.drawerAvatar}
           />
-          <Text style={styles.drawerName}>Alex</Text>
+          <Text style={styles.drawerName}>{user?.profile?.name}</Text>
           <Text style={styles.drawerRole}>Senior Bartender & Mixologist</Text>
           <View style={styles.locationRow}>
             <MapPin width={16} height={16} fill="#ffffff" />
-            <Text style={styles.locationText_drawer}>London, UK</Text>
+            <Text style={styles.locationText_drawer}>{user?.profile?.city}</Text>
           </View>
         </View>
 
@@ -168,3 +192,4 @@ const MainDrawer = () => {
 };
 
 export default MainDrawer;
+

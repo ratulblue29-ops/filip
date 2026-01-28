@@ -10,9 +10,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import styles from './style';
-import { Bell, Bookmark, Search } from 'lucide-react-native';
+import { Bell, Search } from 'lucide-react-native';
 import MainDrawer from '../../components/feed/MainDrawer';
 import Gig from '../../components/feed/Gig';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCurrentUser } from '../../services/user';
 
 const COLORS = {
   secondaryText: '#9E9E9E',
@@ -41,7 +43,10 @@ const FeedContent = ({ navigation }: any) => {
   //     avatar: 'https://i.pravatar.cc/150?u=b',
   //   },
   // ];
-
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: fetchCurrentUser,
+  });
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -53,13 +58,13 @@ const FeedContent = ({ navigation }: any) => {
         >
           <View>
             <Image
-              source={{ uri: 'https://i.pravatar.cc/150?u=a' }}
+              source={{ uri: user?.profile?.photo || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png' }}
               style={styles.avatar}
             />
           </View>
           <View>
             <Text style={styles.greetingText}>good morning</Text>
-            <Text style={styles.nameText}>Alex</Text>
+            <Text style={styles.nameText}>{user?.profile?.name}</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('notification')}>

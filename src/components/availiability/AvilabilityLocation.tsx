@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import styles from '../../screen/SeosonalAvailabilityCreation/style';
 import { X } from 'lucide-react-native';
@@ -8,16 +8,16 @@ const AvilabilityLocation = ({ newLocation, setNewLocation, locations, removeLoc
         <View style={styles.section}>
             <Text style={styles.sectionTitle}>Preferred Location</Text>
 
-            <View style={styles.addLocationRow}>
+            <View style={[styles.addLocationRow, style.LocationRow]}>
                 <TextInput
                     style={[styles.jobText, { flex: 1 }]}
-                    placeholder="Add location..."
+                    placeholder="Add locations"
                     placeholderTextColor="#9CA3AF"
                     value={newLocation}
                     onChangeText={setNewLocation}
                 />
                 <TouchableOpacity style={styles.addLocationButton} onPress={addLocation} activeOpacity={0.7}>
-                    <Text>Add</Text>
+                    <Text style={style.addLocationText}>+</Text>
                 </TouchableOpacity>
             </View>
 
@@ -35,4 +35,20 @@ const AvilabilityLocation = ({ newLocation, setNewLocation, locations, removeLoc
     )
 }
 
-export default AvilabilityLocation
+export default AvilabilityLocation;
+
+export const style = StyleSheet.create({
+    LocationRow: {
+        borderWidth: 1,
+        borderColor: 'rgba(249, 250, 251, 0.10)',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 12,
+        backgroundColor: '#1D1D1D'
+    },
+    addLocationText: {
+        fontSize: 20,
+        color: '#9CA3AF',
+    }
+
+})

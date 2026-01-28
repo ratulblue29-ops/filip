@@ -9,63 +9,48 @@ import {
     TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, Calendar as CalendarIcon } from 'lucide-react-native';
+import { Calendar as CalendarIcon } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
 import styles from './style';
 
-import { getAuth } from '@react-native-firebase/auth';
-import {
-    getFirestore,
-    collection,
-    addDoc,
-    serverTimestamp,
-} from '@react-native-firebase/firestore';
-
 import CalenderCompo from '../../components/availiability/CalendarCompo';
-// import Resume from '../../components/availiability/Resume';
 import Active from '../../components/availiability/Active';
 import AvailiablityHeading from '../../components/availiability/AvailiablityHeading';
-import Toast from 'react-native-toast-message';
 import AvilabilityLocation from '../../components/availiability/AvilabilityLocation';
 import AvailiabilityCategory from '../../components/availiability/AvailiabilityCategory';
 import { addItemToList, removeItemFromList } from '../../helper/listHelper';
 import UploadBanner from '../../components/availiability/UploadBanner';
 import AvailabilityPrice from '../../components/availiability/AvailabilityPrice';
+import { createJob } from '../../services/jobs';
 
-const SeosonalAvailabilityCreationScreen = () => {
+const SeasonalAvailabilityCreationScreen = () => {
     const navigation = useNavigation<any>();
+    const queryClient = useQueryClient();
+
+    // States
     const [bannerImage, setBannerImage] = useState<string | null>(null);
-    const [startDate, setStartDate] = useState('2025-02-03');
-    const [endDate, setEndDate] = useState('2025-02-07');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
     const [hourlyPrice, setHourlyPrice] = useState('0');
     const [locations, setLocations] = useState<string[]>([]);
     const [newLocation, setNewLocation] = useState('');
     const [categoryInput, setCategoryInput] = useState('');
     const [categories, setCategories] = useState<string[]>([]);
     const [aboutText, setAboutText] = useState('');
-    const [isActive, setIsActive] = useState(true);
     const [title, setTitle] = useState('');
 
-    const authInstance = getAuth();
-    const db = getFirestore();
-
-    const handleGoBack = () => navigation.goBack();
-
-    /* LOCATION */
+    // Helpers
     const addLocation = () =>
         addItemToList(newLocation, setNewLocation, setLocations);
-
     const removeLocation = (index: number) =>
         removeItemFromList(index, setLocations);
 
-
-    /*CATEGORY */
     const addCategory = () =>
         addItemToList(categoryInput, setCategoryInput, setCategories);
-
     const removeCategory = (index: number) =>
         removeItemFromList(index, setCategories);
-
 
     const formatDateDisplay = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -75,91 +60,72 @@ const SeosonalAvailabilityCreationScreen = () => {
         return `${month} ${day},\n${year}`;
     };
 
-    /* FIREBASE JOB POST*/
+    const handleGoBack = () => navigation.goBack();
 
-    const handleTost = async () => {
-        try {
-            const user = authInstance.currentUser;
+    // Determine current priority based on end date
+    const getPriorityStatus = () => {
+        const now = new Date();
+        const end = new Date(endDate);
 
-            if (!user) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'User not authenticated',
-                });
-                return;
-            }
+        if (now > end) return 'expired';
+        return 'active';
+    };
 
-            if (!title.trim()) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Title required',
-                });
-                return;
-            }
-
-            if (categories.length === 0) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Please add a category',
-                });
-                return;
-            }
-
-            const jobPost = {
-                userId: user.uid,
-                title: title,
-
+    // Mutation for posting job
+    const mutation = useMutation({
+        mutationFn: () =>
+            createJob({
+                title,
                 type: 'seasonal',
-
-                description: aboutText || 'No description provided.',
+                description: aboutText,
                 bannerImage: bannerImage || '',
-
                 schedule: {
-                    start: `${startDate}T18:00:00Z`,
-                    end: `${endDate}T02:00:00Z`,
+                    start: `${startDate}T00:00:00Z`,
+                    end: `${endDate}T23:59:59Z`,
                 },
-
                 location: locations,
-
                 rate: {
                     amount: hourlyPrice ? parseFloat(hourlyPrice) : 0,
                     unit: 'hour',
                 },
-
                 requiredSkills: categories,
-
-                positions: {
-                    total: 5,
-                    filled: 0,
-                },
-
+                positions: { total: 5, filled: 0 },
                 visibility: {
-                    priority: isActive,
+                    priority: getPriorityStatus(), // 'active' | 'expired'
                     creditUsed: 0,
+                    consumed: 0,
+                    withdrawn: 0,
                 },
-
-                applicationsCount: 0,
-
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp(),
-            };
-
-            await addDoc(collection(db, 'jobs'), jobPost);
-
+            }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['my-jobs'] });
             Toast.show({
                 type: 'success',
                 text1: 'Job Posted',
                 text2: 'Your job has been posted successfully.',
             });
-
             navigation.goBack();
-        } catch (error) {
+        },
+        onError: (error: any) => {
             Toast.show({
                 type: 'error',
                 text1: 'Error posting job',
-                text2: (error as Error).message,
+                text2: error?.message || 'Something went wrong',
             });
+        },
+    });
+
+    const handlePost = () => {
+        if (!title.trim()) {
+            Toast.show({ type: 'error', text1: 'Title required' });
+            return;
         }
+        if (categories.length === 0) {
+            Toast.show({ type: 'error', text1: 'Please add skill' });
+            return;
+        }
+
+        mutation.mutate();
     };
 
     return (
@@ -172,42 +138,36 @@ const SeosonalAvailabilityCreationScreen = () => {
 
                 <Text style={styles.title}>Create Availability</Text>
 
-                <TouchableOpacity onPress={handleTost} activeOpacity={0.7}>
+                <TouchableOpacity onPress={handlePost} activeOpacity={0.7}>
                     <Text style={styles.postText}>Post</Text>
                 </TouchableOpacity>
             </View>
+
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
                 {/* Title */}
                 <AvailiablityHeading setTitle={setTitle} />
+
                 {/* Banner Upload */}
                 <UploadBanner bannerImage={bannerImage} setBannerImage={setBannerImage} />
 
-                {/* hourly price */}
-                <AvailabilityPrice
-                    price={hourlyPrice}
-                    setPrice={setHourlyPrice}
-                />
+                {/* Hourly price */}
+                <AvailabilityPrice price={hourlyPrice} setPrice={setHourlyPrice} />
 
-                {/* Availability */}
+                {/* Availability dates */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Availability</Text>
-
                     <View style={styles.dateRow}>
                         <View style={styles.dateCard}>
                             <CalendarIcon color="#fff" size={24} />
-                            <Text style={styles.dateValue}>
-                                {formatDateDisplay(startDate)}
-                            </Text>
+                            <Text style={styles.dateValue}>{formatDateDisplay(startDate)}</Text>
                         </View>
 
                         <View style={styles.dateCard}>
                             <CalendarIcon color="#fff" size={24} />
-                            <Text style={styles.dateValue}>
-                                {formatDateDisplay(endDate)}
-                            </Text>
+                            <Text style={styles.dateValue}>{formatDateDisplay(endDate)}</Text>
                         </View>
                     </View>
                 </View>
@@ -219,7 +179,7 @@ const SeosonalAvailabilityCreationScreen = () => {
                     setEndDate={setEndDate}
                 />
 
-                {/* Category */}
+                {/* Categories */}
                 <AvailiabilityCategory
                     categoryInput={categoryInput}
                     setCategoryInput={setCategoryInput}
@@ -251,11 +211,14 @@ const SeosonalAvailabilityCreationScreen = () => {
                     />
                 </View>
 
-                {/* <Resume /> */}
-                <Active isActive={isActive} setIsActive={setIsActive} />
+                {/* Active toggle (read-only now, shows status) */}
+                {/* <Active
+                    isActive={getPriorityStatus() === 'active'}
+                    setIsActive={() => { }}
+                /> */}
             </ScrollView>
         </SafeAreaView>
     );
 };
 
-export default SeosonalAvailabilityCreationScreen;
+export default SeasonalAvailabilityCreationScreen;

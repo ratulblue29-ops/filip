@@ -21,26 +21,26 @@ const COLORS = {
 const Drawer = createDrawerNavigator();
 
 const FeedContent = ({ navigation }: any) => {
-  const GIGS_DATA = [
-    {
-      id: '1',
-      title: 'Cataring Staff',
-      company: 'Creative Event • 3.1 Mil',
-      price: '€20/Hr',
-      time: 'Sat, Oct 25 • 4pm Start',
-      spots: '5 Spots Left',
-      avatar: 'https://i.pravatar.cc/150?u=a',
-    },
-    {
-      id: '2',
-      title: 'House Staff',
-      company: 'Burger Joint • 0.2 Mil',
-      price: '€18/Hr',
-      time: 'Today • 5 PM - 11 PM',
-      tags: ['Dishwashing'],
-      avatar: 'https://i.pravatar.cc/150?u=b',
-    },
-  ];
+  // const GIGS_DATA = [
+  //   {
+  //     id: '1',
+  //     title: 'Cataring Staff',
+  //     company: 'Creative Event • 3.1 Mil',
+  //     price: '€20/Hr',
+  //     time: 'Sat, Oct 25 • 4pm Start',
+  //     spots: '5 Spots Left',
+  //     avatar: 'https://i.pravatar.cc/150?u=a',
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'House Staff',
+  //     company: 'Burger Joint • 0.2 Mil',
+  //     price: '€18/Hr',
+  //     time: 'Today • 5 PM - 11 PM',
+  //     tags: ['Dishwashing'],
+  //     avatar: 'https://i.pravatar.cc/150?u=b',
+  //   },
+  // ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -77,35 +77,35 @@ const FeedContent = ({ navigation }: any) => {
       </View>
 
       <FlatList
-        data={GIGS_DATA}
+        // data={GIGS_DATA}
         keyExtractor={item => item.id}
         ListHeaderComponent={<Gig />}
-        renderItem={({ item: gig }) => (
-          <View style={styles.gigCard}>
-            <View style={styles.row}>
-              <Image source={{ uri: gig.avatar }} style={styles.gigAvatar} />
-              <View style={styles.gigInfo}>
-                <View style={styles.rowBetween}>
-                  <Text style={styles.gigTitle}>{gig.title}</Text>
-                  <Bookmark width={24} height={24} color="#fff" />
-                </View>
-                <Text style={styles.locationText_gig}>{gig.company}</Text>
-                <View style={styles.rowBetween}>
-                  <View style={styles.priceChip}>
-                    <Text style={styles.priceChipText}>{gig.price}</Text>
-                  </View>
-                  <Text style={styles.gigTime}>{gig.time}</Text>
-                </View>
-                {gig.tags && (
-                  <View style={styles.tag}>
-                    <Text style={styles.tagText}>{gig.tags[0]}</Text>
-                  </View>
-                )}
-                {gig.spots && <Text style={styles.spotsText}>{gig.spots}</Text>}
-              </View>
-            </View>
-          </View>
-        )}
+        // renderItem={({ item: gig }) => (
+        //   <View style={styles.gigCard}>
+        //     <View style={styles.row}>
+        //       <Image source={{ uri: gig.avatar }} style={styles.gigAvatar} />
+        //       <View style={styles.gigInfo}>
+        //         <View style={styles.rowBetween}>
+        //           <Text style={styles.gigTitle}>{gig.title}</Text>
+        //           <Bookmark width={24} height={24} color="#fff" />
+        //         </View>
+        //         <Text style={styles.locationText_gig}>{gig.company}</Text>
+        //         <View style={styles.rowBetween}>
+        //           <View style={styles.priceChip}>
+        //             <Text style={styles.priceChipText}>{gig.price}</Text>
+        //           </View>
+        //           <Text style={styles.gigTime}>{gig.time}</Text>
+        //         </View>
+        //         {gig.tags && (
+        //           <View style={styles.tag}>
+        //             <Text style={styles.tagText}>{gig.tags[0]}</Text>
+        //           </View>
+        //         )}
+        //         {gig.spots && <Text style={styles.spotsText}>{gig.spots}</Text>}
+        //       </View>
+        //     </View>
+        //   </View>
+        // )}
         showsVerticalScrollIndicator={false}
       />
 

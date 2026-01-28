@@ -61,10 +61,8 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     addLocationButton: {
-        backgroundColor: COLORS.primary,
-        paddingHorizontal: 30,
-        paddingVertical: 10,
-        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     addLocationRow: {
         flexDirection: 'row',

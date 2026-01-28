@@ -13,6 +13,7 @@ import { CameraIcon, MapPin, Plus, } from 'lucide-react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import styles from './mainProfileStyle';
 import { useNavigation } from '@react-navigation/native';
+import SkillInput from '../../components/profile/SkillInput';
 
 
 
@@ -91,32 +92,11 @@ const MainProfile: React.FC = () => {
                     </View>
 
                     {/* Skills */}
-                    {/* Skills header */}
-                    <View style={styles.rowBetween}>
-                        <Text style={[styles.label, styles.skillLabel]}>Skills & Expertise</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.viewAll}>View All</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* Skill input */}
-                    <View style={styles.skillInputWrapper}>
-                        <TextInput
-                            style={styles.skillInput}
-                            placeholder="Add A Skill (E.G. Barista)"
-                            placeholderTextColor="#9CA3AF"
-                            value={skillInput}
-                            onChangeText={setSkillInput}
-                        />
-                        <TouchableOpacity
-                            style={styles.plusIcon}
-                            onPress={addSkill}
-                            onPressIn={() => navigation.navigate('role')}
-                        >
-                            <Plus size={20} color="#FFFFFF" />
-                        </TouchableOpacity>
-                    </View>
-
+                    <SkillInput
+                        skillInput={skillInput}
+                        setSkillInput={setSkillInput}
+                        addSkill={addSkill}
+                    />
 
                     <View style={styles.skillWrap}>
                         {skills.map((skill, index) => (

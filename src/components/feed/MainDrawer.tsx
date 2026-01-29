@@ -42,7 +42,6 @@ const MainDrawer = () => {
     );
   }
 
-  console.log(user);
   return (
     <View style={styles.drawerContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>

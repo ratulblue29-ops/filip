@@ -12,14 +12,12 @@ import {
     ArrowLeft,
     Bell,
     ChevronRight,
-    CookingPot,
-    Martini,
     CircleSlash,
-    Calendar,
+    CalendarRange,
+    BriefcaseBusiness,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
-import TrophyIcon from '../../components/svg/TrophyIcon';
 import styles from './style';
 import { fetchMyJobs } from '../../services/jobs';
 import { fetchUserRole } from '../../services/user';
@@ -65,18 +63,6 @@ const PostedAvailabilitiesScreen = () => {
             default: return 'Active';
         }
     };
-
-    // Icon renderer
-    const renderIcon = (iconType: string) => {
-        switch (iconType) {
-            case 'cup': return <Calendar width={24} height={24} />;
-            case 'Martini': return <Martini width={24} height={24} />;
-            case 'cook': return <CookingPot width={24} height={24} />;
-            case 'clean': return <CircleSlash width={24} height={24} />;
-            default: return <TrophyIcon width={24} height={24} />;
-        }
-    };
-
     // Filter availabilities based on activeTab
     const filteredAvailabilities = availabilities.filter((item: any) => {
         if (activeTab === 'all') return true;
@@ -88,7 +74,6 @@ const PostedAvailabilitiesScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" />
-
             {/* HEADER */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={handleGoBack}>
@@ -120,42 +105,56 @@ const PostedAvailabilitiesScreen = () => {
                     </TouchableOpacity>
                 ))}
             </View>
-
             {/* LIST */}
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 {isLoading && <AvailabilitySkeleton />}
 
-                {filteredAvailabilities.map((item: any) => (
-                    <TouchableOpacity key={item.id} style={styles.availabilityCard}>
-                        <View style={styles.cardHeader}>
-                            <View style={styles.iconCircle}>{renderIcon(item.icon)}</View>
-
-                            <View style={styles.cardInfo}>
-                                <Text style={styles.availabilityTitle}>{item.title}</Text>
-                                <Text style={styles.scheduleText}>
-                                    {item.schedule?.start && item.schedule?.end
-                                        ? formatSchedule(item.schedule.start, item.schedule.end)
-                                        : 'N/A'}
-                                </Text>
-
-                                <View style={styles.bottomRow}>
-                                    <View style={getStatusStyle(item.status)}>
-                                        <Text style={styles.statusText}>
-                                            {getStatusText(item.status)}
+                {!isLoading && filteredAvailabilities.length === 0 ? (
+                    <View style={styles.emptyMessageContainer}>
+                        <Text style={styles.emptyMessageText}>
+                            No availabilities found.
+                        </Text>
+                    </View>
+                ) : (
+                    filteredAvailabilities.map((item: any) => (
+                        <TouchableOpacity key={item.id} style={styles.availabilityCard}>
+                            <View style={styles.cardHeader}>
+                                <View style={styles.iconCircle}>
+                                    {item?.type === 'fulltime' ? (
+                                        <CalendarRange size={24} color="#1F2937" />
+                                    ) : item?.type === 'seasonal' ? (
+                                        <BriefcaseBusiness size={24} color="#1F2937" />
+                                    ) : (
+                                        <CircleSlash size={24} color="#1F2937" />
+                                    )}
+                                </View>
+                                <View style={styles.cardInfo}>
+                                    <Text style={styles.availabilityTitle}>{item.title}</Text>
+                                    {item.type === 'seasonal' && (
+                                        <Text style={styles.scheduleText}>
+                                            {item.schedule?.start && item.schedule?.end
+                                                ? formatSchedule(item.schedule.start, item.schedule.end)
+                                                : 'N/A'}
+                                        </Text>
+                                    )}
+                                    <View style={styles.bottomRow}>
+                                        <View style={getStatusStyle(item.status)}>
+                                            <Text style={styles.statusText}>
+                                                {getStatusText(item.status)}
+                                            </Text>
+                                        </View>
+                                        <Text style={styles.postedTime}>
+                                            Posted {item.createdAt ? timeAgo(item.createdAt) : 'N/A'}
                                         </Text>
                                     </View>
-
-                                    <Text style={styles.postedTime}>
-                                        Posted {item.createdAt ? timeAgo(item.createdAt) : 'N/A'}
-                                    </Text>
                                 </View>
+                                <ChevronRight width={24} height={24} color="#ffffff" />
                             </View>
-
-                            <ChevronRight width={24} height={24} color="#ffffff" />
-                        </View>
-                    </TouchableOpacity>
-                ))}
+                        </TouchableOpacity>
+                    ))
+                )}
             </ScrollView>
+
 
             {/* ADD BUTTON */}
             {userRole !== 'worker' && (

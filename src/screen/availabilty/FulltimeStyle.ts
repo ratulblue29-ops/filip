@@ -4,7 +4,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#111111',
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
+    },
+    HeaderWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 16,
     },
 
     title: {

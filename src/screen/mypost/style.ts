@@ -211,6 +211,17 @@ const styles = StyleSheet.create({
         color: '#1F2937',
         fontFamily: 'InterDisplay-Bold',
     },
+    emptyMessageContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 50,
+    },
+    emptyMessageText: {
+        fontSize: 16,
+        color: '#6B7280',
+        textAlign: 'center',
+    },
 });
 
 export default styles;

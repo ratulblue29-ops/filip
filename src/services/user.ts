@@ -1,25 +1,23 @@
-// services/user.ts
+
+
 import { getAuth } from '@react-native-firebase/auth';
 import { doc, getDoc, getFirestore } from '@react-native-firebase/firestore';
 
+// the role of the current user
 export const fetchUserRole = async () => {
     const user = getAuth().currentUser;
     if (!user) return null;
 
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    const doc = await getFirestore()
-        .collection('users')
-        .doc(user.uid)
-        .get();
-    console.log('User role document:', doc.data());
-    return doc.exists() ? doc.data()?.role ?? null : null;
+    const db = getFirestore();
+    const userRef = doc(db, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
+
+    return userSnap.exists() ? userSnap.data()?.role ?? null : null;
 };
 
-// profile
+//  user profile
 export const fetchCurrentUser = async () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-
+    const user = getAuth().currentUser;
     if (!user) throw new Error('User not logged in');
 
     const db = getFirestore();

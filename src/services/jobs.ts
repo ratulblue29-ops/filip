@@ -8,11 +8,17 @@ import {
     getDocs,
     addDoc,
     serverTimestamp,
+    orderBy,
 } from '@react-native-firebase/firestore';
 
 // Determine current priority based on end date
-const computePriority = (visibility: any, schedule: { start: string; end: string }) => {
+const computePriority = (
+    visibility: any,
+    schedule: { start: string; end: string }
+) => {
     const now = new Date();
+    if (!schedule?.end) return 'active';
+
     const end = new Date(schedule.end);
     if (visibility?.priority === 'consumed') return 'consumed';
     if (visibility?.priority === 'withdrawn') return 'withdrawn';
@@ -21,25 +27,30 @@ const computePriority = (visibility: any, schedule: { start: string; end: string
     return 'active';
 };
 
-// Fetch jobs posted by current user
+// my jobs fetch
 export const fetchMyJobs = async () => {
     const user = getAuth().currentUser;
     if (!user) return [];
 
+    const db = getFirestore();
     const q = query(
-        collection(getFirestore(), 'jobs'),
-        where('userId', '==', user.uid)
+        collection(db, 'jobs'),
+        where('userId', '==', user.uid),
+        orderBy('createdAt', 'desc')
     );
+
     const snapshot = await getDocs(q);
+
     return snapshot.docs.map((doc: { data: () => any; id: any }) => {
         const data = doc.data();
-        const priority = computePriority(data.visibility, data.schedule);
+        const priority = computePriority(data.visibility, data.schedule || { start: '', end: '' });
 
         return {
             id: doc.id,
             title: data.title,
             schedule: data.schedule || { start: '', end: '' },
             status: priority,
+            type: data.type,
             createdAt:
                 data.createdAt && typeof data.createdAt.toDate === 'function'
                     ? data.createdAt.toDate()
@@ -49,7 +60,7 @@ export const fetchMyJobs = async () => {
     });
 };
 
-// Create new job
+// create new job
 export const createJob = async ({
     title,
     type = 'seasonal',
@@ -61,9 +72,11 @@ export const createJob = async ({
     requiredSkills = [] as string[],
     positions = { total: 5, filled: 0 },
     visibility = { priority: 'active', creditUsed: 0, consumed: 0, withdrawn: 0 },
+    contact = { phone: '', email: '' },
+    daysPerWeek = 0,
 }: {
     title: string;
-    type?: string;
+    type?: 'seasonal' | 'fulltime';
     description?: string;
     bannerImage?: string;
     schedule?: { start: string; end: string };
@@ -72,18 +85,22 @@ export const createJob = async ({
     requiredSkills?: string[];
     positions?: { total: number; filled: number };
     visibility?: { priority: 'active' | 'consumed' | 'withdrawn' | 'expired'; creditUsed: number; consumed: number; withdrawn: number };
+    contact?: { phone: string; email: string };
+    daysPerWeek?: number;
 }) => {
     const user = getAuth().currentUser;
     if (!user) throw new Error('User not authenticated');
+
     const currentPriority = computePriority(visibility, schedule);
 
-    const jobPost = {
+    const db = getFirestore();
+
+    const jobPost: any = {
         userId: user.uid,
-        title,
+        title: title || 'No Title',
         type,
-        description,
+        description: description || 'No description provided.',
         bannerImage,
-        schedule,
         location,
         rate,
         requiredSkills,
@@ -97,5 +114,12 @@ export const createJob = async ({
         updatedAt: serverTimestamp(),
     };
 
-    await addDoc(collection(getFirestore(), 'jobs'), jobPost);
+    // Only add optional fields if valid
+    if (type === 'seasonal') jobPost.schedule = schedule;
+    if (type === 'fulltime') {
+        jobPost.contact = contact;
+        jobPost.daysPerWeek = daysPerWeek;
+    }
+
+    await addDoc(collection(db, 'jobs'), jobPost);
 };

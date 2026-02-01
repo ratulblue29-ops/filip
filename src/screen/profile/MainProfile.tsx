@@ -35,6 +35,8 @@ const MainProfile: React.FC = () => {
   const [photo, setPhoto] = useState<string | null>(null);
   const [city, setCity] = useState('');
   const [about, setAbout] = useState('');
+  const [hourlyRate, setHourlyRate] = useState('');
+
 
   // fetch user
   const { data: user } = useQuery({
@@ -47,7 +49,12 @@ const MainProfile: React.FC = () => {
       setCity(user?.profile?.city || '');
       setAbout(user?.workerProfile?.aboutMe || '');
       setSkills(user?.workerProfile?.skills || []);
-      setOpenToWork(user?.workerProfile?.openToWork ?? true);
+      setOpenToWork(user?.workerProfile?.status);
+      setHourlyRate(
+        user?.workerProfile?.hourlyRate
+          ? String(user.workerProfile.hourlyRate)
+          : ''
+      );
     }
   }, [user]);
 
@@ -115,6 +122,7 @@ const MainProfile: React.FC = () => {
       skills,
       openToWork,
       photo,
+      hourlyRate,
     });
   };
 
@@ -176,6 +184,25 @@ const MainProfile: React.FC = () => {
             <MapPin size={24} color="#374151" />
           </View>
 
+
+          {/* Hourly Rate */}
+          <Text style={styles.label}>Hourly Rate</Text>
+
+          <View style={styles.inputWithIcon}>
+            <TextInput
+              style={styles.flexInput}
+              value={hourlyRate}
+              onChangeText={setHourlyRate}
+              placeholder="e.g. 15"
+              placeholderTextColor="#9CA3AF"
+              keyboardType="numeric"
+            />
+            <Text style={styles.hourlyRateText}>
+              /hr
+            </Text>
+          </View>
+
+
           {/* Skills Input */}
           <SkillInput
             skillInput={skillInput}
@@ -200,6 +227,8 @@ const MainProfile: React.FC = () => {
             ))}
           </View>
 
+
+
           {/* Open To Work */}
           <View style={styles.switchRow}>
             <View>
@@ -214,7 +243,7 @@ const MainProfile: React.FC = () => {
             <Switch
               value={openToWork}
               onValueChange={setOpenToWork}
-              trackColor={{ false: '#515E72', true: '#515E72' }}
+              trackColor={{ false: '#515E72', true: '#FFD900' }}
               thumbColor="#FFFFFF"
               style={styles.bigSwitch}
             />

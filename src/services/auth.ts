@@ -41,9 +41,23 @@ export const signUpUser = async (data: SignUpData) => {
         aboutMe: '',
         baseCity: city,
         skills: [],
-        status: 'open',
+        status: true,
+        hourlyRate: null,
+        experienceYears: 0,
+        rating: 0,
+        reviewsCount: 0,
+        availability: {
+          weekdays: true,
+          weekends: false,
+          nights: false,
+        },
       },
-      employerProfile: null,
+      employerProfile: {
+        businessName: '',
+        businessType: '',
+        city: '',
+        verified: false,
+      },
       membership: {
         tier: 'free',
         freePostsUsed: 0,
@@ -100,11 +114,20 @@ export const signInWithGoogle = async () => {
       workerProfile: {
         aboutMe: '',
         baseCity: '',
+        hourlyRate: null,
+        experienceYears: 0,
+        rating: 0,
+        reviewsCount: 0,
         skills: [],
-        status: 'open',
+        status: true,
       },
 
-      employerProfile: null,
+      employerProfile: {
+        businessName: '',
+        businessType: '',
+        city: '',
+        verified: false,
+      },
       membership: {
         tier: 'free',
         freePostsUsed: 0,

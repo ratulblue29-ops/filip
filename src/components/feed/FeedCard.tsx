@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Text, View, TouchableOpacity, ImageBackground } from 'react-native';
 import { BadgeCheck, Clock, Heart } from 'lucide-react-native';
 import styles from '../../screen/feed/style';
-// import { feedData } from '../../@types/FeedData.type';
 import { useNavigation } from '@react-navigation/native';
 
 const FeedCard = ({ item }: { item: any }) => {
@@ -62,7 +61,7 @@ const FeedCard = ({ item }: { item: any }) => {
         <View style={styles.rowBetween}>
           <Text style={styles.roleTitle}>{item?.title}</Text>
           <Text style={styles.rateText}>
-            {item.rate?.amount}
+            €{item.rate?.amount}
             <Text style={styles.perHr}>/{item?.rate?.unit}</Text>
           </Text>
         </View>

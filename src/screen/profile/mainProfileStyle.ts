@@ -122,6 +122,11 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: 'InterDisplay-Regular'
     },
+    hourlyRateText: {
+        color: '#FFD900',
+        fontWeight: 600,
+        fontFamily: 'InterDisplay-SemiBold',
+    },
 
     input: {
         height: 52,

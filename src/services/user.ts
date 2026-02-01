@@ -6,6 +6,7 @@ type UpdateProfilePayload = {
   aboutMe: string;
   skills: string[];
   openToWork: boolean;
+  hourlyRate: string;
   photo?: string | null;
 };
 
@@ -45,7 +46,8 @@ export const updateUserProfile = async (payload: UpdateProfilePayload) => {
     'profile.city': payload.city,
     'workerProfile.aboutMe': payload.aboutMe,
     'workerProfile.skills': payload.skills,
-    'workerProfile.openToWork': payload.openToWork,
+    'workerProfile.status': payload.openToWork,
+    'workerProfile.hourlyRate': payload.hourlyRate,
     ...(payload.photo && { 'profile.photo': payload.photo }),
     updatedAt: new Date(),
   });

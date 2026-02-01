@@ -15,7 +15,7 @@ const WorkerCard = ({
   onPress: () => void;
 }) => {
   const navigation = useNavigation<any>();
-
+  console.log(worker)
   return (
     <View style={styles.card}>
       <View style={styles.cardTopRow}>
@@ -48,7 +48,7 @@ const WorkerCard = ({
 
         <View style={styles.priceSection}>
           <Text style={styles.priceText}>
-            €{worker.price}
+            €{worker?.price}
             <Text style={styles.hrText}>/hr</Text>
           </Text>
           <Text style={styles.distanceText}>
@@ -77,7 +77,7 @@ const WorkerCard = ({
       <View style={styles.line} />
 
       <View style={styles.actionRow}>
-        {worker.isAvailable ? (
+        {worker?.isAvailable ? (
           <>
             <TouchableOpacity
               style={styles.outlineBtn}

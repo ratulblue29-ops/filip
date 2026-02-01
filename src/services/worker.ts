@@ -13,9 +13,9 @@ export const fetchWorkers = async (): Promise<Worker[]> => {
         where('roles', 'array-contains', 'worker')
     );
     const snap = await getDocs(q);
-
     return snap.docs.map((doc: { data: () => any; id: any; }) => {
         const data = doc.data();
+        console.log('worker data', data)
 
         return {
             id: doc.id,
@@ -23,10 +23,10 @@ export const fetchWorkers = async (): Promise<Worker[]> => {
             role: data.workerProfile?.skills?.[0] ?? 'Worker',
             rating: data.rating ?? 0,
             reviews: data.reviews ?? 0,
-            price: data.workerProfile?.price ?? '0',
+            price: data.workerProfile?.hourlyRate,
             distance: '—',
-            isVerified: data.isVerified ?? false,
-            isAvailable: data.workerProfile?.openToWork ?? false,
+            isVerified: data.verified,
+            isAvailable: data.workerProfile?.status,
             bio: data.workerProfile?.aboutMe ?? '',
             tags: data.workerProfile?.skills ?? [],
             image: data.profile?.photo

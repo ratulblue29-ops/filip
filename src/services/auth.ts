@@ -39,6 +39,7 @@ export const signUpUser = async (data: SignUpData) => {
       },
       workerProfile: {
         aboutMe: '',
+        banner: '',
         baseCity: city,
         skills: [],
         status: true,
@@ -47,9 +48,20 @@ export const signUpUser = async (data: SignUpData) => {
         rating: 0,
         reviewsCount: 0,
         availability: {
-          weekdays: true,
-          weekends: false,
-          nights: false,
+          isAvailable: true,
+          type: 'seasonal',
+          // 'seasonal' | 'full' | 'flexible'
+          seasonLabel: 'Summer Season',
+          // UI text: "Available For Summer Season"
+          dateRange: {
+            start: firestore.Timestamp.fromDate(new Date('2026-05-01')),
+            end: firestore.Timestamp.fromDate(new Date('2026-09-30')),
+          },
+          preferences: {
+            weekdays: true,
+            weekends: false,
+            nights: false,
+          },
         },
       },
       employerProfile: {
@@ -103,25 +115,39 @@ export const signInWithGoogle = async () => {
       email: user.email,
       role: 'worker',
       roles: ['worker', 'employer'],
-
       profile: {
         name: user.displayName ?? '',
         photo: user.photoURL ?? null,
         city: '',
         skills: [],
       },
-
       workerProfile: {
         aboutMe: '',
+        banner: '',
         baseCity: '',
+        skills: [],
+        status: true,
         hourlyRate: null,
         experienceYears: 0,
         rating: 0,
         reviewsCount: 0,
-        skills: [],
-        status: true,
+        availability: {
+          isAvailable: true,
+          type: 'seasonal',
+          // 'seasonal' | 'full' | 'flexible'
+          seasonLabel: 'Summer Season',
+          // UI text: "Available For Summer Season"
+          dateRange: {
+            start: firestore.Timestamp.fromDate(new Date('2026-05-01')),
+            end: firestore.Timestamp.fromDate(new Date('2026-09-30')),
+          },
+          preferences: {
+            weekdays: true,
+            weekends: false,
+            nights: false,
+          },
+        },
       },
-
       employerProfile: {
         businessName: '',
         businessType: '',

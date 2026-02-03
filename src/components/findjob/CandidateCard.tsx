@@ -3,7 +3,6 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Calendar, Lock, SendHorizontal, MapPin } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../screen/seasonAvailabilty/style';
-
 export interface Candidate {
   id: string;
   name: string;
@@ -17,11 +16,9 @@ export interface Candidate {
   dates: string;
   isLocked: boolean;
 }
-
 interface CandidateCardProps {
   candidate: Candidate;
 }
-
 const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
   const navigation = useNavigation<any>();
 

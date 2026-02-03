@@ -205,6 +205,7 @@ export const fetchRecommendedJobs = async () => {
   return jobsWithUserInfo;
 };
 
+// fetch full timne jobs
 export const fetchFullTimeJobs = async (): Promise<Job[]> => {
   const db = getFirestore();
 

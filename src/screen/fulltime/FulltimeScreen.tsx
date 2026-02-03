@@ -178,14 +178,12 @@ const FulltimeScreen = () => {
   // ---------------- FILTER LOGIC ----------------
   const filteredJobs = useMemo(() => {
     return jobs.filter(job => {
-      // 🔍 SEARCH (title + description)
+      // SEARCH
       const searchMatch =
         job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
         job.description?.toLowerCase().includes(searchText.toLowerCase());
 
       if (!searchMatch) return false;
-
-      // 🧱 FILTERS
       if (activeFilter === 'All Jobs') return true;
 
       if (activeFilter === 'Kitchen') {
@@ -237,7 +235,6 @@ const FulltimeScreen = () => {
     [],
   );
 
-  // ---------------- UI ----------------
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />

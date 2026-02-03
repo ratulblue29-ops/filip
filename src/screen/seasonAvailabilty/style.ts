@@ -2,7 +2,6 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#111',
     paddingBottom: 60,
     paddingHorizontal: 20,
@@ -101,6 +100,7 @@ export const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 20,
+    height: '100%',
   },
   card: {
     backgroundColor: '#111',

@@ -1,21 +1,16 @@
 import { getAuth } from '@react-native-firebase/auth';
 import {
+  collection,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
+  query,
   serverTimestamp,
   Timestamp,
   updateDoc,
+  where,
 } from '@react-native-firebase/firestore';
-
-// type UpdateProfilePayload = {
-//   city: string;
-//   aboutMe: string;
-//   skills: string[];
-//   openToWork: boolean;
-//   hourlyRate: string;
-//   photo?: string | null;
-// };
 
 // the role of the current user
 export const fetchUserRole = async () => {
@@ -39,24 +34,6 @@ export const fetchCurrentUser = async () => {
   return userSnap.data();
 };
 
-// update profile
-// export const updateUserProfile = async (payload: UpdateProfilePayload) => {
-//   const user = getAuth().currentUser;
-//   if (!user) throw new Error('User not logged in');
-
-//   const db = getFirestore();
-//   const userRef = doc(db, 'users', user.uid);
-
-//   await updateDoc(userRef, {
-//     'profile.city': payload.city,
-//     'workerProfile.aboutMe': payload.aboutMe,
-//     'workerProfile.skills': payload.skills,
-//     'workerProfile.status': payload.openToWork,
-//     'workerProfile.hourlyRate': payload.hourlyRate,
-//     ...(payload.photo && { 'profile.photo': payload.photo }),
-//     updatedAt: new Date(),
-//   });
-// };
 export interface UpdateProfilePayload {
   city: string;
   aboutMe: string;
@@ -153,4 +130,65 @@ export const updateEmployerProfile = async (
 
     updatedAt: new Date(),
   });
+};
+
+// fetch worker
+interface WorkerUser {
+  id: string;
+  email?: string;
+  profile?: {
+    name?: string;
+    photo?: string;
+    city?: string;
+  };
+  workerProfile?: {
+    aboutMe?: string;
+    skills?: string[];
+    hourlyRate?: number;
+    openToWork?: boolean;
+    baseCity?: string;
+    experienceYears?: number;
+    rating?: number;
+    reviewsCount?: number;
+    availability?: {
+      type: string;
+      isAvailable: boolean;
+      seasonLabel: string;
+      dateRange: {
+        start: any;
+        end: any;
+      };
+    };
+  };
+  role?: string;
+  roles?: string[];
+  verified?: boolean;
+}
+export const fetchAllWorkers = async (): Promise<WorkerUser[]> => {
+  try {
+    const db = getFirestore();
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('role', '==', 'worker'));
+    const querySnapshot = await getDocs(q);
+
+    const workers: WorkerUser[] = [];
+
+    querySnapshot.forEach((doc: { data: () => any; id: any }) => {
+      const firestoreData = doc.data() as any;
+      if (firestoreData.id) {
+        delete firestoreData.id;
+      }
+      const workerData: WorkerUser = {
+        ...firestoreData,
+        id: doc.id,
+      };
+
+      workers.push(workerData);
+    });
+
+    return workers;
+  } catch (error) {
+    console.error('Error fetching workers:', error);
+    throw error;
+  }
 };

@@ -98,14 +98,4 @@ export const styles = StyleSheet.create({
     fontWeight: 500,
     lineHeight: 20,
   },
-  dateText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    backgroundColor: '#1E293B',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
 });

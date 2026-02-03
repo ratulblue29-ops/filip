@@ -11,56 +11,9 @@ import { ArrowLeft, Bell, Search, ChevronDown } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './style';
 import { useNavigation } from '@react-navigation/native';
-import CandidateCard, {
-  Candidate,
-} from '../../components/findjob/CandidateCard';
-const CANDIDATES: Candidate[] = [
-  {
-    id: '1',
-    name: 'Alex M.',
-    avatar:
-      'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=400',
-    location: 'Ibiza, Spain',
-    image:
-      'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=400',
-    status: 'Available',
-    statusText: 'Available',
-    tags: ['Head Chef', '5 Years Exp.', 'Michelin Star'],
-    availabilityType: 'Available For Summer Season',
-    dates: 'May 1 - Sept 30',
-    isLocked: false,
-  },
-  {
-    id: '2',
-    name: 'Alex M.',
-    avatar:
-      'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=400',
-    location: 'Mykonos, Greece',
-    image:
-      'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=400',
-    status: 'Starts Soon',
-    statusText: 'Starts June 15',
-    tags: ['Mixologist', '3 Years Exp.'],
-    availabilityType: 'Full Season Availability',
-    dates: 'June 15 - Oct 30',
-    isLocked: true,
-  },
-  {
-    id: '3',
-    name: 'Alex M.',
-    avatar:
-      'https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=400',
-    location: 'Ibiza, Spain',
-    image:
-      'https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=400',
-    status: 'Available',
-    statusText: 'Available',
-    tags: ['Head Waiter', 'Sommelier L2'],
-    availabilityType: 'Flexible Dates',
-    dates: 'June 1 - Oct 31',
-    isLocked: false,
-  },
-];
+import CandidateCard from '../../components/findjob/CandidateCard';
+import { useQuery } from '@tanstack/react-query';
+import { fetchWorkers } from '../../services/worker';
 
 const SeasonAvailabilityScreen = () => {
   const navigation = useNavigation<any>();
@@ -70,10 +23,10 @@ const SeasonAvailabilityScreen = () => {
     navigation.goBack();
   };
 
-  const filteredCandidates = CANDIDATES.filter(candidate =>
-    candidate.name.toLowerCase().includes(search.toLowerCase()),
-  );
-
+  const { data: workers } = useQuery({
+    queryKey: ['workers'],
+    queryFn: fetchWorkers,
+  });
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -145,7 +98,7 @@ const SeasonAvailabilityScreen = () => {
       {/* List Header */}
       <View style={styles.listHeader}>
         <Text style={styles.countText}>
-          {filteredCandidates.length} Available Candidate
+          {workers?.length} Available Candidate
         </Text>
         <TouchableOpacity style={styles.sortRow}>
           <Text style={styles.sortText}>Sort by</Text>
@@ -155,7 +108,7 @@ const SeasonAvailabilityScreen = () => {
 
       {/* Candidate List */}
       <FlatList
-        data={filteredCandidates}
+        data={workers}
         keyExtractor={item => item.id}
         renderItem={({ item }) => <CandidateCard candidate={item} />}
         showsVerticalScrollIndicator={false}

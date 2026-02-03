@@ -21,7 +21,7 @@ interface CandidateCardProps {
 }
 const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
   const navigation = useNavigation<any>();
-
+  console.log('candidate', candidate);
   return (
     <View style={styles.card}>
       {/* Cover Image */}

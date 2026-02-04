@@ -41,9 +41,7 @@ export interface UpdateProfilePayload {
   openToWork: boolean;
   hourlyRate: string;
   photo?: string | null;
-
-  // availability (TIME ONLY)
-  availabilityType: 'seasonal' | 'full' | 'flexible';
+  availabilityType: 'seasonal' | 'fulltime';
   seasonLabel: string;
   startDate: Date;
   endDate: Date;
@@ -83,6 +81,7 @@ export const updateUserProfile = async (payload: UpdateProfilePayload) => {
     updatedAt: serverTimestamp(),
   });
 };
+
 // update role
 export const updateUserRoles = async (roles: string[]) => {
   const user = getAuth().currentUser;

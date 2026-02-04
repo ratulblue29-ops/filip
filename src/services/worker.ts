@@ -11,6 +11,7 @@ export const fetchWorkers = async (): Promise<Worker[]> => {
   const q = query(
     collection(db, 'users'),
     where('roles', 'array-contains', 'worker'),
+    where('workerProfile.availability.type', '==', 'fulltime'),
   );
   const snap = await getDocs(q);
   return snap.docs.map((doc: { data: () => any; id: any }) => {
@@ -43,7 +44,7 @@ export const fetchSeasonalWorkers = async (): Promise<Worker[]> => {
     collection(db, 'users'),
     where('roles', 'array-contains', 'worker'),
     where('workerProfile.status', '==', true),
-    where('workerProfile.availability.dateRange.type', '==', 'seasonal'),
+    where('workerProfile.availability.type', '==', 'seasonal'),
   );
   const snap = await getDocs(q);
   return snap.docs.map((doc: { data: () => any; id: any }) => {

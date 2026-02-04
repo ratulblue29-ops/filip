@@ -7,7 +7,7 @@ export type seasonalJobs = {
   id: string;
   title: string;
   description: string;
-  type: string; // seasonal | fulltime
+  type: string;
   createdAt?: any;
   updatedAt?: any;
   userId: string;

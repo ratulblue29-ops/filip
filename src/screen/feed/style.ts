@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    backgroundColor: '#262626'
+    backgroundColor: '#262626',
   },
   MainbadgeContainer: {
     display: 'flex',
@@ -145,6 +145,11 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: COLORS.yellow,
     marginRight: 12,
+  },
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 22.5,
   },
   avatarInitial: {
     color: '#fff',

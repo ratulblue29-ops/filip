@@ -1,21 +1,28 @@
+export interface WorkerDateRange {
+  start: string; // ISO string
+  end: string;
+}
+
 export default interface Worker {
   id: string;
-  name?: string;
-  rating: number;
-  reviews: number;
-  price?: number;
-  date?: string | any;
-  isAvailable: boolean | string;
-  type?: string;
-  distance: string;
-  isVerified: boolean;
-  bio: string;
+  user: {
+    id: string;
+    name: string;
+    photo: string;
+    city?: string;
+    verified?: boolean;
+    openToWork?: boolean;
+  };
+
+  bannerImage?: string;
+  title?: string;
+
+  dateRange?: WorkerDateRange;
+
   tags: string[];
-  image: string;
-  banner: string;
-  role: string;
-  location: string;
-  seasonLabel: string;
+  locationText?: string;
+
+  isAvailable?: boolean;
   isLocked?: boolean;
-  status?: string;
+  status?: 'Available' | 'Starts Soon';
 }

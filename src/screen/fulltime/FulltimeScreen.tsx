@@ -139,7 +139,7 @@ import { useQuery } from '@tanstack/react-query';
 import { styles } from './style';
 import FilterItem from '../../components/FilterItem';
 import { JobCard } from '../../components/fulltime/JobCard';
-import { fetchFullTimeJobs } from '../../services/jobs';
+import { fetchRecommendedJobs } from '../../services/jobs';
 
 // ---------------- TYPES ----------------
 type Filter = {
@@ -166,7 +166,7 @@ const FulltimeScreen = () => {
   // ---------------- FETCH JOBS ----------------
   const { data: jobs = [], isLoading } = useQuery({
     queryKey: ['fulltime-jobs'],
-    queryFn: fetchFullTimeJobs,
+    queryFn: fetchRecommendedJobs,
   });
 
   // ---------------- ACTIVE FILTER ----------------
@@ -177,36 +177,43 @@ const FulltimeScreen = () => {
 
   // ---------------- FILTER LOGIC ----------------
   const filteredJobs = useMemo(() => {
-    return jobs.filter(job => {
-      // SEARCH
-      const searchMatch =
-        job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-        job.description?.toLowerCase().includes(searchText.toLowerCase());
+    return jobs.filter(
+      (job: {
+        title: string;
+        description: string;
+        rate: { amount: number };
+        priority: string;
+      }) => {
+        // SEARCH
+        const searchMatch =
+          job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.description?.toLowerCase().includes(searchText.toLowerCase());
 
-      if (!searchMatch) return false;
-      if (activeFilter === 'All Jobs') return true;
+        if (!searchMatch) return false;
+        if (activeFilter === 'All Jobs') return true;
 
-      if (activeFilter === 'Kitchen') {
-        return job.title?.toLowerCase().includes('kitchen');
-      }
+        if (activeFilter === 'Kitchen') {
+          return job.title?.toLowerCase().includes('kitchen');
+        }
 
-      if (activeFilter === 'Front House') {
-        return (
-          job.title?.toLowerCase().includes('front') ||
-          job.title?.toLowerCase().includes('reception')
-        );
-      }
+        if (activeFilter === 'Front House') {
+          return (
+            job.title?.toLowerCase().includes('front') ||
+            job.title?.toLowerCase().includes('reception')
+          );
+        }
 
-      if (activeFilter === '$50k+') {
-        return job.rate?.amount >= 50000;
-      }
+        if (activeFilter === '$50k+') {
+          return job.rate?.amount >= 50000;
+        }
 
-      if (activeFilter === 'Immediate Starts') {
-        return job.priority === 'active';
-      }
+        if (activeFilter === 'Immediate Starts') {
+          return job.priority === 'active';
+        }
 
-      return true;
-    });
+        return true;
+      },
+    );
   }, [jobs, searchText, activeFilter]);
 
   // ---------------- FILTER HANDLER ----------------

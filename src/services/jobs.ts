@@ -194,7 +194,8 @@ export const createJob = async ({
 
       transaction.update(userRef, {
         'credits.balance': credits - SEASONAL_JOB_CREDIT_COST,
-        'credits.used': (userData?.credits?.used || 0) + SEASONAL_JOB_CREDIT_COST,
+        'credits.used':
+          (userData?.credits?.used || 0) + SEASONAL_JOB_CREDIT_COST,
       });
     }
 
@@ -233,7 +234,6 @@ export const createJob = async ({
   });
 };
 
-
 export const fetchRecommendedJobs = async () => {
   const db = getFirestore();
   const jobsCol = collection(db, 'jobs');
@@ -251,12 +251,13 @@ export const fetchRecommendedJobs = async () => {
         ...jobData,
         user: userData
           ? {
-            id: userSnap.id,
-            name: userData.profile.name,
-            email: userData.email,
-            membership: userData.membership,
-            verified: userData.verified,
-          }
+              id: userSnap.id,
+              name: userData.profile.name,
+              photo: userData.profile.photo,
+              email: userData.email,
+              membership: userData.membership,
+              verified: userData.verified,
+            }
           : null,
       };
     }),
@@ -327,13 +328,12 @@ export const fetchFullTimeJobs = async (): Promise<Job[]> => {
 };
 
 // fetch seasonal jobs
-
 export const fetchSeasonalJobs = async () => {
   const db = getFirestore();
 
   const q = query(
     collection(db, 'jobs'),
-    where("type", "==", "seasonal"),
+    where('type', '==', 'seasonal'),
     // orderBy('createdAt', 'desc'),
   );
 
@@ -361,9 +361,7 @@ export const fetchSeasonalJobs = async () => {
       const openToWork = userData?.settings?.openToWork ?? true;
 
       const locationText =
-        jobData?.location?.length > 0
-          ? jobData.location.join(', ')
-          : userCity;
+        jobData?.location?.length > 0 ? jobData.location.join(', ') : userCity;
 
       return {
         id: jobDoc.id,

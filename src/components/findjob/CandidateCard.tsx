@@ -10,15 +10,17 @@ interface CandidateCardProps {
 }
 const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
   const navigation = useNavigation<any>();
-  const formatCustomDate = (timestamp: { _seconds: number }) => {
-    if (!timestamp || !timestamp._seconds) return '';
-    const date = new Date(timestamp._seconds * 1000);
+  const formatCustomDate = (dateString?: string) => {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
 
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
     });
   };
+
   return (
     <View style={styles.card}>
       {/* Cover Image */}
@@ -53,7 +55,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
       <View style={styles.profileRow}>
         <Image
           source={{
-            uri: candidate.user.photo
+            uri: candidate.user.photo || 'n/a',
           }}
           style={styles.avatarPlaceholder}
         />
@@ -83,8 +85,8 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
               {candidate?.title || ''}
             </Text>
             <Text style={styles.availabilityDates}>
-              {formatCustomDate(candidate?.dateRange?.start)} -{' '}
-              {formatCustomDate(candidate?.dateRange?.end)}
+              {formatCustomDate(candidate.dateRange?.start)} -{' '}
+              {formatCustomDate(candidate.dateRange?.end)}
             </Text>
           </View>
         </View>

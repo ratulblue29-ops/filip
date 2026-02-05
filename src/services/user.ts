@@ -40,7 +40,6 @@ export const fetchCurrentUser = async () => {
 export const updateUserProfile = async (payload: UpdateProfilePayload) => {
   const user = getAuth().currentUser;
   if (!user) throw new Error('User not logged in');
-
   const db = getFirestore();
   const userRef = doc(db, 'users', user.uid);
 

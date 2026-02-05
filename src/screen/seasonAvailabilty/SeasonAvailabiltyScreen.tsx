@@ -27,7 +27,6 @@ const SeasonAvailabilityScreen = () => {
     queryKey: ['workers'],
     queryFn: fetchSeasonalJobs,
   });
-  console.log(workers)
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />

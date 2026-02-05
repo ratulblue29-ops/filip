@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './style';
 import WorkerCard from '../../components/WorkerCard';
 import { useNavigation } from '@react-navigation/native';
-
 import AvailabilityHeader from '../../components/findjob/AvailabilityHeader';
 import AvailabilityFilters from '../../components/findjob/AvailabilityFilters';
 import PremiumBanner from '../../components/findjob/PremiumBanner';
@@ -13,11 +12,9 @@ import { fetchFullTimeJobs } from '../../services/jobs';
 import Worker from '../../@types/Worker.type';
 
 const AvailabilityScreen = () => {
-
   const navigation = useNavigation<any>();
-
   const { data: workers = [] } = useQuery({
-    queryKey: ['workers'],
+    queryKey: ['fulltime'],
     queryFn: fetchFullTimeJobs,
   });
 

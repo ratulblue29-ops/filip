@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
-import { Text, View, TouchableOpacity, ImageBackground } from 'react-native';
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  ImageBackground,
+  Image,
+} from 'react-native';
 import { BadgeCheck, Clock, Heart } from 'lucide-react-native';
 import styles from '../../screen/feed/style';
 import { useNavigation } from '@react-navigation/native';
+import { Feedtype } from '../../@types/Feed.type';
 
-const FeedCard = ({ item }: { item: any }) => {
+const FeedCard = ({ item }: { item: Feedtype }) => {
   const navigation = useNavigation<any>();
   const [liked, setLiked] = useState<boolean>(false);
   const formatDate = (dateString?: string) => {
@@ -20,7 +27,10 @@ const FeedCard = ({ item }: { item: any }) => {
   };
   return (
     <View key={item.id} style={styles.recCard}>
-      <ImageBackground source={{ uri: item?.bannerImage || "n/a" }} style={styles.cardImage}>
+      <ImageBackground
+        source={{ uri: item?.bannerImage || 'n/a' }}
+        style={styles.cardImage}
+      >
         <View style={styles.MainbadgeContainer}>
           <View style={styles.badgeContainer}>
             <Text style={styles.badgeText}>• {item.type}</Text>
@@ -39,20 +49,23 @@ const FeedCard = ({ item }: { item: any }) => {
         </View>
         <View style={styles.profileRow}>
           <View style={styles.avatarCircle}>
-            <Text style={styles.avatarInitial}>P</Text>
+            <Image
+              style={styles.avatarPlaceholder}
+              source={{
+                uri: item?.user?.photo || 'n/a',
+              }}
+            />
           </View>
           <View>
             <Text style={styles.profileName}>
               {item?.user?.name || 'Unknown'}
             </Text>
-            {
-              item?.user?.verified === true && (
-                <View style={styles.verifiedContainer}>
-                  <BadgeCheck width={16} height={16} color="#FFD900" />
-                  <Text style={styles.verifiedText}>Verified</Text>
-                </View>
-              )
-            }
+            {item?.user?.verified === true && (
+              <View style={styles.verifiedContainer}>
+                <BadgeCheck width={16} height={16} color="#FFD900" />
+                <Text style={styles.verifiedText}>Verified</Text>
+              </View>
+            )}
           </View>
         </View>
       </ImageBackground>
@@ -75,7 +88,9 @@ const FeedCard = ({ item }: { item: any }) => {
             </Text>
             <Text style={styles.availValue}>
               {item?.schedule?.start && item?.schedule?.end
-                ? `${formatDate(item.schedule.start)} - ${formatDate(item.schedule.end)}`
+                ? `${formatDate(item.schedule.start)} - ${formatDate(
+                    item.schedule.end,
+                  )}`
                 : 'Date not available'}
             </Text>
             {item.subAvailability && (
@@ -92,7 +107,6 @@ const FeedCard = ({ item }: { item: any }) => {
               </View>
             ))}
         </View>
-
 
         <TouchableOpacity
           style={styles.viewProfileBtn}

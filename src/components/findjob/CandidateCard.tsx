@@ -23,7 +23,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
     <View style={styles.card}>
       {/* Cover Image */}
       <Image
-        source={{ uri: candidate?.banner || '' }}
+        source={{ uri: candidate?.bannerImage || 'n/a' }}
         style={styles.candidateImage}
       />
 
@@ -52,14 +52,16 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
       {/* Profile Info */}
       <View style={styles.profileRow}>
         <Image
-          source={{ uri: candidate.image }}
+          source={{
+            uri: candidate.user.photo
+          }}
           style={styles.avatarPlaceholder}
         />
         <View>
-          <Text style={styles.candidateName}>{candidate.name}</Text>
+          <Text style={styles.candidateName}>{candidate?.user?.name}</Text>
           <View style={styles.locationRow}>
             <MapPin size={12} color="#FFF" />
-            <Text style={styles.locationText}>{candidate.location}</Text>
+            <Text style={styles.locationText}>{candidate?.user?.city}</Text>
           </View>
         </View>
       </View>
@@ -78,11 +80,11 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
           <Calendar size={24} color="#FFF" />
           <View>
             <Text style={styles.availabilityTitle}>
-              {candidate?.seasonLabel || ''}
+              {candidate?.title || ''}
             </Text>
             <Text style={styles.availabilityDates}>
-              {formatCustomDate(candidate?.date?.start)} -{' '}
-              {formatCustomDate(candidate?.date?.end)}
+              {formatCustomDate(candidate?.dateRange?.start)} -{' '}
+              {formatCustomDate(candidate?.dateRange?.end)}
             </Text>
           </View>
         </View>

@@ -14,6 +14,7 @@ const WorkerCard = ({
   onPress: () => void;
 }) => {
   const navigation = useNavigation<any>();
+  console.log(worker)
   return (
     <View style={styles.card}>
       <View style={styles.cardTopRow}>

@@ -9,14 +9,16 @@ import AvailabilityHeader from '../../components/findjob/AvailabilityHeader';
 import AvailabilityFilters from '../../components/findjob/AvailabilityFilters';
 import PremiumBanner from '../../components/findjob/PremiumBanner';
 import { useQuery } from '@tanstack/react-query';
-import { fetchWorkers } from '../../services/worker';
+import { fetchFullTimeJobs } from '../../services/jobs';
+import Worker from '../../@types/Worker.type';
 
 const AvailabilityScreen = () => {
 
   const navigation = useNavigation<any>();
+
   const { data: workers = [] } = useQuery({
     queryKey: ['workers'],
-    queryFn: fetchWorkers,
+    queryFn: fetchFullTimeJobs,
   });
 
   return (
@@ -28,7 +30,7 @@ const AvailabilityScreen = () => {
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <WorkerCard
-            worker={item}
+            worker={item as Worker}
             onPress={() => navigation.navigate('sendoffer')}
           />
         )}

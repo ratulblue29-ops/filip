@@ -3,7 +3,7 @@ import FeedScreen from '../screen/feed/FeedScreen';
 import CustomTabBar from '../components/CustomTabBar';
 import FindJobsStack from './FindJobsStack';
 import FulltimeScreen from '../screen/fulltime/FulltimeScreen';
-import GetProfile from '../screen/profile/GetProfile';
+import MainProfile from '../screen/profile/MainProfile';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +18,7 @@ export default function BottomTabs() {
       <Tab.Screen name="Feed" component={FeedScreen} />
       <Tab.Screen name="FindJobs" component={FindJobsStack} />
       <Tab.Screen name="fulltime" component={FulltimeScreen} />
-      <Tab.Screen name="Profile" component={GetProfile} />
+      <Tab.Screen name="Profile" component={MainProfile} />
     </Tab.Navigator>
   );
 }

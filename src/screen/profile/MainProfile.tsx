@@ -7,12 +7,10 @@ import {
   ScrollView,
   Image,
   Switch,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraIcon, MapPin, X } from 'lucide-react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import Toast from 'react-native-toast-message';
 import styles from './mainProfileStyle';
 
@@ -28,24 +26,12 @@ const MainProfile: React.FC = () => {
   /* ================= Profile ================= */
   const [skillInput, setSkillInput] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
-  const [openToWork, setOpenToWork] = useState(true);
+  const [openToWork, setOpenToWork] = useState(true); // UI only (not saved now)
   const [photo, setPhoto] = useState<string | null>(null);
   const [city, setCity] = useState('');
   const [about, setAbout] = useState('');
   const [hourlyRate, setHourlyRate] = useState('');
   const [bannerImage, setBannerImage] = useState<string | null>(null);
-
-  /* ================= Availability (TIME ONLY) ================= */
-  const [availabilityType, setAvailabilityType] = useState<
-    'seasonal' | 'fulltime'
-  >('seasonal');
-
-  const [seasonLabel, setSeasonLabel] = useState('');
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
 
   /* ================= Fetch User ================= */
   const { data: user } = useQuery({
@@ -58,27 +44,18 @@ const MainProfile: React.FC = () => {
     if (!user) return;
 
     setCity(user.profile?.city || '');
-    setAbout(user.workerProfile?.aboutMe || '');
-    setSkills(user.workerProfile?.skills || []);
-    setOpenToWork(user.workerProfile?.status ?? true);
+    setAbout(user.profile?.aboutMe || '');
+    setSkills(user.profile?.skills || []);
+
     setHourlyRate(
-      user.workerProfile?.hourlyRate
-        ? String(user.workerProfile.hourlyRate)
-        : '',
+      user.profile?.hourlyRate ? String(user.profile.hourlyRate) : '',
     );
 
-    const availability = user.workerProfile?.availability;
-    if (!availability) return;
+    setPhoto(user.profile?.photo || null);
+    setBannerImage(user.profile?.bannerImage || null);
 
-    setAvailabilityType(availability.type || 'seasonal');
-    setSeasonLabel(availability.seasonLabel || '');
-
-    if (availability.dateRange?.start) {
-      setStartDate(availability.dateRange.start.toDate());
-    }
-    if (availability.dateRange?.end) {
-      setEndDate(availability.dateRange.end.toDate());
-    }
+    // openToWork is not in schema anymore, so keep default true
+    setOpenToWork(true);
   }, [user]);
 
   /* ================= Image Picker ================= */
@@ -98,17 +75,6 @@ const MainProfile: React.FC = () => {
     setSkillInput('');
   };
 
-  /* ================= Date Pickers ================= */
-  const onChangeStartDate = (_: any, date?: Date) => {
-    setShowStartPicker(false);
-    if (date) setStartDate(date);
-  };
-
-  const onChangeEndDate = (_: any, date?: Date) => {
-    setShowEndPicker(false);
-    if (date) setEndDate(date);
-  };
-
   /* ================= Save Mutation ================= */
   const { mutate: saveProfile, isPending } = useMutation({
     mutationFn: updateUserProfile,
@@ -117,7 +83,7 @@ const MainProfile: React.FC = () => {
       Toast.show({
         type: 'success',
         text1: 'Profile Updated',
-        text2: 'Profile & availability saved successfully',
+        text2: 'Profile saved successfully',
       });
     },
     onError: (err: any) => {
@@ -141,29 +107,14 @@ const MainProfile: React.FC = () => {
       return;
     }
 
-    if (
-      availabilityType === 'seasonal' &&
-      startDate.getTime() > endDate.getTime()
-    ) {
-      Toast.show({
-        type: 'error',
-        text1: 'Invalid Date Range',
-        text2: 'End date must be after start date',
-      });
-      return;
-    }
-
     saveProfile({
       city,
       aboutMe: about,
       skills,
-      openToWork,
       photo,
       hourlyRate,
-      availabilityType,
-      seasonLabel,
-      startDate,
-      endDate,
+      bannerImage,
+      openToWork,
     });
   };
 
@@ -182,7 +133,9 @@ const MainProfile: React.FC = () => {
             <TouchableOpacity onPress={pickImage}>
               <View style={styles.avatar}>
                 <Image
-                  source={{ uri: photo || user?.profile?.photo }}
+                  source={{
+                    uri: photo || user?.profile?.photo || undefined,
+                  }}
                   style={styles.avatarImage}
                 />
                 <View style={styles.cameraIcon}>
@@ -207,70 +160,11 @@ const MainProfile: React.FC = () => {
           />
           <Text style={styles.counter}>{about.length}/300</Text>
 
+          {/* Banner */}
           <UploadBanner
             bannerImage={bannerImage}
             setBannerImage={setBannerImage}
           />
-
-          {/* Availability */}
-          <Text style={styles.label}>Availability Type</Text>
-          <View style={styles.row}>
-            {(['seasonal', 'fulltime'] as const).map(type => (
-              <TouchableOpacity
-                key={type}
-                style={[
-                  styles.chip,
-                  availabilityType === type && styles.activeChip,
-                ]}
-                onPress={() => setAvailabilityType(type)}
-              >
-                <Text>{type.toUpperCase()}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {availabilityType === 'seasonal' && (
-            <>
-              <Text style={styles.label}>Season Label</Text>
-              <TextInput
-                style={styles.input}
-                value={seasonLabel}
-                onChangeText={setSeasonLabel}
-              />
-
-              <Text style={styles.label}>Start Date</Text>
-              <TouchableOpacity
-                // style={styles.dateInput}
-                onPress={() => setShowStartPicker(true)}
-              >
-                <Text>{startDate.toDateString()}</Text>
-              </TouchableOpacity>
-
-              {showStartPicker && (
-                <DateTimePicker
-                  value={startDate}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={onChangeStartDate}
-                />
-              )}
-
-              <Text style={styles.label}>End Date</Text>
-              <TouchableOpacity onPress={() => setShowEndPicker(true)}>
-                <Text>{endDate.toDateString()}</Text>
-              </TouchableOpacity>
-
-              {showEndPicker && (
-                <DateTimePicker
-                  value={endDate}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={onChangeEndDate}
-                  minimumDate={startDate}
-                />
-              )}
-            </>
-          )}
 
           {/* City */}
           <Text style={styles.label}>Base City</Text>
@@ -293,7 +187,8 @@ const MainProfile: React.FC = () => {
               value={hourlyRate}
               onChangeText={setHourlyRate}
               keyboardType="numeric"
-              placeholder="e.g. 15"
+              placeholder="€25"
+              placeholderTextColor='#fff'
             />
             <Text style={styles.hourlyRateText}>/hr</Text>
           </View>
@@ -328,7 +223,7 @@ const MainProfile: React.FC = () => {
                 Open To Work
               </Text>
               <Text style={styles.subText}>
-                Show employers you are available
+                Show users you are available
               </Text>
             </View>
             <Switch

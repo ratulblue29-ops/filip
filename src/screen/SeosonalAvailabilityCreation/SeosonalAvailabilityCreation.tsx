@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Text,
@@ -26,6 +27,7 @@ import { createJob } from '../../services/jobs';
 const SeasonalAvailabilityCreationScreen = () => {
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
+
   // States
   const [bannerImage, setBannerImage] = useState<string | null>(null);
   const [startDate, setStartDate] = useState('');
@@ -41,16 +43,22 @@ const SeasonalAvailabilityCreationScreen = () => {
   // Helpers
   const addLocation = () =>
     addItemToList(newLocation, setNewLocation, setLocations);
+
   const removeLocation = (index: number) =>
     removeItemFromList(index, setLocations);
 
   const addCategory = () =>
     addItemToList(categoryInput, setCategoryInput, setCategories);
+
   const removeCategory = (index: number) =>
     removeItemFromList(index, setCategories);
 
   const formatDateDisplay = (dateStr: string) => {
+    if (!dateStr) return '--';
+
     const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '--';
+
     const month = date.toLocaleDateString('en-US', { month: 'short' });
     const day = String(date.getDate()).padStart(2, '0');
     const year = date.getFullYear();
@@ -58,15 +66,8 @@ const SeasonalAvailabilityCreationScreen = () => {
   };
 
   const handleGoBack = () => navigation.goBack();
-  // priority status based on end date
-  const getPriorityStatus = () => {
-    const now = new Date();
-    const end = new Date(endDate);
-    if (now > end) return 'expired';
-    return 'active';
-  };
 
-  // Mutation for posting job
+  // Mutation for posting job (Seasonal Availability)
   const mutation = useMutation({
     mutationFn: () =>
       createJob({
@@ -85,26 +86,22 @@ const SeasonalAvailabilityCreationScreen = () => {
         },
         requiredSkills: categories,
         positions: { total: 5, filled: 0 },
-        visibility: {
-          priority: getPriorityStatus(),
-          creditUsed: 0,
-          consumed: 0,
-          withdrawn: 0,
-        },
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-jobs'] });
+
       Toast.show({
         type: 'success',
-        text1: 'Job Posted',
-        text2: 'Your job has been posted successfully.',
+        text1: 'Availability Posted',
+        text2: 'Your seasonal availability has been posted successfully.',
       });
+
       navigation.goBack();
     },
     onError: (error: any) => {
       Toast.show({
         type: 'error',
-        text1: 'Error posting job',
+        text1: 'Error posting availability',
         text2: error?.message || 'Something went wrong',
       });
     },
@@ -120,6 +117,19 @@ const SeasonalAvailabilityCreationScreen = () => {
       Toast.show({ type: 'error', text1: 'Please select start and end dates' });
       return;
     }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start.getTime() > end.getTime()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Date Range',
+        text2: 'End date must be after start date',
+      });
+      return;
+    }
+
     if (categories.length === 0) {
       Toast.show({ type: 'error', text1: 'Please add skill' });
       return;
@@ -131,6 +141,7 @@ const SeasonalAvailabilityCreationScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
+
       <View style={styles.header}>
         <TouchableOpacity onPress={handleGoBack} activeOpacity={0.7}>
           <Text style={styles.cancelText}>Cancel</Text>
@@ -138,8 +149,14 @@ const SeasonalAvailabilityCreationScreen = () => {
 
         <Text style={styles.title}>Create Availability</Text>
 
-        <TouchableOpacity onPress={handlePost} activeOpacity={0.7}>
-          <Text style={styles.postText}>Post</Text>
+        <TouchableOpacity
+          onPress={handlePost}
+          activeOpacity={0.7}
+          disabled={mutation.isPending}
+        >
+          <Text style={styles.postText}>
+            {mutation.isPending ? 'Posting...' : 'Post'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -162,6 +179,7 @@ const SeasonalAvailabilityCreationScreen = () => {
         {/* Availability dates */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Availability</Text>
+
           <View style={styles.dateRow}>
             <View style={styles.dateCard}>
               <CalendarIcon color="#fff" size={24} />
@@ -172,7 +190,9 @@ const SeasonalAvailabilityCreationScreen = () => {
 
             <View style={styles.dateCard}>
               <CalendarIcon color="#fff" size={24} />
-              <Text style={styles.dateValue}>{formatDateDisplay(endDate)}</Text>
+              <Text style={styles.dateValue}>
+                {formatDateDisplay(endDate)}
+              </Text>
             </View>
           </View>
         </View>

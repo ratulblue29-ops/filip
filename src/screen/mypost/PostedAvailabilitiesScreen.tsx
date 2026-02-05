@@ -19,7 +19,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import styles from './style';
 import { fetchMyJobs } from '../../services/jobs';
-import { fetchUserRole } from '../../services/user';
 import { formatSchedule, timeAgo } from '../../helper/timeanddateHelper';
 import AvailabilitySkeleton from '../../components/skeleton/AvailabilitySkeleton';
 import PostTypeModal from '../../components/availiability/PostTypeModal';
@@ -34,10 +33,6 @@ const PostedAvailabilitiesScreen = () => {
   const { data: availabilities = [], isLoading } = useQuery<Mypost[]>({
     queryKey: ['my-jobs'],
     queryFn: fetchMyJobs,
-  });
-  const { data: userRole } = useQuery({
-    queryKey: ['user-role'],
-    queryFn: fetchUserRole,
   });
 
   const handleGoBack = () => navigation.goBack();
@@ -170,11 +165,9 @@ const PostedAvailabilitiesScreen = () => {
       </ScrollView>
 
       {/* ADD BUTTON */}
-      {userRole !== 'worker' && (
-        <TouchableOpacity style={styles.addButton} onPress={handleAddNew}>
-          <Text style={styles.addButtonText}>+ Post New</Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity style={styles.addButton} onPress={handleAddNew}>
+        <Text style={styles.addButtonText}>+ Post New</Text>
+      </TouchableOpacity>
 
       {/* modal */}
       <PostTypeModal

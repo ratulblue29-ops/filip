@@ -107,6 +107,17 @@ export const createJob = async ({
 
   const priority = computePriority(visibility, schedule);
 
+  // helper: monthKey
+  const getMonthKey = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`; // "2026-02"
+  };
+
+  // client requirement credit cost
+  const SEASONAL_JOB_CREDIT_COST = 5;
+
   await runTransaction(db, async transaction => {
     const userSnap = await transaction.get(userRef);
 
@@ -117,32 +128,79 @@ export const createJob = async ({
 
     const membershipTier: 'free' | 'basic' | 'premium' =
       userData?.membership?.tier || 'free';
+
     const membershipExpiry = userData?.membership?.expiresAt?.toDate?.();
     const credits = userData?.credits?.balance ?? 0;
 
-    // Check if membership expired
     const now = new Date();
+    const currentMonthKey = getMonthKey();
+
+    // -----------------------------
+    // Membership expiry check
+    // -----------------------------
     if (
       membershipTier !== 'free' &&
       membershipExpiry &&
       now > membershipExpiry
     ) {
-      throw new Error('Your premium membership has expired.');
+      throw new Error('Your membership has expired.');
     }
 
-    // Free & Basic tier: check credits
-    if (membershipTier !== 'premium' && credits < 1) {
-      throw new Error('Not enough credits to post a job');
-    }
+    // -----------------------------
+    // FULLTIME JOB LOGIC (Membership-based)
+    // -----------------------------
+    if (type === 'fulltime') {
+      if (membershipTier === 'free') {
+        throw new Error(
+          'Free users cannot post Full-Time jobs. Please upgrade membership.',
+        );
+      }
 
-    // Deduct credit if free/basic tier
-    if (membershipTier !== 'premium') {
+      const storedMonthKey = userData?.membership?.monthKey || currentMonthKey;
+
+      let postedThisMonth =
+        userData?.membership?.fullTimeAdsPostedThisMonth ?? 0;
+
+      // reset monthly count if month changed
+      if (storedMonthKey !== currentMonthKey) {
+        postedThisMonth = 0;
+
+        transaction.update(userRef, {
+          'membership.monthKey': currentMonthKey,
+          'membership.fullTimeAdsPostedThisMonth': 0,
+        });
+      }
+
+      // Basic membership limit = 1
+      if (membershipTier === 'basic' && postedThisMonth >= 1) {
+        throw new Error(
+          'You have reached your monthly Full-Time job posting limit.',
+        );
+      }
+
+      // increment monthly counter
       transaction.update(userRef, {
-        'credits.balance': credits - 1,
-        'membership.freePostsUsed':
-          (userData?.membership?.freePostsUsed || 0) + 1,
+        'membership.fullTimeAdsPostedThisMonth': postedThisMonth + 1,
       });
     }
+
+    // -----------------------------
+    // SEASONAL JOB LOGIC (Credit-based)
+    // -----------------------------
+    if (type === 'seasonal') {
+      if (credits < SEASONAL_JOB_CREDIT_COST) {
+        throw new Error('Not enough credits to post a seasonal job');
+      }
+
+      transaction.update(userRef, {
+        'credits.balance': credits - SEASONAL_JOB_CREDIT_COST,
+        'credits.used': (userData?.credits?.used || 0) + SEASONAL_JOB_CREDIT_COST,
+      });
+    }
+
+    // -----------------------------
+    // Job Object
+    // -----------------------------
     const jobPost: any = {
       userId: user.uid,
       title: title,
@@ -156,7 +214,7 @@ export const createJob = async ({
       visibility: {
         ...visibility,
         priority,
-        creditUsed: membershipTier === 'premium' ? 0 : 1,
+        creditUsed: type === 'seasonal' ? SEASONAL_JOB_CREDIT_COST : 0,
       },
       applicationsCount: 0,
       createdAt: serverTimestamp(),
@@ -164,6 +222,7 @@ export const createJob = async ({
     };
 
     if (type === 'seasonal') jobPost.schedule = schedule;
+
     if (type === 'fulltime') {
       jobPost.contact = contact;
       jobPost.daysPerWeek = daysPerWeek;
@@ -173,6 +232,7 @@ export const createJob = async ({
     transaction.set(jobRef, jobPost);
   });
 };
+
 
 export const fetchRecommendedJobs = async () => {
   const db = getFirestore();
@@ -191,12 +251,12 @@ export const fetchRecommendedJobs = async () => {
         ...jobData,
         user: userData
           ? {
-              id: userSnap.id,
-              name: userData.profile.name,
-              email: userData.email,
-              membership: userData.membership,
-              verified: userData.verified,
-            }
+            id: userSnap.id,
+            name: userData.profile.name,
+            email: userData.email,
+            membership: userData.membership,
+            verified: userData.verified,
+          }
           : null,
       };
     }),
@@ -264,4 +324,74 @@ export const fetchFullTimeJobs = async (): Promise<Job[]> => {
   });
 
   return fullTimeJobs;
+};
+
+// fetch seasonal jobs
+
+export const fetchSeasonalJobs = async () => {
+  const db = getFirestore();
+
+  const q = query(
+    collection(db, 'jobs'),
+    where("type", "==", "seasonal"),
+    // orderBy('createdAt', 'desc'),
+  );
+
+  const snap = await getDocs(q);
+  const results = await Promise.all(
+    snap.docs.map(async (jobDoc: any) => {
+      const jobData = jobDoc.data();
+
+      let userData: any = null;
+
+      if (jobData?.userId) {
+        const userRef = doc(db, 'users', jobData.userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          userData = userSnap.data();
+        }
+      }
+
+      const userName =
+        userData?.profile?.fullName || userData?.profile?.name || 'Unknown';
+
+      const userCity = userData?.profile?.city || '';
+      const verified = userData?.verified ?? false;
+      const openToWork = userData?.settings?.openToWork ?? true;
+
+      const locationText =
+        jobData?.location?.length > 0
+          ? jobData.location.join(', ')
+          : userCity;
+
+      return {
+        id: jobDoc.id,
+
+        user: {
+          id: jobData.userId,
+          name: userName,
+          photo: userData?.profile?.photo ?? null,
+          city: userCity,
+          verified,
+          openToWork,
+        },
+
+        bannerImage: jobData.bannerImage ?? null,
+
+        title: jobData.title ?? 'Seasonal Availability',
+
+        dateRange: {
+          start: jobData?.schedule?.start ?? null,
+          end: jobData?.schedule?.end ?? null,
+        },
+
+        tags: jobData.requiredSkills ?? [],
+
+        locationText,
+      };
+    }),
+  );
+
+  return results;
 };

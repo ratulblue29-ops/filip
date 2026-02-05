@@ -26,7 +26,7 @@ import SeosonalAvailabilityCreation from '../screen/SeosonalAvailabilityCreation
 import RoleScreen from '../screen/profile/RoleScreen';
 import ReferralScreen from '../screen/referral/ReferralScreen ';
 import FullTimeAvailabilityCreation from '../screen/availabilty/FullTimeAvailabilityCreation';
-import GetProfile from '../screen/profile/GetProfile';
+import MainProfile from '../screen/profile/MainProfile';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -110,7 +110,7 @@ const RootNavigator: React.FC = () => {
       <Stack.Screen name="postAvailabilites" component={withPrivate(PostedAvailabilitiesScreen)} />
       <Stack.Screen name="SeosonalAvailabilityCreation" component={withPrivate(SeosonalAvailabilityCreation)} />
       <Stack.Screen name="FullTimeAvailabilityCreation" component={withPrivate(FullTimeAvailabilityCreation)} />
-      <Stack.Screen name="GetProfile" component={withPrivate(GetProfile)} />
+      <Stack.Screen name="GetProfile" component={withPrivate(MainProfile)} />
       <Stack.Screen name="role" component={withPrivate(RoleScreen)} />
     </Stack.Navigator>
   );

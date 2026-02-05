@@ -15,7 +15,7 @@ const AvailabilityFilters = ({ onSeasonal }: any) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.resultsText}>32 Workers Found Nearby</Text>
+      {/* <Text style={styles.resultsText}>32 Workers Found Nearby</Text> */}
     </View>
   );
 };

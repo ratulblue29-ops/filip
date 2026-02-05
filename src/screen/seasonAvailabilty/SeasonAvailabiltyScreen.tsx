@@ -13,7 +13,7 @@ import { styles } from './style';
 import { useNavigation } from '@react-navigation/native';
 import CandidateCard from '../../components/findjob/CandidateCard';
 import { useQuery } from '@tanstack/react-query';
-import { fetchSeasonalWorkers } from '../../services/worker';
+import { fetchSeasonalJobs } from '../../services/jobs';
 
 const SeasonAvailabilityScreen = () => {
   const navigation = useNavigation<any>();
@@ -25,8 +25,9 @@ const SeasonAvailabilityScreen = () => {
 
   const { data: workers } = useQuery({
     queryKey: ['workers'],
-    queryFn: fetchSeasonalWorkers,
+    queryFn: fetchSeasonalJobs,
   });
+  console.log(workers)
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />

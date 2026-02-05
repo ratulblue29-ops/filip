@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   View,
@@ -133,9 +132,7 @@ const FullTimeAvailabilityCreation = () => {
             <CircleDollarSign size={26} color="#F5C400" />
             <View style={styles.textWrapper}>
               <Text style={styles.feeTitle}>Membership Requirement</Text>
-              <Text style={styles.feeText}>
-                {getMembershipText()}
-              </Text>
+              <Text style={styles.feeText}>{getMembershipText()}</Text>
             </View>
           </View>
 
@@ -172,7 +169,7 @@ const FullTimeAvailabilityCreation = () => {
           <View style={styles.flex}>
             <Text style={styles.label}>Salary</Text>
             <TextInput
-              placeholder="65000 / Year"
+              placeholder="€65K / Yr"
               placeholderTextColor="#9CA3AF"
               style={styles.input}
               value={salary}

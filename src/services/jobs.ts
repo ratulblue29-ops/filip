@@ -269,10 +269,8 @@ export const fetchRecommendedJobs = async () => {
 // fetch full timne jobs
 export const fetchFullTimeJobs = async (): Promise<Job[]> => {
   const db = getFirestore();
-
   // Fetch all jobs
   const snapshot = await getDocs(collection(db, 'jobs'));
-
   // Map jobs + attach user info
   const jobsWithUser: Job[] = await Promise.all(
     snapshot.docs.map(async (jobDoc: { data: () => any; id: any }) => {
@@ -291,6 +289,10 @@ export const fetchFullTimeJobs = async (): Promise<Job[]> => {
               id: userSnap.id,
               name: u?.profile?.name,
               photo: u?.profile?.photo,
+              verified: u?.profile?.verified ?? false,
+              opentowork: u?.profile?.opentowork ?? true,
+              rating: u?.profile?.rating ?? 0,
+              reviewsCount: u?.profile?.reviewsCount ?? 0,
             };
           }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -17,7 +17,7 @@ const AvailabilityScreen = () => {
     queryKey: ['fulltime'],
     queryFn: fetchFullTimeJobs,
   });
-
+  console.log(workers);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />

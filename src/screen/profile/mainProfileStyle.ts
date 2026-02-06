@@ -274,9 +274,6 @@ const styles = StyleSheet.create({
   },
   photoSection: {
     alignItems: 'center',
-    marginTop: -60, // Banner এর সাথে overlap করবে
-    marginBottom: 24,
-    zIndex: 1, // Profile photo সামনে থাকবে
   },
 });
 

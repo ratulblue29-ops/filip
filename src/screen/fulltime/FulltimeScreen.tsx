@@ -8,9 +8,8 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import { Bell, Search, SlidersHorizontal } from 'lucide-react-native';
+import { Search, SlidersHorizontal } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 
 import { styles } from './style';
@@ -18,8 +17,8 @@ import FilterItem from '../../components/FilterItem';
 import { JobCard } from '../../components/fulltime/JobCard';
 import { fetchRecommendedJobs } from '../../services/jobs';
 import JobCardSkeleton from '../../components/skeleton/JobCardSkeleton';
-import { fetchMyNotifications } from '../../services/notification';
-
+import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
+import NotificationDot from '../../components/feed/NotificationDot';
 // TYPES
 type Filter = {
   id: string;
@@ -37,11 +36,9 @@ const INITIAL_FILTERS: Filter[] = [
 ];
 
 const FulltimeScreen = () => {
-  const navigation = useNavigation<any>();
-
   const [filters, setFilters] = useState<Filter[]>(INITIAL_FILTERS);
   const [searchText, setSearchText] = useState('');
-
+  
   // FETCH JOBS
   const { data: jobs = [], isLoading } = useQuery({
     queryKey: ['fulltime-jobs'],
@@ -121,12 +118,7 @@ const FulltimeScreen = () => {
   );
 
   // notification get for dot
-  const { data: notifications = [] } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: fetchMyNotifications,
-  });
-
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const { hasUnread } = useUnreadNotifications();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -135,18 +127,10 @@ const FulltimeScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Full-Time roles</Text>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate('notification')}
-        >
-          <Bell width={24} height={24} color="white" />
-
-          {unreadCount > 0 && <View style={styles.notifDot} />}
-        </TouchableOpacity>
+        <NotificationDot hasUnread={hasUnread} />
       </View>
 
       {/* Search */}
-
       <View style={styles.searchContainerWrapper}>
         <View style={styles.searchContainer}>
           <Search width={24} height={24} color="white" />

@@ -10,12 +10,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import styles from './style';
-import { Bell, Bookmark, Search } from 'lucide-react-native';
+import { Bookmark, Search } from 'lucide-react-native';
 import MainDrawer from '../../components/feed/MainDrawer';
 import Gig from '../../components/feed/Gig';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCurrentUser } from '../../services/user';
-import { fetchMyNotifications } from '../../services/notification';
+import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
+import NotificationDot from '../../components/feed/NotificationDot';
 
 const COLORS = {
   secondaryText: '#9E9E9E',
@@ -48,12 +49,7 @@ const FeedContent = ({ navigation }: any) => {
     queryFn: fetchCurrentUser,
   });
   // notification get for dot
-  const { data: notifications = [] } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: fetchMyNotifications,
-  });
-
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const { hasUnread } = useUnreadNotifications();
   // get current time
   const getGreeting = () => {
     const hours = new Date().getHours();
@@ -85,14 +81,7 @@ const FeedContent = ({ navigation }: any) => {
           </View>
         </TouchableOpacity>
         {/* notification dot */}
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate('notification')}
-        >
-          <Bell width={24} height={24} color="white" />
-
-          {unreadCount > 0 && <View style={styles.notifDot} />}
-        </TouchableOpacity>
+        <NotificationDot hasUnread={hasUnread} />
       </View>
       <View style={styles.searchContainer}>
         <Search width={24} height={24} color="white" />

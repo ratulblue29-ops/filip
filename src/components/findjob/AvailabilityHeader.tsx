@@ -1,36 +1,23 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { Bell, Search } from 'lucide-react-native';
+import { View, Text, TextInput } from 'react-native';
+import { Search } from 'lucide-react-native';
 import styles from '../../screen/availabilty/style';
-import { useNavigation } from '@react-navigation/native';
-import { useQuery } from '@tanstack/react-query';
-import { fetchMyNotifications } from '../../services/notification';
+import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
+import NotificationDot from '../feed/NotificationDot';
 
 const COLORS = {
   secondaryText: '#9E9E9E',
 };
 
 const AvailabilityHeader = () => {
-  const navigation = useNavigation<any>();
   // notification get for dot
-  const { data: notifications = [] } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: fetchMyNotifications,
-  });
+  const { hasUnread } = useUnreadNotifications();
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
   return (
     <View>
       <View style={styles.header}>
         <Text style={styles.title}>Find Workers</Text>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate('notification')}
-        >
-          <Bell width={24} height={24} color="white" />
-
-          {unreadCount > 0 && <View style={styles.notifDot} />}
-        </TouchableOpacity>
+        <NotificationDot hasUnread={hasUnread} />
       </View>
 
       <View style={styles.searchContainer}>

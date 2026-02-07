@@ -1,19 +1,10 @@
-import { useNavigation } from '@react-navigation/native';
 import { Banknote, Bookmark, Clock, MapPin } from 'lucide-react-native';
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-  ToastAndroid,
-  Alert,
-} from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { JobCardProps } from '../../@types/JobCardProps.type';
+import Toast from 'react-native-toast-message';
 
 const InfoTag = ({
   text,
@@ -45,7 +36,6 @@ const InfoTag = ({
 };
 
 export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
-  const navigation = useNavigation<any>();
   const [loading, setLoading] = useState(false);
 
   const handleApply = async (): Promise<void> => {
@@ -53,17 +43,34 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
 
     try {
       const user = auth().currentUser;
-      if (!user) throw new Error('User not logged in');
+      if (!user) {
+        Toast.show({
+          type: 'error',
+          text1: 'Please login to apply',
+        });
+        return;
+      }
 
-      if (!job?.id || !job?.userId) throw new Error('Job information missing');
+      if (!job?.id || !job?.userId) {
+        Toast.show({
+          type: 'error',
+          text1: 'Job information missing',
+        });
+        return;
+      }
 
-      if (job.userId === user.uid)
-        throw new Error('You cannot apply to your own job');
+      if (job.userId === user.uid) {
+        Toast.show({
+          type: 'error',
+          text1: 'You cannot apply to your own job',
+        });
+        return;
+      }
 
       setLoading(true);
       const db = firestore();
 
-      // Check if already applied
+      // if already applied
       const existingSnap = await db
         .collection('jobApplications')
         .where('jobId', '==', job.id)
@@ -71,8 +78,14 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
         .limit(1)
         .get();
 
-      if (!existingSnap.empty)
-        throw new Error('You already applied for this job');
+      if (!existingSnap.empty) {
+        Toast.show({
+          type: 'error',
+          text1: 'You already applied for this job',
+        });
+        setLoading(false);
+        return;
+      }
 
       const applicationRef = db.collection('jobApplications').doc();
       const jobRef = db.collection('jobs').doc(job.id);
@@ -80,9 +93,10 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
 
       await db.runTransaction(async transaction => {
         const jobSnap = await transaction.get(jobRef);
-        if (!jobSnap.exists) throw new Error('Job not found');
+        if (!jobSnap.exists) {
+          throw new Error('Job not found');
+        }
 
-        // Create application
         transaction.set(applicationRef, {
           jobId: job.id,
           applicantId: user.uid,
@@ -91,13 +105,11 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
           createdAt: firestore.FieldValue.serverTimestamp(),
         });
 
-        // Create notification
         transaction.set(notifRef, {
           toUserId: job.userId,
           fromUserId: user.uid,
           type: 'JOB_APPLY',
           title: 'New Job Application',
-          body: `${user.email ?? 'Someone'} applied for your job`,
           data: {
             jobId: job.id,
             applicationId: applicationRef.id,
@@ -107,21 +119,16 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
         });
       });
 
-      const message = 'Applied successfully';
-      if (Platform.OS === 'android') {
-        ToastAndroid.show(message, ToastAndroid.SHORT);
-      } else {
-        Alert.alert('Success', message);
-      }
-
-      navigation.goBack();
+      Toast.show({
+        type: 'success',
+        text1: 'Applied successfully',
+      });
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Failed to apply';
-      if (Platform.OS === 'android') {
-        ToastAndroid.show(msg, ToastAndroid.SHORT);
-      } else {
-        Alert.alert('Error', msg);
-      }
+      Toast.show({
+        type: 'error',
+        text1: msg,
+      });
     } finally {
       setLoading(false);
     }

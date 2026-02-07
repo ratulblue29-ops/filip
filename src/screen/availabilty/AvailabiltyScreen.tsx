@@ -17,7 +17,6 @@ const AvailabilityScreen = () => {
     queryKey: ['fulltime'],
     queryFn: fetchFullTimeJobs,
   });
-
   
 
   return (

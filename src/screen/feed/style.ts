@@ -48,16 +48,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
     lineHeight: 16,
   },
-  notifDot: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 10,
-    height: 10,
-    borderRadius: 4,
-    backgroundColor: '#FF3D00',
-    borderWidth: 1,
-  },
+
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -7,7 +7,7 @@ import {
   FlatList,
   StatusBar,
 } from 'react-native';
-import { ArrowLeft, Bell, Search, ChevronDown } from 'lucide-react-native';
+import { ArrowLeft, Search, ChevronDown } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './style';
 import { useNavigation } from '@react-navigation/native';
@@ -15,7 +15,8 @@ import CandidateCard from '../../components/findjob/CandidateCard';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSeasonalJobs } from '../../services/jobs';
 import CandidateCardSkeleton from '../../components/skeleton/CandidateCardSkeleton';
-import { fetchMyNotifications } from '../../services/notification';
+import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
+import NotificationDot from '../../components/feed/NotificationDot';
 
 const SeasonAvailabilityScreen = () => {
   const navigation = useNavigation<any>();
@@ -31,12 +32,7 @@ const SeasonAvailabilityScreen = () => {
   });
 
   // notification get for dot
-  const { data: notifications = [] } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: fetchMyNotifications,
-  });
-
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const { hasUnread } = useUnreadNotifications();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -50,14 +46,7 @@ const SeasonAvailabilityScreen = () => {
 
         <Text style={styles.headerTitle}>Seasonal Talent</Text>
 
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate('notification')}
-        >
-          <Bell width={24} height={24} color="white" />
-
-          {unreadCount > 0 && <View style={styles.notifDot} />}
-        </TouchableOpacity>
+        <NotificationDot hasUnread={hasUnread} />
       </View>
 
       {/* Search Bar */}

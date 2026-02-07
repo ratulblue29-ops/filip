@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   notificationDescription: {
     fontSize: 14,
     fontWeight: 400,
-    color: COLORS.gray,
+    color: COLORS.white,
     fontFamily: 'InterDisplayRegular',
     lineHeight: 20,
   },

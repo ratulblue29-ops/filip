@@ -251,13 +251,13 @@ export const fetchRecommendedJobs = async () => {
         ...jobData,
         user: userData
           ? {
-            id: userSnap.id,
-            name: userData.profile.name,
-            photo: userData.profile.photo,
-            verified: userData?.profile.verified,
-            email: userData.email,
-            membership: userData.membership,
-          }
+              id: userSnap.id,
+              name: userData.profile.name,
+              photo: userData.profile.photo,
+              verified: userData?.profile.verified,
+              email: userData.email,
+              membership: userData.membership,
+            }
           : null,
       };
     }),

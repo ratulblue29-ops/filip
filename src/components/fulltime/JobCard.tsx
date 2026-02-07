@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { Banknote, Bookmark, Clock, MapPin } from 'lucide-react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
   ToastAndroid,
   Alert,
 } from 'react-native';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import { JobCardProps } from '../../@types/JobCardProps.type';
 
 const InfoTag = ({
@@ -32,7 +34,7 @@ const InfoTag = ({
     <View
       style={[styles.tagContainer, iconType === 'salary' && styles.salaryTag]}
     >
-      <Text style={styles.tagIcon}>{getIcon()}</Text>
+      {getIcon()}
       <Text
         style={[styles.tagText, iconType === 'salary' && styles.salaryText]}
       >
@@ -44,24 +46,90 @@ const InfoTag = ({
 
 export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
   const navigation = useNavigation<any>();
-  const handleTost = () => {
-    const message = 'Apply successfully';
+  const [loading, setLoading] = useState(false);
 
-    if (Platform.OS === 'android') {
-      ToastAndroid.showWithGravity(
-        message,
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM,
-      );
-    } else {
-      Alert.alert('Success', message);
+  const handleApply = async (): Promise<void> => {
+    if (loading) return;
+
+    try {
+      const user = auth().currentUser;
+      if (!user) throw new Error('User not logged in');
+
+      if (!job?.id || !job?.userId) throw new Error('Job information missing');
+
+      if (job.userId === user.uid)
+        throw new Error('You cannot apply to your own job');
+
+      setLoading(true);
+      const db = firestore();
+
+      // Check if already applied
+      const existingSnap = await db
+        .collection('jobApplications')
+        .where('jobId', '==', job.id)
+        .where('applicantId', '==', user.uid)
+        .limit(1)
+        .get();
+
+      if (!existingSnap.empty)
+        throw new Error('You already applied for this job');
+
+      const applicationRef = db.collection('jobApplications').doc();
+      const jobRef = db.collection('jobs').doc(job.id);
+      const notifRef = db.collection('notifications').doc();
+
+      await db.runTransaction(async transaction => {
+        const jobSnap = await transaction.get(jobRef);
+        if (!jobSnap.exists) throw new Error('Job not found');
+
+        // Create application
+        transaction.set(applicationRef, {
+          jobId: job.id,
+          applicantId: user.uid,
+          jobOwnerId: job.userId,
+          status: 'pending',
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+
+        // Create notification
+        transaction.set(notifRef, {
+          toUserId: job.userId,
+          fromUserId: user.uid,
+          type: 'JOB_APPLY',
+          title: 'New Job Application',
+          body: `${user.email ?? 'Someone'} applied for your job`,
+          data: {
+            jobId: job.id,
+            applicationId: applicationRef.id,
+          },
+          isRead: false,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+      });
+
+      const message = 'Applied successfully';
+      if (Platform.OS === 'android') {
+        ToastAndroid.show(message, ToastAndroid.SHORT);
+      } else {
+        Alert.alert('Success', message);
+      }
+
+      navigation.goBack();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Failed to apply';
+      if (Platform.OS === 'android') {
+        ToastAndroid.show(msg, ToastAndroid.SHORT);
+      } else {
+        Alert.alert('Error', msg);
+      }
+    } finally {
+      setLoading(false);
     }
-
-    navigation.goBack();
   };
 
   return (
     <View style={styles.card}>
+      {/* Header */}
       <View style={styles.headerRow}>
         <View style={styles.titleSection}>
           <Image source={{ uri: job?.user?.photo }} style={styles.avatar} />
@@ -75,16 +143,18 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Info Tags Row */}
+      {/* Info Tags */}
       <View style={styles.tagsWrapper}>
         <View style={styles.row}>
           <InfoTag text={job.location} iconType="location" />
-          <InfoTag
-            text={`€ ${job?.rate?.amount}/${
-              job?.rate?.unit.charAt(0).toUpperCase() + job?.rate?.unit.slice(1)
-            }`}
-            iconType="salary"
-          />
+          {job.rate && (
+            <InfoTag
+              text={`€ ${job.rate.amount}/${
+                job.rate.unit.charAt(0).toUpperCase() + job.rate.unit.slice(1)
+              }`}
+              iconType="salary"
+            />
+          )}
         </View>
         <View style={styles.row}>
           <InfoTag
@@ -95,13 +165,20 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
       </View>
 
       {/* Apply Button */}
-      <TouchableOpacity style={styles.applyButton} onPress={handleTost}>
-        <Text style={styles.applyButtonText}>Apply Now</Text>
+      <TouchableOpacity
+        style={[styles.applyButton, loading && { opacity: 0.7 }]}
+        onPress={handleApply}
+        disabled={loading}
+      >
+        <Text style={styles.applyButtonText}>
+          {loading ? 'Applying...' : 'Apply Now'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 };
 
+// ------------------ Styles ------------------
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#121212',
@@ -126,13 +203,12 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 12,
-    objectFit: 'cover',
     marginRight: 12,
   },
   jobTitle: {
     color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: 700,
+    fontWeight: '700',
     fontFamily: 'InterDisplayBold',
   },
   companyName: {
@@ -140,7 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 2,
     fontFamily: 'InterDisplayRegular',
-    fontWeight: 400,
+    fontWeight: '400',
   },
   tagsWrapper: {
     gap: 10,
@@ -149,7 +225,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 21,
-    textTransform: 'capitalize',
   },
   tagContainer: {
     flexDirection: 'row',
@@ -164,15 +239,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 215, 0, 0.3)',
   },
-  tagIcon: {
-    fontSize: 12,
-    marginRight: 6,
-  },
   tagText: {
     color: '#E0E0E0',
     fontSize: 12,
     fontFamily: 'InterDisplayRegular',
-    fontWeight: 400,
+    fontWeight: '400',
+    marginLeft: 4,
   },
   salaryText: {
     color: '#FBBF24',
@@ -187,7 +259,7 @@ const styles = StyleSheet.create({
   applyButtonText: {
     color: '#1F2937',
     fontSize: 16,
-    fontWeight: 500,
+    fontWeight: '500',
     fontFamily: 'InterDisplayMedium',
     lineHeight: 24,
   },

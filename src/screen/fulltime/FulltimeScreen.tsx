@@ -115,7 +115,7 @@ const FulltimeScreen = () => {
   );
 
   const renderJobItem: ListRenderItem<any> = useCallback(
-    ({ item }) => <JobCard job={item} />,
+    ({ item }) => <JobCard job={item} onBookmark={() => {}} />,
     [],
   );
 

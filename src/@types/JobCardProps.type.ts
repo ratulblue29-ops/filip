@@ -1,18 +1,18 @@
 export interface JobCardProps {
   job: {
+    id: string;
+    userId: string;
     title: string;
-    user: {
-      name: string;
-      photo: string;
-    };
     location: string;
-    rate: {
+    type: string;
+    rate?: {
       amount: number;
       unit: string;
     };
-    type: string;
-    image: string;
+    user?: {
+      name?: string;
+      photo?: string;
+    };
   };
-  onApply?: () => void;
-  onBookmark?: () => void;
+  onBookmark: () => void;
 }

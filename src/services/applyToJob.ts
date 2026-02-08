@@ -59,7 +59,6 @@ export const applyToJob = async (job: { id: string; userId: string }) => {
 };
 
 // fetch my application (offer)
-
 export const fetchMyOffers = async (): Promise<OfferItem[]> => {
   const user = auth().currentUser;
   if (!user) throw new Error('User not logged in');
@@ -71,7 +70,6 @@ export const fetchMyOffers = async (): Promise<OfferItem[]> => {
     .get();
 
   const offers: OfferItem[] = [];
-
   for (const doc of snap.docs) {
     const app = doc.data();
 
@@ -89,18 +87,64 @@ export const fetchMyOffers = async (): Promise<OfferItem[]> => {
       },
     });
   }
-
+  console.log('abckendoffer', offers);
   return offers;
 };
 
 // update offer status
-
 export const updateOfferStatus = async (
   applicationId: string,
   status: 'accepted' | 'rejected',
 ) => {
-  await firestore().collection('jobApplications').doc(applicationId).update({
+  const db = firestore();
+
+  // Update the offer status
+  await db.collection('jobApplications').doc(applicationId).update({
     status,
     updatedAt: firestore.FieldValue.serverTimestamp(),
   });
+
+  // Send notification for both accepted & rejected
+  const appDoc = await db
+    .collection('jobApplications')
+    .doc(applicationId)
+    .get();
+  if (!appDoc.exists) return;
+
+  const appData = appDoc.data();
+  if (!appData) return;
+
+  const notifRef = db.collection('notifications').doc();
+
+  if (status === 'rejected') {
+    await notifRef.set({
+      toUserId: appData.jobOwnerId,
+      fromUserId: auth().currentUser?.uid || '',
+      type: 'OFFER_REJECTED',
+      title: 'Offer Rejected',
+      body: 'Your applicant has rejected the offer',
+      data: {
+        applicationId,
+        jobId: appData.jobId,
+      },
+      isRead: false,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+    });
+  }
+
+  if (status === 'accepted') {
+    await notifRef.set({
+      toUserId: appData.jobOwnerId,
+      fromUserId: auth().currentUser?.uid || '',
+      type: 'OFFER_ACCEPTED',
+      title: 'Offer Accepted',
+      body: 'Your applicant has accepted the offer',
+      data: {
+        applicationId,
+        jobId: appData.jobId,
+      },
+      isRead: false,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+    });
+  }
 };

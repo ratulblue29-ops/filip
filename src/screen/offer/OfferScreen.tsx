@@ -35,16 +35,17 @@ const OfferScreen = () => {
     queryKey: ['my-offers'],
     queryFn: fetchMyOffers,
   });
-
+  console.log(offers);
   //Filtered Offers
   const filteredOffers = useMemo(() => {
     return offers.filter(o => {
-      if (activeTab === 'pending') return o.status === 'pending';
-      if (activeTab === 'upcoming') return o.status === 'accepted';
-      return o.status === 'rejected';
+      const status = o.status?.toLowerCase().trim();
+      if (activeTab === 'pending') return status === 'pending';
+      if (activeTab === 'upcoming') return status === 'accepted';
+      if (activeTab === 'history') return status === 'rejected';
+      return false;
     });
   }, [offers, activeTab]);
-
   // Toggle description
   const toggleDescription = useCallback((id: string) => {
     setExpandedCards(prev => {
@@ -111,7 +112,10 @@ const OfferScreen = () => {
         ))}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Empty State */}
         {filteredOffers.length === 0 && (
           <Text style={styles.emptyStateText}>

@@ -1,10 +1,11 @@
 import { Banknote, Bookmark, Clock, MapPin } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+// import auth from '@react-native-firebase/auth';
+// import firestore from '@react-native-firebase/firestore';
 import { JobCardProps } from '../../@types/JobCardProps.type';
 import Toast from 'react-native-toast-message';
+import { applyToJob } from '../../services/applyToJob';
 
 const InfoTag = ({
   text,
@@ -20,7 +21,6 @@ const InfoTag = ({
       return <Banknote width={16} height={16} color="white" />;
     return <Clock width={16} height={16} color="white" />;
   };
-
   return (
     <View
       style={[styles.tagContainer, iconType === 'salary' && styles.salaryTag]}
@@ -38,102 +38,113 @@ const InfoTag = ({
 export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
   const [loading, setLoading] = useState(false);
 
-  const handleApply = async (): Promise<void> => {
-    if (loading) return;
+  // const handleApply = async (): Promise<void> => {
+  //   if (loading) return;
 
+  //   try {
+  //     const user = auth().currentUser;
+  //     if (!user) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: 'Please login to apply',
+  //       });
+  //       return;
+  //     }
+
+  //     if (!job?.id || !job?.userId) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: 'Job information missing',
+  //       });
+  //       return;
+  //     }
+
+  //     if (job.userId === user.uid) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: 'You cannot apply to your own job',
+  //       });
+  //       return;
+  //     }
+
+  //     setLoading(true);
+  //     const db = firestore();
+
+  //     // if already applied
+  //     const existingSnap = await db
+  //       .collection('jobApplications')
+  //       .where('jobId', '==', job.id)
+  //       .where('applicantId', '==', user.uid)
+  //       .limit(1)
+  //       .get();
+
+  //     if (!existingSnap.empty) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: 'You already applied for this job',
+  //       });
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     const applicationRef = db.collection('jobApplications').doc();
+  //     const jobRef = db.collection('jobs').doc(job.id);
+  //     const notifRef = db.collection('notifications').doc();
+
+  //     await db.runTransaction(async transaction => {
+  //       const jobSnap = await transaction.get(jobRef);
+  //       if (!jobSnap.exists) {
+  //         throw new Error('Job not found');
+  //       }
+
+  //       transaction.set(applicationRef, {
+  //         jobId: job.id,
+  //         applicantId: user.uid,
+  //         jobOwnerId: job.userId,
+  //         status: 'pending',
+  //         createdAt: firestore.FieldValue.serverTimestamp(),
+  //       });
+
+  //       transaction.set(notifRef, {
+  //         toUserId: job.userId,
+  //         fromUserId: user.uid,
+  //         type: 'JOB_APPLY',
+  //         title: 'New Job Application',
+  //         data: {
+  //           jobId: job.id,
+  //           applicationId: applicationRef.id,
+  //         },
+  //         isRead: false,
+  //         createdAt: firestore.FieldValue.serverTimestamp(),
+  //       });
+  //     });
+
+  //     Toast.show({
+  //       type: 'success',
+  //       text1: 'Applied successfully',
+  //     });
+  //   } catch (error) {
+  //     const msg = error instanceof Error ? error.message : 'Failed to apply';
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: msg,
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const handleApply = async () => {
     try {
-      const user = auth().currentUser;
-      if (!user) {
-        Toast.show({
-          type: 'error',
-          text1: 'Please login to apply',
-        });
-        return;
-      }
-
-      if (!job?.id || !job?.userId) {
-        Toast.show({
-          type: 'error',
-          text1: 'Job information missing',
-        });
-        return;
-      }
-
-      if (job.userId === user.uid) {
-        Toast.show({
-          type: 'error',
-          text1: 'You cannot apply to your own job',
-        });
-        return;
-      }
-
       setLoading(true);
-      const db = firestore();
-
-      // if already applied
-      const existingSnap = await db
-        .collection('jobApplications')
-        .where('jobId', '==', job.id)
-        .where('applicantId', '==', user.uid)
-        .limit(1)
-        .get();
-
-      if (!existingSnap.empty) {
-        Toast.show({
-          type: 'error',
-          text1: 'You already applied for this job',
-        });
-        setLoading(false);
-        return;
-      }
-
-      const applicationRef = db.collection('jobApplications').doc();
-      const jobRef = db.collection('jobs').doc(job.id);
-      const notifRef = db.collection('notifications').doc();
-
-      await db.runTransaction(async transaction => {
-        const jobSnap = await transaction.get(jobRef);
-        if (!jobSnap.exists) {
-          throw new Error('Job not found');
-        }
-
-        transaction.set(applicationRef, {
-          jobId: job.id,
-          applicantId: user.uid,
-          jobOwnerId: job.userId,
-          status: 'pending',
-          createdAt: firestore.FieldValue.serverTimestamp(),
-        });
-
-        transaction.set(notifRef, {
-          toUserId: job.userId,
-          fromUserId: user.uid,
-          type: 'JOB_APPLY',
-          title: 'New Job Application',
-          data: {
-            jobId: job.id,
-            applicationId: applicationRef.id,
-          },
-          isRead: false,
-          createdAt: firestore.FieldValue.serverTimestamp(),
-        });
-      });
-
-      Toast.show({
-        type: 'success',
-        text1: 'Applied successfully',
-      });
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Failed to apply';
-      Toast.show({
-        type: 'error',
-        text1: msg,
-      });
+      await applyToJob(job);
+      Toast.show({ type: 'success', text1: 'Applied successfully' });
+    } catch (err: any) {
+      Toast.show({ type: 'error', text1: err.message });
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <View style={styles.card}>
       {/* Header */}
@@ -185,7 +196,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
   );
 };
 
-// ------------------ Styles ------------------
+// Styles
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#121212',

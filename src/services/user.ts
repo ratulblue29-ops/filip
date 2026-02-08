@@ -13,6 +13,7 @@ import {
 } from '@react-native-firebase/firestore';
 import { UpdateProfilePayload } from '../@types/UpdateProfile.type';
 import { UserInfo } from '../@types/userInfo.type';
+import { WorkerUser } from '../@types/WorkerUser.type';
 
 // the role of the current user
 export const fetchUserRole = async () => {
@@ -57,7 +58,6 @@ export const updateUserProfile = async (payload: UpdateProfilePayload) => {
   });
 };
 
-
 // update role
 export const updateUserRoles = async (roles: string[]) => {
   const user = getAuth().currentUser;
@@ -72,46 +72,12 @@ export const updateUserRoles = async (roles: string[]) => {
   });
 };
 
-
-
 // fetch worker
-interface WorkerUser {
-  id: string;
-  email?: string;
-  profile?: {
-    name?: string;
-    photo?: string;
-    city?: string;
-  };
-  workerProfile?: {
-    aboutMe?: string;
-    skills?: string[];
-    hourlyRate?: number;
-    openToWork?: boolean;
-    baseCity?: string;
-    experienceYears?: number;
-    rating?: number;
-    reviewsCount?: number;
-    availability?: {
-      type: string;
-      isAvailable: boolean;
-      seasonLabel: string;
-      dateRange: {
-        start: any;
-        end: any;
-      };
-    };
-  };
-  role?: string;
-  roles?: string[];
-  verified?: boolean;
-}
-
 
 export const fetchFullTimeJobs = async (): Promise<WorkerUser[]> => {
   const db = getFirestore();
 
-  // Only fetch fulltime jobs (optimized)
+  // Only fetch fulltime jobs
   const q = query(
     collection(db, 'jobs'),
     where('type', '==', 'fulltime'),

@@ -1,78 +1,106 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import functions from '@react-native-firebase/functions';
+import { OfferItem } from '../@types/jobApplication.type';
 
-export const applyToJob = async (jobId: string) => {
+export const applyToJob = async (job: { id: string; userId: string }) => {
   const user = auth().currentUser;
-  if (!user) throw new Error('User not logged in');
+  if (!user) {
+    throw new Error('Please login to apply');
+  }
 
-  const db = firestore();
-  const jobRef = db.collection('jobs').doc(jobId);
-
-  const jobSnap = await jobRef.get();
-  if (!jobSnap.exists) throw new Error('Job not found');
-
-  const jobData = jobSnap.data();
-  if (!jobData) throw new Error('Job data missing');
-
-  const jobOwnerId = jobData.userId;
-  if (!jobOwnerId) throw new Error('Job owner not found');
-
-  if (jobOwnerId === user.uid) {
+  if (job.userId === user.uid) {
     throw new Error('You cannot apply to your own job');
   }
 
-  // check already applied
+  const db = firestore();
+
+  //already applied
   const existingSnap = await db
     .collection('jobApplications')
-    .where('jobId', '==', jobId)
+    .where('jobId', '==', job.id)
     .where('applicantId', '==', user.uid)
     .limit(1)
     .get();
 
   if (!existingSnap.empty) {
-    throw new Error('You already applied to this job');
+    throw new Error('You already applied for this job');
   }
 
-  // create application
   const applicationRef = db.collection('jobApplications').doc();
-
-  await applicationRef.set({
-    jobId,
-    applicantId: user.uid,
-    jobOwnerId,
-    status: 'pending',
-    createdAt: firestore.FieldValue.serverTimestamp(),
-  });
-
-  // create notification doc
   const notifRef = db.collection('notifications').doc();
 
-  await notifRef.set({
-    toUserId: jobOwnerId,
-    fromUserId: user.uid,
-    type: 'JOB_APPLY',
-    title: 'New Job Application',
-    body: 'Someone applied for your job',
-    data: {
-      jobId,
-      applicationId: applicationRef.id,
-    },
-    isRead: false,
-    createdAt: firestore.FieldValue.serverTimestamp(),
-  });
+  await db.runTransaction(async transaction => {
+    // job application
+    transaction.set(applicationRef, {
+      jobId: job.id,
+      applicantId: user.uid,
+      jobOwnerId: job.userId,
+      status: 'pending',
+      createdAt: firestore.FieldValue.serverTimestamp(),
+    });
 
-  // push send (cloud function)
-  await functions().httpsCallable('sendNotification')({
-    toUserId: jobOwnerId,
-    title: 'New Job Application',
-    body: 'Someone applied for your job',
-    payload: {
-      jobId,
-      applicationId: applicationRef.id,
+    // notification
+    transaction.set(notifRef, {
+      toUserId: job.userId,
+      fromUserId: user.uid,
       type: 'JOB_APPLY',
-    },
+      title: 'New Job Application',
+      body: 'Someone applied for your job',
+      data: {
+        jobId: job.id,
+        applicationId: applicationRef.id,
+      },
+      isRead: false,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+    });
   });
 
   return true;
+};
+
+// fetch my application (offer)
+
+export const fetchMyOffers = async (): Promise<OfferItem[]> => {
+  const user = auth().currentUser;
+  if (!user) throw new Error('User not logged in');
+
+  const snap = await firestore()
+    .collection('jobApplications')
+    .where('applicantId', '==', user.uid)
+    // .orderBy('createdAt', 'desc')
+    .get();
+
+  const offers: OfferItem[] = [];
+
+  for (const doc of snap.docs) {
+    const app = doc.data();
+
+    const jobDoc = await firestore().collection('jobs').doc(app.jobId).get();
+
+    if (!jobDoc.exists) continue;
+
+    offers.push({
+      id: doc.id,
+      status: app.status,
+      createdAt: app.createdAt,
+      job: {
+        id: jobDoc.id,
+        ...(jobDoc.data() as any),
+      },
+    });
+  }
+
+  return offers;
+};
+
+// update offer status
+
+export const updateOfferStatus = async (
+  applicationId: string,
+  status: 'accepted' | 'rejected',
+) => {
+  await firestore().collection('jobApplications').doc(applicationId).update({
+    status,
+    updatedAt: firestore.FieldValue.serverTimestamp(),
+  });
 };

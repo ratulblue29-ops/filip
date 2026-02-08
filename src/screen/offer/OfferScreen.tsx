@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Text,
   View,
@@ -13,62 +13,64 @@ import {
   CreditCard,
   Calendar,
   MapPin,
-  Image,
-  CalendarIcon,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
 import styles from './style';
 import CupIcon from '../../components/svg/CupIcon';
+import { fetchMyOffers, updateOfferStatus } from '../../services/applyToJob';
 
 const OfferScreen = () => {
-  const navigation = useNavigation();
-  const [activeTab, setActiveTab] = useState('pending');
-  const [expandedCards, setExpandedCards] = useState(new Set());
+  const navigation = useNavigation<any>();
+  const queryClient = useQueryClient();
 
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
+  const [activeTab, setActiveTab] = useState<
+    'pending' | 'upcoming' | 'history'
+  >('pending');
 
-  const toggleDescription = (id: string) => {
-    setExpandedCards((prev: any) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+
+  const { data: offers = [] } = useQuery({
+    queryKey: ['my-offers'],
+    queryFn: fetchMyOffers,
+  });
+
+  //Filtered Offers
+  const filteredOffers = useMemo(() => {
+    return offers.filter(o => {
+      if (activeTab === 'pending') return o.status === 'pending';
+      if (activeTab === 'upcoming') return o.status === 'accepted';
+      return o.status === 'rejected';
     });
-  };
+  }, [offers, activeTab]);
 
-  const pendingOffers = [
-    {
-      id: '1',
-      type: 'bartender',
-      title: 'Bartender',
-      time: '1h Ago',
-      rate: '35/Hr + Tips',
-      schedule: 'Today, 7 PM',
-      location: 'Downtown',
-      description:
-        'High Volume Cocktail Bar, Black Vest Required. Experience With Craft Cocktails Preferred',
-      fullDescription:
-        'High Volume Cocktail Bar, Black Vest Required. Experience With Craft Cocktails Preferred. Must be able to work in fast-paced environment.',
+  // Toggle description
+  const toggleDescription = useCallback((id: string) => {
+    setExpandedCards(prev => {
+      const s = new Set(prev);
+      s.has(id) ? s.delete(id) : s.add(id);
+      return s;
+    });
+  }, []);
+
+  // Accept
+  const handleAccept = useCallback(
+    async (id: string) => {
+      await updateOfferStatus(id, 'accepted');
+      queryClient.invalidateQueries({ queryKey: ['my-offers'] });
     },
-    {
-      id: '2',
-      type: 'cook',
-      title: 'Line Cook',
-      time: '1h Ago',
-      rate: '35/Hr + Tips',
-      schedule: 'Friday, Today, 7 PM',
-      location: 'Downtown',
-      description:
-        'High Volume Cocktail Bar, Black Vest Required. Experience With Craft Cocktails Preferred',
-      fullDescription:
-        'High Volume Cocktail Bar, Black Vest Required. Experience With Craft Cocktails Preferred. Professional kitchen experience required.',
+    [queryClient],
+  );
+
+  // Decline
+  const handleDecline = useCallback(
+    async (id: string) => {
+      await updateOfferStatus(id, 'rejected');
+      queryClient.invalidateQueries({ queryKey: ['my-offers'] });
     },
-  ];
+    [queryClient],
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -76,142 +78,115 @@ const OfferScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleGoBack} activeOpacity={0.7}>
-          <ArrowLeft width={24} height={24} color="#FFFFFF" />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <ArrowLeft width={24} height={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.title}>My offer</Text>
         <View style={styles.notificationWrapper}>
-          <Bell width={24} height={24} color="#FFFFFF" />
-          <View style={styles.notifDot} />
+          <Bell width={24} height={24} color="#fff" />
         </View>
       </View>
 
       {/* Tabs */}
       <View style={styles.tabsContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'pending' && styles.activeTab]}
-          onPress={() => setActiveTab('pending')}
-          activeOpacity={0.7}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'pending' && styles.activeTabText,
-            ]}
+        {['pending', 'upcoming', 'history'].map(tab => (
+          <TouchableOpacity
+            key={tab}
+            style={[styles.tab, activeTab === tab && styles.activeTab]}
+            onPress={() => setActiveTab(tab as any)}
           >
-            Pending (2)
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'upcoming' && styles.activeTab]}
-          onPress={() => setActiveTab('upcoming')}
-          activeOpacity={0.7}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'upcoming' && styles.activeTabText,
-            ]}
-          >
-            Upcoming
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'history' && styles.activeTab]}
-          onPress={() => setActiveTab('history')}
-          activeOpacity={0.7}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'history' && styles.activeTabText,
-            ]}
-          >
-            History
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === tab && styles.activeTabText,
+              ]}
+            >
+              {tab === 'pending'
+                ? 'Pending'
+                : tab === 'upcoming'
+                ? 'Upcoming'
+                : 'History'}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Offer Cards */}
-        {pendingOffers.map(offer => (
-          <View key={offer.id} style={styles.offerCard}>
-            {/* Header Row */}
-            <View style={styles.cardHeader}>
-              <View style={styles.cardHeaderLeft}>
-                <View style={styles.iconCircle}>
-                  {offer.type === 'bartender' ? (
-                    <CupIcon width={27} height={26} color="#FCD34D" />
-                  ) : (
-                    <CalendarIcon width={27} height={26} color="#FFD900" />
-                  )}
-                </View>
-                <Text style={styles.jobTitle}>{offer.title}</Text>
-              </View>
-              <Text style={styles.timeAgo}>{offer.time}</Text>
-            </View>
-
-            {/* Info Pills */}
-            <View style={styles.infoPills}>
-              <View style={styles.infoPill}>
-                <CreditCard width={14} height={14} color="#FFD900" />
-                <Text style={styles.infoPillTextYellow}>{offer.rate}</Text>
-              </View>
-              <View style={styles.infoPill}>
-                <Calendar width={14} height={14} color="#9CA3AF" />
-                <Text style={styles.infoPillText}>{offer.schedule}</Text>
-              </View>
-              <View style={styles.infoPill}>
-                <MapPin width={14} height={14} color="#9CA3AF" />
-                <Text style={styles.infoPillText}>{offer.location}</Text>
-              </View>
-            </View>
-
-            {/* Description */}
-            <Text
-              style={styles.description}
-              numberOfLines={expandedCards.has(offer.id) ? undefined : 2}
-            >
-              {expandedCards.has(offer.id)
-                ? offer.fullDescription
-                : offer.description}
-            </Text>
-            <TouchableOpacity
-              onPress={() => toggleDescription(offer.id)}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.showMore}>
-                {expandedCards.has(offer.id) ? 'Show Less' : 'Show More'}
-              </Text>
-            </TouchableOpacity>
-
-            {/* Action Buttons */}
-            <View style={styles.actionButtons}>
-              <TouchableOpacity
-                style={styles.declineButton}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.declineButtonText}>Decline</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.acceptButton} activeOpacity={0.7}>
-                <Text style={styles.acceptButtonText}>Accept Offer</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-
-        {/* Bottom CTA */}
-        <View style={styles.bottomCTA}>
-          <View style={styles.ctaIconWrapper}>
-            <Image width={24} height={24} color="#d3d3d3" />
-          </View>
-          <Text style={styles.ctaText}>
-            Update Your Availability To{'\n'}Receive More Offers Tailored To
-            {'\n'}You.
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Empty State */}
+        {filteredOffers.length === 0 && (
+          <Text style={styles.emptyStateText}>
+            No offers found for this section
           </Text>
-        </View>
+        )}
+
+        {filteredOffers.map(offer => {
+          const job = offer.job;
+
+          return (
+            <View key={offer.id} style={styles.offerCard}>
+              <View style={styles.cardHeader}>
+                <View style={styles.cardHeaderLeft}>
+                  <View style={styles.iconCircle}>
+                    <CupIcon width={27} height={26} color="#FFD900" />
+                  </View>
+                  <Text style={styles.jobTitle}>{job.title}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoPills}>
+                <View style={styles.infoPill}>
+                  <CreditCard width={14} height={14} color="#FFD900" />
+                  <Text style={styles.infoPillTextYellow}>
+                    €{job?.rate?.amount}/{job?.rate?.unit}
+                  </Text>
+                </View>
+                <View style={styles.infoPill}>
+                  <Calendar width={14} height={14} color="#9CA3AF" />
+                  <Text style={styles.infoPillText}>
+                    {job?.schedule?.start ?? '—'}
+                  </Text>
+                </View>
+                <View style={styles.infoPill}>
+                  <MapPin width={14} height={14} color="#9CA3AF" />
+                  <Text style={styles.infoPillText}>
+                    {job?.location?.[0] ?? '—'}
+                  </Text>
+                </View>
+              </View>
+
+              <Text
+                style={styles.description}
+                numberOfLines={expandedCards.has(offer.id) ? undefined : 2}
+              >
+                {job.description}
+              </Text>
+
+              <TouchableOpacity onPress={() => toggleDescription(offer.id)}>
+                <Text style={styles.showMore}>
+                  {expandedCards.has(offer.id) ? 'Show Less' : 'Show More'}
+                </Text>
+              </TouchableOpacity>
+
+              {activeTab === 'pending' && (
+                <View style={styles.actionButtons}>
+                  <TouchableOpacity
+                    style={styles.declineButton}
+                    onPress={() => handleDecline(offer.id)}
+                  >
+                    <Text style={styles.declineButtonText}>Decline</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.acceptButton}
+                    onPress={() => handleAccept(offer.id)}
+                  >
+                    <Text style={styles.acceptButtonText}>Accept Offer</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          );
+        })}
       </ScrollView>
     </SafeAreaView>
   );

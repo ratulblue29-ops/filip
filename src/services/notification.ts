@@ -117,7 +117,7 @@ import {
 
 import { JobItem, NotificationItem } from '../@types/notificationIte.type';
 
-// ✅ Register FCM Token
+// Register FCM Token
 export const registerFCMToken = async () => {
   const app = getApp();
 
@@ -150,7 +150,7 @@ export const registerFCMToken = async () => {
   return token;
 };
 
-// ✅ Fetch My Notifications
+// Fetch My Notifications
 export const fetchMyNotifications = async (): Promise<
   (NotificationItem & { job?: JobItem })[]
 > => {

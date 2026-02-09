@@ -167,44 +167,8 @@ const styles = StyleSheet.create({
     fontFamily: 'InterDisplayMedium',
     marginBottom: 16,
   },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  declineButton: {
-    flex: 1,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.yellow,
-    backgroundColor: COLORS.cardBg,
-  },
-  declineButtonText: {
-    fontSize: 14,
-    fontWeight: 700,
-    color: COLORS.primary,
-    fontFamily: 'InterDisplaySemiBold',
-    lineHeight: 16,
-    textTransform: 'capitalize',
-  },
-  acceptButton: {
-    flex: 1,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    backgroundColor: COLORS.primary,
-  },
-  acceptButtonText: {
-    fontSize: 14,
-    fontWeight: 700,
-    color: COLORS.textDark,
-    fontFamily: 'InterDisplaySemiBold',
-    lineHeight: 16,
-    textTransform: 'capitalize',
-  },
+
+
   bottomCTA: {
     marginTop: 32,
     alignItems: 'center',

@@ -20,6 +20,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import styles from './style';
 import CupIcon from '../../components/svg/CupIcon';
 import { fetchMyOffers, updateOfferStatus } from '../../services/applyToJob';
+import AcceptDeclineBtn from '../../components/AcceptDeclineBtn';
 
 const OfferScreen = () => {
   const navigation = useNavigation<any>();
@@ -172,21 +173,25 @@ const OfferScreen = () => {
               </TouchableOpacity>
 
               {activeTab === 'pending' && (
-                <View style={styles.actionButtons}>
-                  <TouchableOpacity
-                    style={styles.declineButton}
-                    onPress={() => handleDecline(offer.id)}
-                  >
-                    <Text style={styles.declineButtonText}>Decline</Text>
-                  </TouchableOpacity>
+                // <View style={styles.actionButtons}>
+                //   <TouchableOpacity
+                //     style={styles.declineButton}
+                //     onPress={() => handleDecline(offer.id)}
+                //   >
+                //     <Text style={styles.declineButtonText}>Decline</Text>
+                //   </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.acceptButton}
-                    onPress={() => handleAccept(offer.id)}
-                  >
-                    <Text style={styles.acceptButtonText}>Accept Offer</Text>
-                  </TouchableOpacity>
-                </View>
+                //   <TouchableOpacity
+                //     style={styles.acceptButton}
+                //     onPress={() => handleAccept(offer.id)}
+                //   >
+                //     <Text style={styles.acceptButtonText}>Accept Offer</Text>
+                //   </TouchableOpacity>
+                // </View>
+                <AcceptDeclineBtn
+                  handleAccept={() => handleAccept(offer.id)}
+                  handleDecline={() => handleDecline(offer.id)}
+                />
               )}
             </View>
           );

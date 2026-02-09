@@ -17,20 +17,19 @@ const AvailabilityScreen = () => {
     queryKey: ['fulltime'],
     queryFn: fetchFullTimeJobs,
   });
-  
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <AvailabilityHeader />
       <FlatList
-        data={isLoading ? Array(5).fill({}) : workers} 
+        data={isLoading ? Array(5).fill({}) : workers}
         keyExtractor={(item, index) => (item.id ? item.id : index.toString())}
         renderItem={({ item }) => (
           <WorkerCard
             worker={item as Worker}
             isLoading={isLoading}
-            onPress={() => navigation.navigate('sendoffer')}
+            onPress={() => navigation.navigate('sendoffer', { worker: item })}
           />
         )}
         ListHeaderComponent={

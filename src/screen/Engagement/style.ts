@@ -182,6 +182,9 @@ const styles = StyleSheet.create({
   statusTextRejected: {
     color: COLORS.rejectedText,
   },
+  actionButtons: {
+    marginTop: 16,
+  },
 });
 
 export default styles;

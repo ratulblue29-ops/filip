@@ -15,7 +15,7 @@ import { UpdateProfilePayload } from '../@types/UpdateProfile.type';
 import { UserInfo } from '../@types/userInfo.type';
 import { WorkerUser } from '../@types/WorkerUser.type';
 
-// the role of the current user
+// The role of the current user
 export const fetchUserRole = async () => {
   const user = getAuth().currentUser;
   if (!user) return null;
@@ -26,7 +26,7 @@ export const fetchUserRole = async () => {
   return userSnap.exists() ? userSnap.data()?.role ?? null : null;
 };
 
-//  user profile
+// User profile
 export const fetchCurrentUser = async () => {
   const user = getAuth().currentUser;
   if (!user) throw new Error('User not logged in');
@@ -58,7 +58,7 @@ export const updateUserProfile = async (payload: UpdateProfilePayload) => {
   });
 };
 
-// update role
+// Update role
 export const updateUserRoles = async (roles: string[]) => {
   const user = getAuth().currentUser;
   if (!user) throw new Error('User not logged in');
@@ -72,8 +72,7 @@ export const updateUserRoles = async (roles: string[]) => {
   });
 };
 
-// fetch worker
-
+// Fetch worker
 export const fetchFullTimeJobs = async (): Promise<WorkerUser[]> => {
   const db = getFirestore();
 

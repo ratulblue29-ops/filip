@@ -32,19 +32,17 @@ const styles = StyleSheet.create({
   },
 
   avatar: {
-    width: 92,
-    height: 92,
+    width: 72,
+    height: 72,
     borderRadius: 50,
     backgroundColor: '#1D1D1D',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarImage: {
-    width: 92,
-    height: 92,
+    width: 72,
+    height: 72,
     borderRadius: 45,
-    borderWidth: 2,
-    borderColor: '#FFD900',
   },
   cameraIcon: {
     position: 'absolute',
@@ -65,7 +63,6 @@ const styles = StyleSheet.create({
   subText: {
     color: '#FFFFFF',
     fontSize: 12,
-    marginTop: 4,
     fontFamily: 'InterDisplay-Regular',
     fontWeight: '400',
   },
@@ -81,10 +78,13 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   openToWorkText: {
-    marginBottom: 8,
     fontWeight: 600,
     fontFamily: 'InterDisplay-SemiBold',
     color: '#fff',
+  },
+  switchContainer: {
+    paddingBottom: 8,
+    marginTop: -24,
   },
 
   counter: {
@@ -202,15 +202,13 @@ const styles = StyleSheet.create({
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    // alignItems: 'center',
     marginTop: 24,
-
     backgroundColor: '#1D1D1D',
     borderWidth: 1,
     borderColor: '#1D1D1D',
     borderRadius: 14,
     paddingHorizontal: 16,
-    paddingVertical: 14,
   },
 
   bigSwitch: {

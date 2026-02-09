@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Text,
   View,
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  ActivityIndicator,
+  Alert,
+  ToastAndroid,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Clock4 } from 'lucide-react-native';
@@ -14,60 +18,104 @@ import styles from './style';
 import TrophyIcon from '../../components/svg/TrophyIcon';
 import BadgeIcon from '../../components/svg/BadgeIcon';
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  acceptOffer,
+  declineOffer,
+  fetchReceivedOffers,
+  fetchSentOffers,
+} from '../../services/offer';
+import AcceptDeclineBtn from '../../components/AcceptDeclineBtn';
+
 const EngagementScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+  const queryClient = useQueryClient();
+
   const [activeTab, setActiveTab] = useState('received');
+
   const handleGoBack = () => {
     navigation.goBack();
   };
 
-  const receivedOffers = [
-    {
-      id: '1',
-      title: 'Senior Bartender',
-      venue: 'The Golden Tap',
-      rate: '€25/Hr',
-      status: 'action-needed',
-      schedule: 'Today,Oct 25 • 6:00 PM - 12:00 AM',
-      icon: 'glass',
-    },
-    {
-      id: '2',
-      title: 'Event Server',
-      venue: 'Grand Hotel Events',
-      rate: '€25/Hr',
-      status: 'accepted',
-      schedule: 'Fri,Oct 25 • 6:00 PM - 12:00 AM',
-      icon: 'event',
-    },
-    {
-      id: '3',
-      title: 'Sous Chef',
-      venue: 'Grand Hotel Events',
-      rate: '€25/Hr',
-      status: 'pending',
-      schedule: 'Today,Oct 25 • 6:00 PM - 12:00 AM',
-      icon: 'glass',
-    },
-    {
-      id: '4',
-      title: 'Barback',
-      venue: 'Grand Hotel Events',
-      rate: '€18/Hr',
-      status: 'rejected',
-      schedule: 'Today,Oct 25 • 6:00 PM - 12:00 AM',
-      icon: 'glass',
-    },
-  ];
+  // --------------------------
+  // Queries
+  // --------------------------
+  const {
+    data: receivedOffers = [],
+    isLoading: receivedLoading,
+    refetch: refetchReceived,
+  } = useQuery({
+    queryKey: ['receivedOffers'],
+    queryFn: fetchReceivedOffers,
+    enabled: activeTab === 'received',
+  });
 
+  const {
+    data: sentOffers = [],
+    isLoading: sentLoading,
+    refetch: refetchSent,
+  } = useQuery({
+    queryKey: ['sentOffers'],
+    queryFn: fetchSentOffers,
+    enabled: activeTab === 'sent',
+  });
+
+  const offersToShow = useMemo(() => {
+    return activeTab === 'received' ? receivedOffers : sentOffers;
+  }, [activeTab, receivedOffers, sentOffers]);
+
+  const isLoading = activeTab === 'received' ? receivedLoading : sentLoading;
+
+  // --------------------------
+  // Toast helper
+  // --------------------------
+  const showToast = (msg: string) => {
+    if (Platform.OS === 'android') {
+      ToastAndroid.showWithGravity(
+        msg,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
+    } else {
+      Alert.alert('Info', msg);
+    }
+  };
+
+  // --------------------------
+  // Mutations (Accept / Decline)
+  // --------------------------
+  const { mutate: acceptMutation } = useMutation({
+    mutationFn: acceptOffer,
+    onSuccess: () => {
+      showToast('Offer accepted');
+      queryClient.invalidateQueries({ queryKey: ['receivedOffers'] });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || 'Accept failed');
+    },
+  });
+
+  const { mutate: declineMutation } = useMutation({
+    mutationFn: declineOffer,
+    onSuccess: () => {
+      showToast('Offer declined');
+      queryClient.invalidateQueries({ queryKey: ['receivedOffers'] });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || 'Decline failed');
+    },
+  });
+
+  // --------------------------
+  // Status UI mapping
+  // --------------------------
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'action-needed':
-        return styles.statusActionNeeded;
       case 'accepted':
         return styles.statusAccepted;
       case 'pending':
         return styles.statusPending;
+      case 'declined':
       case 'rejected':
         return styles.statusRejected;
       default:
@@ -77,12 +125,11 @@ const EngagementScreen = () => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'action-needed':
-        return 'Action Needed';
       case 'accepted':
         return 'Accepted';
       case 'pending':
         return 'Pending';
+      case 'declined':
       case 'rejected':
         return 'Rejected';
       default:
@@ -105,7 +152,10 @@ const EngagementScreen = () => {
       <View style={styles.tabsContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'received' && styles.activeTab]}
-          onPress={() => setActiveTab('received')}
+          onPress={() => {
+            setActiveTab('received');
+            refetchReceived();
+          }}
           activeOpacity={0.7}
         >
           <Text
@@ -117,9 +167,13 @@ const EngagementScreen = () => {
             Received Offers
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[styles.tab, activeTab === 'sent' && styles.activeTab]}
-          onPress={() => setActiveTab('sent')}
+          onPress={() => {
+            setActiveTab('sent');
+            refetchSent();
+          }}
           activeOpacity={0.7}
         >
           <Text
@@ -134,57 +188,131 @@ const EngagementScreen = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {receivedOffers.map(offer => (
-          <View
-            key={offer.id}
-            style={[
-              styles.offerCard,
-              offer.status === 'rejected' && styles.offerCardRejected,
-            ]}
-          >
-            <View style={styles.cardHeader}>
-              <View style={styles.iconCircle}>
-                {offer.icon === 'glass' ? (
-                  <TrophyIcon width={24} height={24} color="#000000" />
-                ) : (
-                  <BadgeIcon
-                    width={24}
-                    height={24}
-                    primaryColor="#F4922E"
-                    backgroundColor="transparent"
-                  />
-                )}
-              </View>
-              <View style={styles.cardInfo}>
-                <View style={styles.titleRow}>
-                  <Text style={styles.offerTitle}>{offer.title}</Text>
-                  <Text style={styles.offerRate}>{offer.rate}</Text>
-                  <View style={getStatusStyle(offer.status)}>
-                    <Text
-                      style={[
-                        styles.statusText,
-                        offer.status === 'action-needed' &&
-                          styles.statusTextActionNeeded,
-                        offer.status === 'accepted' &&
-                          styles.statusTextAccepted,
-                        offer.status === 'pending' && styles.statusTextPending,
-                        offer.status === 'rejected' &&
-                          styles.statusTextRejected,
-                      ]}
-                    >
-                      {getStatusText(offer.status)}
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#FFD900" />
+        ) : offersToShow.length === 0 ? (
+          <Text style={{ color: '#fff', textAlign: 'center', marginTop: 30 }}>
+            No offers found
+          </Text>
+        ) : (
+          offersToShow.map((offer: any) => {
+            const status = offer.status || 'pending';
+
+            return (
+              <View
+                key={offer.id}
+                style={[
+                  styles.offerCard,
+                  (status === 'rejected' || status === 'declined') &&
+                    styles.offerCardRejected,
+                ]}
+              >
+                <View style={styles.cardHeader}>
+                  <View style={styles.iconCircle}>
+                    {offer.type === 'glass' ? (
+                      <TrophyIcon width={24} height={24} color="#000000" />
+                    ) : (
+                      <BadgeIcon
+                        width={24}
+                        height={24}
+                        primaryColor="#F4922E"
+                        backgroundColor="transparent"
+                      />
+                    )}
+                  </View>
+
+                  <View style={styles.cardInfo}>
+                    <View style={styles.titleRow}>
+                      <Text style={styles.offerTitle}>
+                        {offer.title || 'Job Offer'}
+                      </Text>
+
+                      <Text style={styles.offerRate}>
+                        €{offer.rate || 0}/Hr
+                      </Text>
+
+                      <View style={getStatusStyle(status)}>
+                        <Text
+                          style={[
+                            styles.statusText,
+                            status === 'accepted' && styles.statusTextAccepted,
+                            status === 'pending' && styles.statusTextPending,
+                            (status === 'rejected' || status === 'declined') &&
+                              styles.statusTextRejected,
+                          ]}
+                        >
+                          {getStatusText(status)}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <Text style={styles.venue}>
+                      {offer.location || 'Unknown Location'}
                     </Text>
+
+                    <View style={styles.scheduleRow}>
+                      <Clock4 width={16} height={16} color="#FFD900" />
+                      <Text style={styles.scheduleText}>
+                        {offer.schedule || 'No schedule'}
+                      </Text>
+                    </View>
+
+                    {/* ✅ Accept / Decline only for Received Offers + Pending */}
+                    {activeTab === 'received' && status === 'pending' && (
+                      // <View
+                      //   style={{
+                      //     flexDirection: 'row',
+                      //     gap: 10,
+                      //     marginTop: 12,
+                      //   }}
+                      // >
+                      //   <TouchableOpacity
+                      //     onPress={() => acceptMutation(offer.id)}
+                      //     disabled={acceptLoading || declineLoading}
+                      //     style={{
+                      //       flex: 1,
+                      //       backgroundColor: '#00C853',
+                      //       paddingVertical: 10,
+                      //       borderRadius: 10,
+                      //       alignItems: 'center',
+                      //       opacity: acceptLoading ? 0.7 : 1,
+                      //     }}
+                      //   >
+                      //     <Text style={{ color: '#000', fontWeight: '700' }}>
+                      //       Accept
+                      //     </Text>
+                      //   </TouchableOpacity>
+
+                      //   <TouchableOpacity
+                      //     onPress={() => declineMutation(offer.id)}
+                      //     disabled={acceptLoading || declineLoading}
+                      //     style={{
+                      //       flex: 1,
+                      //       backgroundColor: '#FF3D00',
+                      //       paddingVertical: 10,
+                      //       borderRadius: 10,
+                      //       alignItems: 'center',
+                      //       opacity: declineLoading ? 0.7 : 1,
+                      //     }}
+                      //   >
+                      //     <Text style={{ color: '#fff', fontWeight: '700' }}>
+                      //       Decline
+                      //     </Text>
+                      //   </TouchableOpacity>
+                      // </View>
+                      <View style={styles.actionButtons}>
+                        <AcceptDeclineBtn
+                          handleAccept={() => acceptMutation(offer.id)}
+                          handleDecline={() => declineMutation(offer.id)}
+                        />
+                      </View>
+                    )}
                   </View>
                 </View>
-                <Text style={styles.venue}>{offer.venue}</Text>
-                <View style={styles.scheduleRow}>
-                  <Clock4 width={16} height={16} color="#FFD900" />
-                  <Text style={styles.scheduleText}>{offer.schedule}</Text>
-                </View>
               </View>
-            </View>
-          </View>
-        ))}
+            );
+          })
+        )}
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -16,7 +15,6 @@ import Toast from 'react-native-toast-message';
 import styles from './mainProfileStyle';
 
 import SkillInput from '../../components/profile/SkillInput';
-import UploadBanner from '../../components/availiability/UploadBanner';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCurrentUser, updateUserProfile } from '../../services/user';
@@ -216,7 +214,7 @@ const MainProfile: React.FC = () => {
 
           {/* Open to work */}
           <View style={styles.switchRow}>
-            <View>
+            <View style={styles.switchContainer}>
               <Text style={[styles.label, styles.openToWorkText]}>
                 Open To Work
               </Text>

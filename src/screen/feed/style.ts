@@ -354,7 +354,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'InterDisplayRegular',
     fontWeight: 400,
-    textTransform: 'capitalize',
     lineHeight: 22,
     letterSpacing: -0.18,
   },

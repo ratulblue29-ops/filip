@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -18,48 +19,50 @@ import SkillInput from '../../components/profile/SkillInput';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCurrentUser, updateUserProfile } from '../../services/user';
+import { uploadProfilePhoto } from '../../services/uploadPhoto';
+
 
 const MainProfile: React.FC = () => {
   const queryClient = useQueryClient();
-
-  /*  Profile */
   const [skillInput, setSkillInput] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
   const [openToWork, setOpenToWork] = useState(true);
   const [photo, setPhoto] = useState<string | null>(null);
   const [city, setCity] = useState('');
   const [about, setAbout] = useState('');
+  const [fullName, setFullName] = useState('');
   const [hourlyRate, setHourlyRate] = useState('');
   const [bannerImage, setBannerImage] = useState<string | null>(null);
 
-  /* Fetch User */
+  const [localPhoto, setLocalPhoto] = useState<string | null>(null);
+
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: fetchCurrentUser,
   });
 
-  /* Populate State */
+
   useEffect(() => {
     if (!user) return;
 
     setCity(user.profile?.city || '');
     setAbout(user.profile?.aboutMe || '');
     setSkills(user.profile?.skills || []);
-
+    setFullName(user.profile?.name || '');
     setHourlyRate(
       user.profile?.hourlyRate ? String(user.profile.hourlyRate) : '',
     );
 
     setPhoto(user.profile?.photo || null);
     setBannerImage(user.profile?.bannerImage || null);
-
-    setOpenToWork(true);
+    setOpenToWork(user.profile?.openToWork ?? true);
   }, [user]);
 
-  /* Image Picker */
+  /* Pick Image */
   const pickImage = () => {
     launchImageLibrary({ mediaType: 'photo', quality: 0.7 }, res => {
       if (res.assets?.[0]?.uri) {
+        setLocalPhoto(res.assets[0].uri);
         setPhoto(res.assets[0].uri);
       }
     });
@@ -73,7 +76,7 @@ const MainProfile: React.FC = () => {
     setSkillInput('');
   };
 
-  /* Save Profile Mutation  */
+  /* Mutation */
   const { mutate: saveProfile, isPending } = useMutation({
     mutationFn: updateUserProfile,
     onSuccess: () => {
@@ -83,6 +86,7 @@ const MainProfile: React.FC = () => {
         text1: 'Profile Updated',
         text2: 'Profile saved successfully',
       });
+      setLocalPhoto(null);
     },
     onError: (err: any) => {
       Toast.show({
@@ -92,9 +96,8 @@ const MainProfile: React.FC = () => {
       });
     },
   });
-
-  /*  Save Handler  */
-  const handleSaveProfile = () => {
+  // handle profile save
+  const handleSaveProfile = async () => {
     if (!city.trim()) {
       Toast.show({ type: 'error', text1: 'City is required' });
       return;
@@ -105,11 +108,26 @@ const MainProfile: React.FC = () => {
       return;
     }
 
+    let finalPhotoUrl = photo;
+
+    if (localPhoto && localPhoto.startsWith('file://')) {
+      try {
+        finalPhotoUrl = await uploadProfilePhoto(localPhoto);
+      } catch (err) {
+        Toast.show({
+          type: 'error',
+          text1: 'Photo upload failed',
+        });
+        return;
+      }
+    }
+
     saveProfile({
       city,
       aboutMe: about,
+      name: fullName,
       skills,
-      photo,
+      photo: finalPhotoUrl,
       hourlyRate,
       bannerImage,
       openToWork,
@@ -126,17 +144,16 @@ const MainProfile: React.FC = () => {
         <View style={styles.container}>
           <Text style={styles.headerTitle}>Edit Profile</Text>
 
-          {/* <UploadBanner
-            bannerImage={bannerImage}
-            setBannerImage={setBannerImage}
-          /> */}
-
+          {/* Photo */}
           <View style={styles.photoSection}>
             <TouchableOpacity onPress={pickImage}>
               <View style={styles.avatar}>
                 <Image
                   source={{
-                    uri: photo || user?.profile?.photo || undefined,
+                    uri:
+                      photo ||
+                      user?.profile?.photo ||
+                      '',
                   }}
                   style={styles.avatarImage}
                 />
@@ -148,6 +165,16 @@ const MainProfile: React.FC = () => {
             <Text style={styles.uploadText}>Upload Photo</Text>
             <Text style={styles.subText}>Make a great first impression</Text>
           </View>
+
+          {/* Full Name */}
+          <Text style={styles.label}>Full Name</Text>
+          <TextInput
+            style={styles.input}
+            value={fullName}
+            onChangeText={setFullName}
+            placeholder="Full Name"
+            placeholderTextColor="#9CA3AF"
+          />
 
           {/* About */}
           <Text style={styles.label}>About Me</Text>
@@ -175,19 +202,16 @@ const MainProfile: React.FC = () => {
             <MapPin size={24} color="#374151" />
           </View>
 
-          {/* Hourly Rate */}
+          {/* Hourly */}
           <Text style={styles.label}>Hourly Rate</Text>
-          <View style={styles.inputWithIcon}>
-            <TextInput
-              style={styles.flexInput}
-              value={hourlyRate}
-              onChangeText={setHourlyRate}
-              keyboardType="numeric"
-              placeholder="€25"
-              placeholderTextColor="#fff"
-            />
-            <Text style={styles.hourlyRateText}>/hr</Text>
-          </View>
+          <TextInput
+            style={styles.input}
+            value={hourlyRate}
+            onChangeText={setHourlyRate}
+            keyboardType="numeric"
+            placeholder="€25"
+            placeholderTextColor="#9CA3AF"
+          />
 
           {/* Skills */}
           <SkillInput
@@ -204,7 +228,6 @@ const MainProfile: React.FC = () => {
                   onPress={() =>
                     setSkills(prev => prev.filter((_, i) => i !== index))
                   }
-                  style={styles.removeBtn}
                 >
                   <X color="#fff" size={18} />
                 </TouchableOpacity>
@@ -215,17 +238,16 @@ const MainProfile: React.FC = () => {
           {/* Open to work */}
           <View style={styles.switchRow}>
             <View style={styles.switchContainer}>
-              <Text style={[styles.label, styles.openToWorkText]}>
-                Open To Work
+              <Text style={styles.label}>Open To Work</Text>
+              <Text style={styles.subText}>
+                Show users you are available
               </Text>
-              <Text style={styles.subText}>Show users you are available</Text>
             </View>
             <Switch
               value={openToWork}
               onValueChange={setOpenToWork}
               trackColor={{ false: '#515E72', true: '#FFD900' }}
               thumbColor="#FFFFFF"
-              style={styles.bigSwitch}
             />
           </View>
 

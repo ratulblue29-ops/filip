@@ -1,5 +1,3 @@
-
-
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -88,69 +86,92 @@ export const signUpUser = async (data: SignUpData) => {
 
 // google signup
 export const signInWithGoogle = async () => {
-  await GoogleSignin.hasPlayServices({
-    showPlayServicesUpdateDialog: true,
-  });
-
-  await GoogleSignin.signIn();
-
-  const { idToken } = await GoogleSignin.getTokens();
-
-  if (!idToken) {
-    throw new Error('Google ID token not found');
-  }
-
-  const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-  const userCredential = await auth().signInWithCredential(googleCredential);
-
-  const user = userCredential.user;
-
-  const userRef = firestore().collection('users').doc(user.uid);
-  const snap = await userRef.get();
-
-  if (!snap.exists) {
-    await userRef.set({
-      email: user.email ? user.email.trim().toLowerCase() : '',
-
-      profile: {
-        name: user.displayName ?? '',
-        aboutMe: '',
-        photo: user.photoURL ?? null,
-        city: '',
-        skills: [],
-        hourlyRate: null,
-        experienceYears: 0,
-        rating: 0,
-        reviewsCount: 0,
-        verified: false,
-        opentowork: true,
-      },
-
-      membership: {
-        tier: 'free', // free | basic | premium
-        startedAt: null,
-        expiresAt: null,
-
-        monthKey: getMonthKey(), // IMPORTANT
-        fullTimeAdsPostedThisMonth: 0,
-        fullTimeAdsLimit: 0, // free = 0, basic = 1, premium = unlimited (null)
-      },
-
-      credits: {
-        balance: 10,
-        lifetimeEarned: 10,
-        used: 0,
-      },
-
-      terms: {
-        accepted: true,
-        acceptedAt: firestore.FieldValue.serverTimestamp(),
-      },
-
-      createdAt: firestore.FieldValue.serverTimestamp(),
-      updatedAt: firestore.FieldValue.serverTimestamp(),
+  try {
+    await GoogleSignin.hasPlayServices({
+      showPlayServicesUpdateDialog: true,
     });
-  }
 
-  return user;
+    await GoogleSignin.signIn();
+
+    const { idToken } = await GoogleSignin.getTokens();
+    if (!idToken) throw new Error('Google ID token not found');
+
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+    const userCredential = await auth().signInWithCredential(googleCredential);
+    const user = userCredential.user;
+
+    const userRef = firestore().collection('users').doc(user.uid);
+    const snap = await userRef.get();
+
+    const existingProfile = snap.exists() ? snap.data()?.profile : null;
+
+    const finalPhoto = existingProfile?.photo || user.photoURL || null;
+    const finalName = existingProfile?.name || user.displayName || '';
+
+    // first time user
+    if (!snap.exists) {
+      await userRef.set({
+        email: user.email?.trim().toLowerCase() ?? '',
+
+        profile: {
+          name: finalName,
+          aboutMe: '',
+          photo: finalPhoto,
+          city: '',
+          skills: [],
+          hourlyRate: null,
+          experienceYears: 0,
+          rating: 0,
+          reviewsCount: 0,
+          verified: false,
+          openToWork: true,
+        },
+
+        terms: {
+          accepted: false,
+          acceptedAt: null,
+        },
+
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        updatedAt: firestore.FieldValue.serverTimestamp(),
+      });
+    }
+
+
+    await userRef.set(
+      {
+        email: user.email?.trim().toLowerCase() ?? '',
+        updatedAt: firestore.FieldValue.serverTimestamp(),
+
+        profile: {
+          name: finalName,
+          photo: finalPhoto,
+        },
+
+        membership: {
+          tier: 'free',
+          startedAt: null,
+          expiresAt: null,
+          monthKey: getMonthKey(),
+          fullTimeAdsPostedThisMonth: 0,
+          fullTimeAdsLimit: 0,
+        },
+
+        credits: {
+          balance: 10,
+          lifetimeEarned: 10,
+          used: 0,
+        },
+
+        active: true,
+      },
+      { merge: true }
+    );
+
+    return user;
+  } catch (error) {
+    console.log('Google Signup Error:', error);
+    throw error;
+  }
 };
+

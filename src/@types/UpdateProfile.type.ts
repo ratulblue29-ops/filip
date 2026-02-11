@@ -1,6 +1,7 @@
 export interface UpdateProfilePayload {
     city: string;
     aboutMe: string;
+    name: string;
     skills: string[];
     openToWork: boolean;
     hourlyRate: string;

@@ -23,12 +23,15 @@ import { formatSchedule, timeAgo } from '../../helper/timeanddateHelper';
 import AvailabilitySkeleton from '../../components/skeleton/AvailabilitySkeleton';
 import PostTypeModal from '../../components/availiability/PostTypeModal';
 import { Mypost } from '../../@types/Mypost.type';
+import NotificationDot from '../../components/feed/NotificationDot';
+import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
 
 const PostedAvailabilitiesScreen = () => {
   const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'past'>('all');
   const [showPostTypeModal, setShowPostTypeModal] = useState<boolean>(false);
-
+  // notification get for dot
+  const { hasUnread } = useUnreadNotifications();
   // Queries
   const { data: availabilities = [], isLoading } = useQuery<Mypost[]>({
     queryKey: ['my-jobs'],
@@ -86,10 +89,7 @@ const PostedAvailabilitiesScreen = () => {
           <ArrowLeft width={24} height={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.title}>My Posted Availabilities</Text>
-        <View>
-          <Bell width={24} height={24} color="white" />
-          <View style={styles.notifDot} />
-        </View>
+        <NotificationDot hasUnread={hasUnread} />
       </View>
 
       {/* TABS */}

@@ -41,22 +41,29 @@ export const fetchCurrentUser = async () => {
 export const updateUserProfile = async (payload: UpdateProfilePayload) => {
   const user = getAuth().currentUser;
   if (!user) throw new Error('User not logged in');
+
   const db = getFirestore();
   const userRef = doc(db, 'users', user.uid);
 
-  await updateDoc(userRef, {
+  const data: any = {
     'profile.city': payload.city,
-    ...(payload.photo && { 'profile.photo': payload.photo }),
-
     'profile.aboutMe': payload.aboutMe,
+    'profile.name': payload.name,
     'profile.skills': payload.skills,
     'profile.hourlyRate':
       payload.hourlyRate !== '' ? Number(payload.hourlyRate) : null,
     'profile.experienceYears': payload.experienceYears ?? 0,
     'profile.openToWork': payload.openToWork,
     updatedAt: serverTimestamp(),
-  });
+  };
+
+  if (payload.photo && payload.photo.startsWith('https://')) {
+    data['profile.photo'] = payload.photo;
+  }
+
+  await updateDoc(userRef, data);
 };
+
 
 // Update role
 export const updateUserRoles = async (roles: string[]) => {

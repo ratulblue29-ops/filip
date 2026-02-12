@@ -218,6 +218,9 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
     textDecorationLine: 'underline',
   },
+  loading: {
+    marginTop: 20,
+  }
 });
 
 export default styles;

@@ -406,9 +406,6 @@ const MemberShipScreen = () => {
     handlePurchase('premium');
   };
 
-  const handleRestore = () => {
-    console.log('Restore purchases');
-  };
 
   const handleBack = () => {
     navigation.goBack();
@@ -421,12 +418,15 @@ const MemberShipScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
-          <ArrowLeft width={22} height={22} color="white" />
+          <View>
+            <ArrowLeft width={22} height={22} color="white" />
+          </View>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Membership Plans</Text>
-        <TouchableOpacity onPress={handleRestore}>
+        {/* <TouchableOpacity onPress={handleRestore}>
           <Text style={styles.restoreText}>Restore</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <View />
       </View>
 
       <ScrollView

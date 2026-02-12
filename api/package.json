@@ -13,6 +13,7 @@
   },
   "main": "index.js",
   "dependencies": {
+    "dotenv": "^17.2.4",
     "firebase-admin": "^13.6.1",
     "firebase-functions": "^7.0.5",
     "stripe": "^20.3.1"

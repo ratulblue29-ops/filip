@@ -88,13 +88,14 @@
 //         }
 //     }
 // );
+
 const { onCall } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const Stripe = require("stripe");
-
+require("dotenv").config();
 admin.initializeApp();
 
-const stripe = new Stripe("REMOVED_51SL7SOLT7u05bl0TZL2k2X5cZOIkmJzgAWjaHtGrSmmtwTEQTE4DH2wMlwIZqSimuDNl0yhxj559AFGpq8wGUSOG00L8oEuTYJ");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.createPaymentIntent = onCall(
     { region: "us-central1" },

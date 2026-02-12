@@ -133,6 +133,7 @@
 // };
 
 // export default PurchaseScreen;
+
 import React, { useState } from "react";
 import {
   Text,
@@ -167,18 +168,14 @@ const PurchaseScreen = () => {
   const navigation = useNavigation<any>();
   const { confirmPayment } = useStripe();
 
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">(
-    "monthly"
-  );
+  const [selectedPlan, setSelectedPlan] =
+    useState<"monthly" | "yearly">("monthly");
   const [loading, setLoading] = useState(false);
 
   const handleUpgrade = async () => {
     try {
       setLoading(true);
 
-      console.log("====== DEBUG START ======");
-
-      // 🔥 Ensure user logged in
       const auth = getAuth();
       const user = auth.currentUser;
 
@@ -189,24 +186,20 @@ const PurchaseScreen = () => {
 
       console.log("User UID:", user.uid);
 
-      // 🔥 Get Firebase App
-      const app = getApp();
-      console.log("Project ID:", app.options.projectId);
+      // 🔥 Force refresh token
+      await user.getIdToken(true);
 
-      // 🔥 Get Functions with region
+      const app = getApp();
       const functions = getFunctions(app, "us-central1");
 
-      // 🔥 Callable reference
-      const createSubscription = httpsCallable(
+      // ✅ CORRECT FUNCTION NAME
+      const createPaymentIntent = httpsCallable(
         functions,
-        "createSubscription"
+        "createPaymentIntent"
       );
 
-      console.log("Callable ready");
-
-      // 🔥 Call backend
-      const response: any = await createSubscription({
-        plan: "premium",
+      const response: any = await createPaymentIntent({
+        plan: selectedPlan === "monthly" ? "basic" : "premium",
       });
 
       const clientSecret = response?.data?.clientSecret;
@@ -217,10 +210,12 @@ const PurchaseScreen = () => {
 
       console.log("Client secret received");
 
-      // 🔥 Confirm Stripe payment
-      const { error, paymentIntent } = await confirmPayment(clientSecret, {
-        paymentMethodType: "Card",
-      });
+      const { error, paymentIntent } = await confirmPayment(
+        clientSecret,
+        {
+          paymentMethodType: "Card",
+        }
+      );
 
       if (error) {
         Alert.alert("Payment Failed", error.message);
@@ -228,15 +223,14 @@ const PurchaseScreen = () => {
       }
 
       if (paymentIntent) {
-        Alert.alert("Success", "Premium plan purchased successfully");
+        Alert.alert("Success", "Payment successful!");
         navigation.goBack();
       }
 
     } catch (error: any) {
-      console.log("🔥 FULL ERROR:", error);
+      console.log("FULL ERROR:", error);
       Alert.alert("Error", error?.message || "Something went wrong");
     } finally {
-      console.log("====== DEBUG END ======");
       setLoading(false);
     }
   };
@@ -293,7 +287,8 @@ const PurchaseScreen = () => {
           <View style={styles.priceContainer}>
             <Text style={styles.priceText}>Total today</Text>
             <Text style={styles.priceTextActive}>
-              €24.99<Text style={styles.priceMonth}>/month</Text>
+              {selectedPlan === "monthly" ? "€9.99" : "€24.99"}
+              <Text style={styles.priceMonth}>/month</Text>
             </Text>
           </View>
 
@@ -306,7 +301,9 @@ const PurchaseScreen = () => {
               <ActivityIndicator color="#000" />
             ) : (
               <>
-                <Text style={styles.upgradeButtonText}>Upgrade Now</Text>
+                <Text style={styles.upgradeButtonText}>
+                  Upgrade Now
+                </Text>
                 <ArrowRight />
               </>
             )}

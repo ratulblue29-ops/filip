@@ -1,0 +1,7 @@
+[33m887ca25[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: checkout: moving from e07951df34197d4ff715140876c1df3434f1ded1 to main
+[33me07951d[m HEAD@{1}: checkout: moving from main to HEAD~1
+[33m887ca25[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{2}: reset: moving to HEAD~2
+[33m7625ca2[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{3}: reset: moving to HEAD~2
+[33m3e8e884[m HEAD@{4}: commit: not solveing py payment getway
+[33m250fcf8[m HEAD@{5}: commit: feat: Implement Stripe subscription flow with a new Firebase Cloud Function and a dedicated purchase screen.
+[33m7625ca2[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{6}: clone: from https://github.com/MohammadAlamin99/filip.git

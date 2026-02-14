@@ -22,16 +22,23 @@ import {
 import UserProfileIcon from '../../components/svg/UserProfileIcon';
 import { useNavigation } from '@react-navigation/native';
 import styles from './style';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCurrentUser } from '../../services/user';
 
 const SettingScreen = () => {
   const navigation = useNavigation<any>();
+
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: fetchCurrentUser,
+  });
+
   const menuItems = [
     {
       id: '1',
       label: 'Personal Information',
       icon: User,
-      onPress: () => {
-      },
+      onPress: () => {},
     },
     {
       id: '2',
@@ -101,7 +108,7 @@ const SettingScreen = () => {
           <ArrowLeft size={24} color="#ffffff" />
         </TouchableOpacity>
         <Text style={styles.title}>Settings</Text>
-        <View></View>
+        <View />
       </View>
 
       <ScrollView
@@ -112,12 +119,14 @@ const SettingScreen = () => {
         <View style={styles.profileSection}>
           <Image
             source={{
-              uri: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=800',
+              uri: user?.profile?.photo || '',
             }}
             style={styles.profileImage}
           />
-          <Text style={styles.userName}>Daniel Martinez</Text>
-          <Text style={styles.userEmail}>Daniel.M@Example.Com</Text>
+          <Text style={styles.userName}>{user?.profile?.name || 'User'}</Text>
+          <Text style={styles.userEmail}>
+            {user?.email || 'user@example.com'}
+          </Text>
         </View>
 
         {/* Menu Items */}

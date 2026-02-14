@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Text,
@@ -16,19 +15,18 @@ import { ArrowLeft, Check } from 'lucide-react-native';
 
 import { getApp } from '@react-native-firebase/app';
 import { getAuth } from '@react-native-firebase/auth';
-import {
-  getFunctions,
-  httpsCallable,
-} from '@react-native-firebase/functions';
+import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
 import { useStripe } from '@stripe/stripe-react-native';
+import Toast from 'react-native-toast-message';
 
 const MemberShipScreen = () => {
   const navigation = useNavigation<any>();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
-  const [selectedPlan, setSelectedPlan] =
-    useState<'monthly' | 'yearly'>('monthly');
+  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>(
+    'monthly',
+  );
 
   const [loading, setLoading] = useState(false);
 
@@ -40,7 +38,10 @@ const MemberShipScreen = () => {
       const user = auth.currentUser;
 
       if (!user) {
-        Alert.alert('Error', 'User not logged in');
+        Toast.show({
+          type: 'error',
+          text1: 'Please log in to purchase a membership plan.',
+        });
         return;
       }
 
@@ -54,9 +55,8 @@ const MemberShipScreen = () => {
         'createPaymentIntent',
       );
 
-      // ✅ ONLY SEND backend supported plans
-      const finalPlan =
-        planType === 'standard' ? 'basic' : 'premium';
+      //ONLY SEND backend supported plans
+      const finalPlan = planType === 'standard' ? 'basic' : 'premium';
 
       const response: any = await createPaymentIntent({
         plan: finalPlan,
@@ -74,7 +74,10 @@ const MemberShipScreen = () => {
       });
 
       if (initError) {
-        Alert.alert('Error', initError.message);
+        Toast.show({
+          type: 'error',
+          text1: initError.message,
+        });
         return;
       }
 
@@ -84,20 +87,19 @@ const MemberShipScreen = () => {
         Alert.alert('Payment failed', error.message);
         return;
       }
-
-      Alert.alert(
-        'Payment Success 🎉',
-        'Your membership will activate shortly.'
-      );
-
+      Toast.show({
+        type: 'success',
+        text1: 'Membership plan purchased successfully!',
+      });
     } catch (err: any) {
-      console.log('FULL ERROR:', err);
-      Alert.alert('Error', err?.message || 'Something went wrong');
+      Toast.show({
+        type: 'error',
+        text1: err?.message || 'Something went wrong',
+      });
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleChooseStandard = () => {
     handlePurchase('standard');
@@ -144,16 +146,14 @@ const MemberShipScreen = () => {
           <TouchableOpacity
             style={[
               styles.toggleButton,
-              selectedPlan === 'monthly' &&
-              styles.toggleButtonActive,
+              selectedPlan === 'monthly' && styles.toggleButtonActive,
             ]}
             onPress={() => setSelectedPlan('monthly')}
           >
             <Text
               style={[
                 styles.toggleText,
-                selectedPlan === 'monthly' &&
-                styles.toggleTextActive,
+                selectedPlan === 'monthly' && styles.toggleTextActive,
               ]}
             >
               Monthly
@@ -163,24 +163,20 @@ const MemberShipScreen = () => {
           <TouchableOpacity
             style={[
               styles.toggleButton,
-              selectedPlan === 'yearly' &&
-              styles.toggleButtonActive,
+              selectedPlan === 'yearly' && styles.toggleButtonActive,
             ]}
             onPress={() => setSelectedPlan('yearly')}
           >
             <Text
               style={[
                 styles.toggleText,
-                selectedPlan === 'yearly' &&
-                styles.toggleTextActive,
+                selectedPlan === 'yearly' && styles.toggleTextActive,
               ]}
             >
               Yearly
             </Text>
             <View style={styles.saveBadge}>
-              <Text style={styles.saveBadgeText}>
-                Save 20%
-              </Text>
+              <Text style={styles.saveBadgeText}>Save 20%</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -194,14 +190,14 @@ const MemberShipScreen = () => {
             <Text style={styles.priceUnit}>/mo</Text>
           </View>
 
-
           <View style={styles.featuresList}>
             <View style={styles.featureItem}>
               <Check width={22} height={22} color="#FFD900" />
               <Text style={styles.featureText}>10 Monthly Credits</Text>
             </View>
             <View style={styles.featureItem}>
-              <Check width={22} height={22} color="#FFD900" />               <Text style={styles.featureText}>1 Job Ad Post</Text>
+              <Check width={22} height={22} color="#FFD900" />{' '}
+              <Text style={styles.featureText}>1 Job Ad Post</Text>
             </View>
             <View style={styles.featureItem}>
               <Text style={styles.crossIcon}>✕</Text>

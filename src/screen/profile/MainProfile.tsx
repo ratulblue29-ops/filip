@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -20,8 +19,7 @@ import SkillInput from '../../components/profile/SkillInput';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCurrentUser, updateUserProfile } from '../../services/user';
 import { uploadProfilePhoto } from '../../services/uploadPhoto';
-
-
+// import defaultProfile from '../../../assets/images/defaultProfile.png';
 const MainProfile: React.FC = () => {
   const queryClient = useQueryClient();
   const [skillInput, setSkillInput] = useState('');
@@ -33,14 +31,12 @@ const MainProfile: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [hourlyRate, setHourlyRate] = useState('');
   const [bannerImage, setBannerImage] = useState<string | null>(null);
-
   const [localPhoto, setLocalPhoto] = useState<string | null>(null);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: fetchCurrentUser,
   });
-
 
   useEffect(() => {
     if (!user) return;
@@ -151,10 +147,7 @@ const MainProfile: React.FC = () => {
               <View style={styles.avatar}>
                 <Image
                   source={{
-                    uri:
-                      photo ||
-                      user?.profile?.photo ||
-                      '',
+                    uri: photo || user?.profile?.photo || 'n/a',
                   }}
                   style={styles.avatarImage}
                 />
@@ -240,9 +233,7 @@ const MainProfile: React.FC = () => {
           <View style={styles.switchRow}>
             <View style={styles.switchContainer}>
               <Text style={styles.label}>Open To Work</Text>
-              <Text style={styles.subText}>
-                Show users you are available
-              </Text>
+              <Text style={styles.subText}>Show users you are available</Text>
             </View>
             <Switch
               value={openToWork}

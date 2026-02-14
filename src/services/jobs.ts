@@ -10,6 +10,8 @@ import {
   orderBy,
   getDocs,
   getDoc,
+  startAfter,
+  limit,
 } from '@react-native-firebase/firestore';
 import { UserInfo } from '../@types/userInfo.type';
 import { Job } from '../@types/job.type';
@@ -65,7 +67,6 @@ export const fetchMyJobs = async () => {
 };
 
 // create jobs
-
 type JobType = 'seasonal' | 'fulltime';
 
 interface CreateJobPayload {
@@ -105,7 +106,6 @@ const computePrioritySafe = (
 ) => {
   return visibility?.priority ?? 'active';
 };
-
 
 export const createJob = async ({
   title,
@@ -154,7 +154,7 @@ export const createJob = async ({
 
       const membershipExpiry =
         userData?.membership?.expiresAt &&
-          typeof userData.membership.expiresAt.toDate === 'function'
+        typeof userData.membership.expiresAt.toDate === 'function'
           ? userData.membership.expiresAt.toDate()
           : null;
 
@@ -184,8 +184,9 @@ export const createJob = async ({
         const storedMonthKey =
           userData?.membership?.monthKey ?? currentMonthKey;
 
-        let postedThisMonth =
-          Number(userData?.membership?.fullTimeAdsPostedThisMonth ?? 0);
+        let postedThisMonth = Number(
+          userData?.membership?.fullTimeAdsPostedThisMonth ?? 0,
+        );
 
         if (storedMonthKey !== currentMonthKey) {
           postedThisMonth = 0;
@@ -263,36 +264,58 @@ export const createJob = async ({
     throw error;
   }
 };
-export const fetchRecommendedJobs = async () => {
+
+export const fetchRecommendedJobsPaginated = async (
+  lastDoc: any = null,
+  pageSize: number = 10,
+) => {
   const db = getFirestore();
   const jobsCol = collection(db, 'jobs');
-  const q = query(jobsCol, orderBy('createdAt', 'desc'));
-  const jobSnapshots = await getDocs(q);
+
+  let q = query(jobsCol, orderBy('createdAt', 'desc'), limit(pageSize));
+
+  if (lastDoc) {
+    q = query(
+      jobsCol,
+      orderBy('createdAt', 'desc'),
+      startAfter(lastDoc),
+      limit(pageSize),
+    );
+  }
+
+  const snapshot = await getDocs(q);
 
   const jobsWithUserInfo = await Promise.all(
-    jobSnapshots.docs.map(async (jobDoc: { data: () => any; id: any }) => {
+    snapshot.docs.map(async (jobDoc: { data: () => any; id: any }) => {
       const jobData = jobDoc.data();
+
       const userRef = doc(db, 'users', jobData.userId);
       const userSnap = await getDoc(userRef);
       const userData = userSnap.exists() ? userSnap.data() : null;
+
       return {
         id: jobDoc.id,
         ...jobData,
         user: userData
           ? {
-            id: userSnap.id,
-            name: userData.profile.name,
-            photo: userData.profile.photo,
-            verified: userData?.profile.verified,
-            email: userData.email,
-            membership: userData.membership,
-          }
+              id: userSnap.id,
+              name: userData.profile.name,
+              photo: userData.profile.photo,
+              verified: userData?.profile.verified,
+              email: userData.email,
+              membership: userData.membership,
+            }
           : null,
       };
     }),
   );
 
-  return jobsWithUserInfo;
+  return {
+    jobs: jobsWithUserInfo,
+    lastDoc:
+      snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
+    hasMore: snapshot.docs.length === pageSize,
+  };
 };
 
 // fetch full timne jobs
@@ -424,7 +447,3 @@ export const fetchSeasonalJobs = async () => {
 
   return results;
 };
-function getMonthKey() {
-  throw new Error('Function not implemented.');
-}
-

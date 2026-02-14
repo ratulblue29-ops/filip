@@ -65,7 +65,6 @@ export const updateUserProfile = async (payload: UpdateProfilePayload) => {
   await updateDoc(userRef, data);
 };
 
-
 // Update role
 export const updateUserRoles = async (roles: string[]) => {
   const user = getAuth().currentUser;
@@ -129,21 +128,20 @@ export const fetchFullTimeJobs = async (): Promise<WorkerUser[]> => {
   return jobsWithUser;
 };
 
-
 // get user by id
 
 export const getUserById = async (userId: string): Promise<UserType> => {
-  if (!userId) throw new Error("User ID is required");
+  if (!userId) throw new Error('User ID is required');
   const db = getFirestore();
-  const userRef = doc(db, "users", userId);
+  const userRef = doc(db, 'users', userId);
   const snap = await getDoc(userRef);
 
   if (!snap.exists()) {
-    throw new Error("User not found");
+    throw new Error('User not found');
   }
 
   return {
     id: snap.id,
-    ...(snap.data() as Omit<UserType, "id">),
+    ...(snap.data() as Omit<UserType, 'id'>),
   };
 };

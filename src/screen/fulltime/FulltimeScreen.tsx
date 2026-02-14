@@ -7,18 +7,20 @@ import {
   ListRenderItem,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { Search, SlidersHorizontal } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 import { styles } from './style';
 import FilterItem from '../../components/FilterItem';
 import { JobCard } from '../../components/fulltime/JobCard';
-import { fetchRecommendedJobs } from '../../services/jobs';
+import { fetchRecommendedJobsPaginated } from '../../services/jobs';
 import JobCardSkeleton from '../../components/skeleton/JobCardSkeleton';
 import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
 import NotificationDot from '../../components/feed/NotificationDot';
+
 // TYPES
 type Filter = {
   id: string;
@@ -38,12 +40,22 @@ const INITIAL_FILTERS: Filter[] = [
 const FulltimeScreen = () => {
   const [filters, setFilters] = useState<Filter[]>(INITIAL_FILTERS);
   const [searchText, setSearchText] = useState('');
-  
-  // FETCH JOBS
-  const { data: jobs = [], isLoading } = useQuery({
-    queryKey: ['fulltime-jobs'],
-    queryFn: fetchRecommendedJobs,
-  });
+
+  /* ---------------- PAGINATION FETCH JOBS ---------------- */
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['fulltime-jobs'],
+      queryFn: ({ pageParam }) => fetchRecommendedJobsPaginated(pageParam, 10),
+      initialPageParam: null,
+      getNextPageParam: lastPage => {
+        return lastPage?.hasMore ? lastPage?.lastDoc : undefined;
+      },
+    });
+
+  /* ---------------- FIX ESLINT WARNING ---------------- */
+  const jobs = useMemo(() => {
+    return data?.pages?.flatMap(page => page.jobs) ?? [];
+  }, [data]);
 
   // ACTIVE FILTER
   const activeFilter = useMemo(
@@ -60,12 +72,12 @@ const FulltimeScreen = () => {
         rate: { amount: number };
         priority: string;
       }) => {
-        // SEARCH
         const searchMatch =
           job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
           job.description?.toLowerCase().includes(searchText.toLowerCase());
 
         if (!searchMatch) return false;
+
         if (activeFilter === 'All Jobs') return true;
 
         if (activeFilter === 'Kitchen') {
@@ -86,6 +98,7 @@ const FulltimeScreen = () => {
         if (activeFilter === 'Immediate Starts') {
           return job.priority === 'active';
         }
+
         return true;
       },
     );
@@ -160,12 +173,12 @@ const FulltimeScreen = () => {
 
       {/* Job List */}
       <FlatList
-        data={isLoading ? [] : filteredJobs}
+        data={isPending ? [] : filteredJobs}
         keyExtractor={item => item.id}
         renderItem={renderJobItem}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          isLoading ? (
+          isPending ? (
             <JobCardSkeleton />
           ) : (
             <Text
@@ -174,6 +187,22 @@ const FulltimeScreen = () => {
               No jobs found
             </Text>
           )
+        }
+        ListFooterComponent={
+          <View style={{ marginVertical: 10 }}>
+            {hasNextPage ? (
+              <TouchableOpacity
+                onPress={() => fetchNextPage()}
+                activeOpacity={0.7}
+              >
+                {isFetchingNextPage ? (
+                  <ActivityIndicator color="#fcd303" />
+                ) : (
+                  <Text style={styles.seeAllText}>See More</Text>
+                )}
+              </TouchableOpacity>
+            ) : null}
+          </View>
         }
       />
     </SafeAreaView>

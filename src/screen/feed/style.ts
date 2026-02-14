@@ -82,9 +82,17 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     color: COLORS.yellow,
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'InterDisplayRegular',
     fontWeight: 400,
+    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.yellow,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    width: 100,
+    marginHorizontal: 'auto',
   },
 
   recCard: {

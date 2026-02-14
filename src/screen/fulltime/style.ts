@@ -68,6 +68,20 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(249, 250, 251, 0.10)',
   },
+  seeAllText: {
+    color: '#FFD900',
+    fontSize: 14,
+    fontFamily: 'InterDisplayRegular',
+    fontWeight: 400,
+    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: '#FFD900',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    width: 100,
+    marginHorizontal: 'auto',
+  },
 
   filterScroll: {
     alignItems: 'center',

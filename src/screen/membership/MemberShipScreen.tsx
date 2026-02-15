@@ -116,7 +116,6 @@ const MemberShipScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
@@ -127,7 +126,6 @@ const MemberShipScreen = () => {
         <Text style={styles.headerTitle}>Membership Plans</Text>
         <View />
       </View>
-
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -140,7 +138,6 @@ const MemberShipScreen = () => {
             hospitality professionals.
           </Text>
         </View>
-
         {/* Plan Toggle */}
         <View style={styles.toggleContainer}>
           <TouchableOpacity
@@ -180,11 +177,9 @@ const MemberShipScreen = () => {
             </View>
           </TouchableOpacity>
         </View>
-
         {/* Standard Plan */}
         <View style={styles.planCard}>
           <Text style={styles.planName}>Standard</Text>
-
           <View style={styles.priceContainer}>
             <Text style={styles.priceAmount}>€7.99</Text>
             <Text style={styles.priceUnit}>/mo</Text>
@@ -214,7 +209,6 @@ const MemberShipScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
-
         {/* Premium Plan */}
         <View style={styles.premiumCard}>
           <Text style={styles.premiumName}>Premium</Text>
@@ -251,7 +245,6 @@ const MemberShipScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
-
         {loading && <ActivityIndicator style={styles.loading} />}
       </ScrollView>
     </SafeAreaView>

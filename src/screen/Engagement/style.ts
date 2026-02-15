@@ -185,6 +185,14 @@ const styles = StyleSheet.create({
   actionButtons: {
     marginTop: 16,
   },
+  emptyStateText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: 16,
+    opacity: 0.8,
+    fontFamily: 'InterDisplayRegular',
+    fontWeight: 500,
+  },
 });
 
 export default styles;

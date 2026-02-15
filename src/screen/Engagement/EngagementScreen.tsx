@@ -97,9 +97,6 @@ const EngagementScreen = () => {
     },
   });
 
-  // --------------------------
-  // Status UI mapping
-  // --------------------------
   const getStatusStyle = (status: string) => {
     switch (status) {
       case 'accepted':
@@ -182,9 +179,7 @@ const EngagementScreen = () => {
         {isLoading ? (
           <ActivityIndicator size="large" color="#FFD900" />
         ) : offersToShow.length === 0 ? (
-          <Text style={{ color: '#fff', textAlign: 'center', marginTop: 30 }}>
-            No offers found
-          </Text>
+          <Text style={styles.emptyStateText}>No offers found</Text>
         ) : (
           offersToShow.map((offer: any) => {
             const status = offer.status || 'pending';

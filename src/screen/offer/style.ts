@@ -168,7 +168,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-
   bottomCTA: {
     marginTop: 32,
     alignItems: 'center',
@@ -195,7 +194,6 @@ const styles = StyleSheet.create({
   emptyStateText: {
     color: '#fff',
     textAlign: 'center',
-    marginTop: 40,
     fontSize: 16,
     opacity: 0.8,
     fontFamily: 'InterDisplayRegular',

@@ -321,6 +321,7 @@ export const fetchFullTimeJobs = async (): Promise<Job[]> => {
               reviewsCount: u?.profile?.reviewsCount ?? 0,
             };
           }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err: any) {
           console.warn('Failed to fetch user:', jobData.userId);
         }

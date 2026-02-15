@@ -150,7 +150,14 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
       {/* Header */}
       <View style={styles.headerRow}>
         <View style={styles.titleSection}>
-          <Image source={{ uri: job?.user?.photo }} style={styles.avatar} />
+          <Image
+            source={{
+              uri:
+                job?.user?.photo ||
+                'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg',
+            }}
+            style={styles.avatar}
+          />
           <View>
             <Text style={styles.jobTitle}>{job.title}</Text>
             <Text style={styles.companyName}>{job?.user?.name}</Text>

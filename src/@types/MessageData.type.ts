@@ -1,11 +1,12 @@
-export interface MessageData {
+export type MessageData = {
   id: string;
   name: string;
   role: string;
-  status: 'Offer Pending' | 'Hired' | 'Completed' | 'Inquiry' | 'Canceled';
+  status: string;
   statusColor: string;
   statusTextColor: string;
   message: string;
   time: string;
   image: string;
-}
+  unreadCount?: number;
+};

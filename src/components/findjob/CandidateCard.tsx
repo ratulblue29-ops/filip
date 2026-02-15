@@ -50,9 +50,10 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
       // ✅ Pass job context when creating chat
       const chatId = await createOrGetChat(candidate.user.id, jobContext);
 
-      navigation.navigate('ChatDetailScreen', {
-        chatId,
-        otherUserId: candidate.user.id,
+      // ✅ Navigate to ChatScreen first, with chatId param
+      navigation.navigate('chat', {
+        autoChatId: chatId,
+        autoUserId: candidate.user.id,
       });
     } catch (error: any) {
       Toast.show({
@@ -94,7 +95,9 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
       <View style={styles.profileRow}>
         <Image
           source={{
-            uri: candidate.user.photo || 'n/a',
+            uri:
+              candidate.user.photo ||
+              'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg',
           }}
           style={styles.avatarPlaceholder}
         />

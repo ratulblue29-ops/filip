@@ -39,7 +39,7 @@ export type RootStackParamList = {
   purchase: undefined;
   Seasonal: undefined;
   fulltime: undefined;
-  chat: undefined;
+  chat: { autoChatId?: string; autoUserId?: string } | undefined;
   ChatDetailScreen: { chatId: string; otherUserId: string };
   credit: undefined;
   offer: undefined;

@@ -147,7 +147,7 @@
 // };
 
 // export default FeedScreen;
-
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   View,
@@ -157,33 +157,64 @@ import {
   Image,
   FlatList,
 } from 'react-native';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import styles from './style';
 import { Search } from 'lucide-react-native';
+
+import styles from './style';
 import MainDrawer from '../../components/feed/MainDrawer';
 import Gig from '../../components/feed/Gig';
+import FeedCard from '../../components/feed/FeedCard';
+import NotificationDot from '../../components/feed/NotificationDot';
+
 import { useQuery } from '@tanstack/react-query';
 import { fetchCurrentUser } from '../../services/user';
+import { searchJobs } from '../../services/jobs';
+import { fetchWishlistIds } from '../../services/wishlist';
 import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
-import NotificationDot from '../../components/feed/NotificationDot';
 
 const COLORS = {
   secondaryText: '#9E9E9E',
-  yellow: '#fcd303',
 };
+
 const Drawer = createDrawerNavigator();
 
 const FeedContent = ({ navigation }: any) => {
+  const [searchText, setSearchText] = useState('');
+  const [debouncedText, setDebouncedText] = useState('');
+
+  /* ---------------- DEBOUNCE ---------------- */
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedText(searchText.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchText]);
+
+  /* ---------------- CURRENT USER ---------------- */
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: fetchCurrentUser,
   });
 
-  // notification get for dot
+  /* ---------------- WISHLIST ---------------- */
+  const { data: wishlistIds = [] } = useQuery({
+    queryKey: ['wishlistIds'],
+    queryFn: fetchWishlistIds,
+  });
+
+  /* ---------------- SEARCH QUERY ---------------- */
+  const { data: searchResults = [], isLoading: searchLoading } = useQuery({
+    queryKey: ['searchJobs', debouncedText],
+    queryFn: () => searchJobs(debouncedText),
+    enabled: debouncedText.length > 2,
+  });
+
+  /* ---------------- NOTIFICATIONS ---------------- */
   const { hasUnread } = useUnreadNotifications();
 
-  // get current time
   const getGreeting = () => {
     const hours = new Date().getHours();
     if (hours < 12) return 'Good morning';
@@ -191,61 +222,78 @@ const FeedContent = ({ navigation }: any) => {
     return 'Good evening';
   };
 
-  const feeds: any[] = [];
+  /* ---------------- AVATAR ---------------- */
+  const avatarSource =
+    user?.profile?.photo && user.profile.photo.trim().length > 0
+      ? { uri: user.profile.photo }
+      : {
+          uri: 'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg',
+        };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <View style={styles.header}>
+
+      {/* ================= HEADER ================= */}
+      <View style={[styles.header, { justifyContent: 'space-between' }]}>
         <TouchableOpacity
           style={styles.topRow}
           onPress={() => navigation.openDrawer()}
           activeOpacity={0.7}
         >
-          <View>
-            <Image
-              source={{
-                uri:
-                  user?.profile?.photo ||
-                  'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg',
-              }}
-              style={styles.avatar}
-              resizeMode="cover"
-            />
-          </View>
+          <Image
+            source={avatarSource}
+            style={styles.avatar}
+            resizeMode="cover"
+          />
+
           <View>
             <Text style={styles.greetingText}>{getGreeting()}</Text>
-            <Text style={styles.nameText}>{user?.profile?.name}</Text>
+            <Text style={styles.nameText}>{user?.profile?.name || 'User'}</Text>
           </View>
         </TouchableOpacity>
 
-        {/* notification dot */}
         <NotificationDot hasUnread={hasUnread} />
       </View>
 
+      {/* ================= SEARCH ================= */}
       <View style={styles.searchContainer}>
-        <Search width={24} height={24} color="white" />
+        <Search width={20} height={20} color="white" />
         <TextInput
-          placeholder="Search"
+          placeholder="Search jobs..."
           placeholderTextColor={COLORS.secondaryText}
           style={styles.input}
+          value={searchText}
+          onChangeText={setSearchText}
         />
       </View>
 
-      <FlatList
-        data={feeds}
-        keyExtractor={(_, index) => index.toString()}
-        ListHeaderComponent={<Gig />}
-        // ListEmptyComponent={
-        //   <View style={{ alignItems: 'center', marginTop: 30 }}>
-        //     <Text style={{ color: '#fff', fontSize: 16 }}>
-        //       No feeds available right now
-        //     </Text>
-        //   </View>
-        // }
-        renderItem={() => null}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* ================= CONTENT ================= */}
+
+      {searchText.length > 0 && debouncedText.length < 3 ? (
+        <View style={styles.noResultContainer}>
+          <Text style={styles.noResultText}>Type at least 3 characters</Text>
+        </View>
+      ) : debouncedText.length > 2 ? (
+        <FlatList
+          data={searchResults}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <FeedCard item={item} wishlistIds={wishlistIds} />
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          ListEmptyComponent={
+            !searchLoading ? (
+              <View style={styles.noResultContainer}>
+                <Text style={styles.noResultText}>No results found</Text>
+              </View>
+            ) : null
+          }
+        />
+      ) : (
+        <Gig />
+      )}
     </SafeAreaView>
   );
 };
@@ -258,7 +306,7 @@ const FeedScreen = () => {
         headerShown: false,
         drawerPosition: 'left',
         drawerType: 'front',
-        overlayColor: 'rgba(255, 255, 255, 0.3)',
+        overlayColor: 'rgba(255,255,255,0.3)',
         swipeEnabled: true,
         drawerStyle: styles.drawerStyle,
       }}

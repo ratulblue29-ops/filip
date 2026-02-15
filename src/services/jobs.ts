@@ -447,3 +447,45 @@ export const fetchSeasonalJobs = async () => {
 
   return results;
 };
+
+// search recomanded jobs
+export const searchJobs = async (searchText: string) => {
+  if (!searchText.trim()) return [];
+
+  const db = getFirestore();
+  const snapshot = await getDocs(collection(db, 'jobs'));
+
+  const lower = searchText.toLowerCase();
+
+  const filtered = await Promise.all(
+    snapshot.docs
+      .map((doc: { id: any; data: () => any }) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .filter((job: { title: string }) =>
+        job.title?.toLowerCase().includes(lower),
+      )
+      .slice(0, 20)
+      .map(async (job: { userId: string }) => {
+        if (!job.userId) return job;
+
+        const userSnap = await getDoc(doc(db, 'users', job.userId));
+        const userData = userSnap.exists() ? userSnap.data() : null;
+
+        return {
+          ...job,
+          user: userData
+            ? {
+                id: userSnap.id,
+                name: userData.profile?.name,
+                photo: userData.profile?.photo,
+                verified: userData.profile?.verified,
+              }
+            : null,
+        };
+      }),
+  );
+
+  return filtered;
+};

@@ -102,6 +102,7 @@
 // };
 
 // export default Gig;
+
 import React, { useMemo } from 'react';
 import {
   View,
@@ -120,31 +121,25 @@ import FeedCardSkeleton from '../skeleton/FeedCardSkeleton';
 import { fetchRecommendedJobsPaginated } from '../../services/jobs';
 import { fetchWishlistIds } from '../../services/wishlist';
 
-
 const Gig = () => {
-  /* ---------------- RECOMMENDED JOBS PAGINATION ---------------- */
-  const {
-    data,
-    isPending,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['recommendedJobs'],
-    queryFn: ({ pageParam }) => fetchRecommendedJobsPaginated(pageParam, 10),
-    initialPageParam: null,
-    getNextPageParam: lastPage => {
-      return lastPage?.hasMore ? lastPage?.lastDoc : undefined;
-    },
-  });
+  // RECOMMENDED JOBS
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['recommendedJobs'],
+      queryFn: ({ pageParam }) => fetchRecommendedJobsPaginated(pageParam, 10),
+      initialPageParam: null,
+      getNextPageParam: lastPage => {
+        return lastPage?.hasMore ? lastPage?.lastDoc : undefined;
+      },
+    });
 
-  /* ---------------- FETCH WISHLIST IDS ---------------- */
+  //  FETCH WISHLIST IDS
   const { data: wishlistIds = [], isLoading: wishlistLoading } = useQuery({
     queryKey: ['wishlistIds'],
     queryFn: fetchWishlistIds,
   });
 
-  /* ---------------- FLATTEN JOBS ---------------- */
+  //  FLATTEN JOBS
   const recommendedData = useMemo(() => {
     return data?.pages?.flatMap(page => page.jobs) ?? [];
   }, [data]);
@@ -167,7 +162,7 @@ const Gig = () => {
         )}
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
-          <View style={{ marginVertical: 10, alignItems: 'center' }}>
+          <View style={styles.gigContainer}>
             {hasNextPage ? (
               <TouchableOpacity
                 onPress={() => fetchNextPage()}

@@ -17,6 +17,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 15,
   },
+  gigContainer: {
+    paddingBottom: 120,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -561,6 +564,17 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  noResultContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 40,
+  },
+  noResultText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'InterDisplayRegular',
+    fontWeight: 400,
   },
 });
 

@@ -1,28 +1,25 @@
-
-import React from "react";
+import React from 'react';
 import {
-    View,
-    Text,
-    TouchableOpacity,
-    ScrollView,
-    StatusBar,
-    ActivityIndicator,
-    ToastAndroid,
-    Platform,
-    Alert,
-} from "react-native";
-import { X, MapPin, CalendarCheck2 } from "lucide-react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import styles from "./viewProfileStyle";
-import ReviewCard from "../../components/profile/ReviewCard";
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StatusBar,
+  ActivityIndicator,
+} from 'react-native';
+import { X, MapPin, CalendarCheck2 } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import styles from './viewProfileStyle';
+import ReviewCard from '../../components/profile/ReviewCard';
 // import ProfileHead from "./ProfileHead";
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 
-import { useQuery } from "@tanstack/react-query";
-import { getUserById } from "../../services/user";
-import ProfileHead from "./ProfileHead";
-import { UserType } from "../../@types/ViewProfile.type";
-
+import { useQuery } from '@tanstack/react-query';
+import { getUserById } from '../../services/user';
+import ProfileHead from './ProfileHead';
+import { UserType } from '../../@types/ViewProfile.type';
+import { createOrGetChat } from '../../services/chat';
+import Toast from 'react-native-toast-message';
 
 // interface Day {
 //     day: string;
@@ -32,149 +29,172 @@ import { UserType } from "../../@types/ViewProfile.type";
 // }
 
 type RootStackParamList = {
-    viewProfile: { userId: string };
+  viewProfile: { userId: string };
 };
-type ViewProfileRouteProp = RouteProp<RootStackParamList, "viewProfile">;
+type ViewProfileRouteProp = RouteProp<RootStackParamList, 'viewProfile'>;
 
 const ViewProfileScreen: React.FC = () => {
-    const navigation = useNavigation<any>();
-    const route = useRoute<ViewProfileRouteProp>();
+  const navigation = useNavigation<any>();
+  const route = useRoute<ViewProfileRouteProp>();
 
-    const { userId } = route.params;
+  const { userId } = route.params;
 
-    const {
-        data: user,
-        isLoading,
-        isError,
-        error,
-    } = useQuery<UserType>({
-        queryKey: ["userProfile", userId],
-        queryFn: () => getUserById(userId),
-        enabled: !!userId,
-    });
-    console.log("user get", user)
+  const {
+    data: user,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<UserType>({
+    queryKey: ['userProfile', userId],
+    queryFn: () => getUserById(userId),
+    enabled: !!userId,
+  });
+  console.log('user get', user);
 
-    // const dates: Day[] = [
-    //     { day: "Sat", date: "12", active: true, hasDot: true },
-    //     { day: "Sun", date: "13", active: false },
-    //     { day: "Mon", date: "14", active: false, hasDot: true },
-    //     { day: "Tue", date: "15", active: false },
-    //     { day: "Wed", date: "16", active: false, hasDot: true },
-    //     { day: "Thu", date: "17", active: true, hasDot: true },
-    //     { day: "Fri", date: "18", active: true, hasDot: true },
-    // ];
+  // const dates: Day[] = [
+  //     { day: "Sat", date: "12", active: true, hasDot: true },
+  //     { day: "Sun", date: "13", active: false },
+  //     { day: "Mon", date: "14", active: false, hasDot: true },
+  //     { day: "Tue", date: "15", active: false },
+  //     { day: "Wed", date: "16", active: false, hasDot: true },
+  //     { day: "Thu", date: "17", active: true, hasDot: true },
+  //     { day: "Fri", date: "18", active: true, hasDot: true },
+  // ];
 
-    const handleSendEngagement = () => {
-        const message = "Engagement request sent successfully.";
+  //   const handleSendEngagement = () => {
+  //     const message = 'Engagement request sent successfully.';
 
-        if (Platform.OS === "android") {
-            ToastAndroid.showWithGravity(
-                message,
-                ToastAndroid.SHORT,
-                ToastAndroid.BOTTOM
-            );
-        } else {
-            Alert.alert("Success", message);
-        }
+  //     if (Platform.OS === 'android') {
+  //       ToastAndroid.showWithGravity(
+  //         message,
+  //         ToastAndroid.SHORT,
+  //         ToastAndroid.BOTTOM,
+  //       );
+  //     } else {
+  //       Alert.alert('Success', message);
+  //     }
 
-        navigation.goBack();
-    };
+  //     navigation.goBack();
+  //   };
 
-    // Loading UI
-    if (isLoading) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <StatusBar barStyle="light-content" />
+  const handleSendEngagement = async () => {
+    try {
+      // Pass job context when creating chat
+      const chatId = await createOrGetChat(user?.id || '');
 
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <X size={20} color="#fff" strokeWidth={2.5} />
-                    </TouchableOpacity>
-
-                    <Text style={styles.headerTitle}>Profile</Text>
-                    <View />
-                </View>
-
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <ActivityIndicator size="large" color="#FFD900" />
-                    <Text style={{ marginTop: 10, color: "#fff" }}>
-                        Loading profile...
-                    </Text>
-                </View>
-            </SafeAreaView>
-        );
+      // Navigate to ChatScreen first, with chatId param
+      navigation.navigate('chat', {
+        autoChatId: chatId,
+        autoUserId: user?.id,
+      });
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to start chat',
+      });
     }
+  };
 
-    // Error UI
-    if (isError) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <StatusBar barStyle="light-content" />
-
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <X size={20} color="#fff" strokeWidth={2.5} />
-                    </TouchableOpacity>
-
-                    <Text style={styles.headerTitle}>Profile</Text>
-                    <View />
-                </View>
-
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ color: "red", fontSize: 16 }}>
-                        {(error as Error)?.message || "Something went wrong"}
-                    </Text>
-                </View>
-            </SafeAreaView>
-        );
-    }
-
-    // safety fallback
-    if (!user) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <Text style={{ color: "#fff" }}>No user data found.</Text>
-            </SafeAreaView>
-        );
-    }
-
-    // const roles: string[] = user.roles ?? [];
-
+  // Loading UI
+  if (isLoading) {
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" />
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
 
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <X size={20} color="#fff" strokeWidth={2.5} />
-                </TouchableOpacity>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <X size={20} color="#fff" strokeWidth={2.5} />
+          </TouchableOpacity>
 
-                <Text style={styles.headerTitle}>Profile</Text>
-                <View />
-            </View>
+          <Text style={styles.headerTitle}>Profile</Text>
+          <View />
+        </View>
 
-            <ScrollView
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
-                {/* Profile Section */}
-                <ProfileHead photo={user.profile.photo} />
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <ActivityIndicator size="large" color="#FFD900" />
+          <Text style={{ marginTop: 10, color: '#fff' }}>
+            Loading profile...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
-                {/* Full Name */}
-                <Text style={styles.label}>Full Name</Text>
-                <Text style={styles.box}>{user.profile.name}</Text>
+  // Error UI
+  if (isError) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
 
-                {/* City + Age */}
-                <View>
-                    <Text style={styles.label}>City</Text>
-                    <View style={styles.inputWithIcon}>
-                        <MapPin size={24} color="#fff" />
-                        <Text style={styles.flexInput}>{user.profile.city ?? "N/A"}</Text>
-                    </View>
-                </View>
-                <View style={styles.row}>
-                    {/* <View>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <X size={20} color="#fff" strokeWidth={2.5} />
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>Profile</Text>
+          <View />
+        </View>
+
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Text style={{ color: 'red', fontSize: 16 }}>
+            {(error as Error)?.message || 'Something went wrong'}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // safety fallback
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={{ color: '#fff' }}>No user data found.</Text>
+      </SafeAreaView>
+    );
+  }
+
+  // const roles: string[] = user.roles ?? [];
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <X size={20} color="#fff" strokeWidth={2.5} />
+        </TouchableOpacity>
+
+        <Text style={styles.headerTitle}>Profile</Text>
+        <View />
+      </View>
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Profile Section */}
+        <ProfileHead photo={user.profile.photo} />
+
+        {/* Full Name */}
+        <Text style={styles.label}>Full Name</Text>
+        <Text style={styles.box}>{user.profile.name}</Text>
+
+        {/* City + Age */}
+        <View>
+          <Text style={styles.label}>City</Text>
+          <View style={styles.inputWithIcon}>
+            <MapPin size={24} color="#fff" />
+            <Text style={styles.flexInput}>{user.profile.city ?? 'N/A'}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          {/* <View>
                         <Text style={styles.label}>City</Text>
                         <View style={styles.inputWithIcon}>
                             <MapPin size={24} color="#fff" />
@@ -182,38 +202,38 @@ const ViewProfileScreen: React.FC = () => {
                         </View>
                     </View> */}
 
-                    {/* <View style={styles.age}>
+          {/* <View style={styles.age}>
                         <Text style={styles.label}>Age</Text>
                         <Text style={[styles.box, styles.agetext]}>
                             {user.age ?? "N/A"}
                         </Text>
                     </View> */}
+        </View>
+
+        {/* Bio */}
+        <Text style={styles.label}>Short Bio / CV</Text>
+        <Text style={[styles.box, styles.bioText]}>
+          {user.profile.aboutMe ?? 'No bio available'}
+        </Text>
+
+        {/* Roles */}
+        <Text style={styles.label}>Professional Roles</Text>
+        <View style={styles.rolesContainer}>
+          <View style={styles.tagsWrapper}>
+            {user.profile.skills.length > 0 ? (
+              user.profile.skills.map((role, i) => (
+                <View key={`${role}-${i}`} style={styles.tag}>
+                  <Text style={styles.tagText}>{role}</Text>
                 </View>
+              ))
+            ) : (
+              <Text style={{ color: '#aaa' }}>No roles found</Text>
+            )}
+          </View>
+        </View>
 
-                {/* Bio */}
-                <Text style={styles.label}>Short Bio / CV</Text>
-                <Text style={[styles.box, styles.bioText]}>
-                    {user.profile.aboutMe ?? "No bio available"}
-                </Text>
-
-                {/* Roles */}
-                <Text style={styles.label}>Professional Roles</Text>
-                <View style={styles.rolesContainer}>
-                    <View style={styles.tagsWrapper}>
-                        {user.profile.skills.length > 0 ? (
-                            user.profile.skills.map((role, i) => (
-                                <View key={`${role}-${i}`} style={styles.tag}>
-                                    <Text style={styles.tagText}>{role}</Text>
-                                </View>
-                            ))
-                        ) : (
-                            <Text style={{ color: "#aaa" }}>No roles found</Text>
-                        )}
-                    </View>
-                </View>
-
-                {/* Availability */}
-                {/* <Text style={styles.label}>This Week</Text>
+        {/* Availability */}
+        {/* <Text style={styles.label}>This Week</Text>
                 <View style={styles.daysRow}>
                     {dates.map((item, i) => (
                         <View key={i} style={styles.dayContainer}>
@@ -239,34 +259,37 @@ const ViewProfileScreen: React.FC = () => {
                     ))}
                 </View> */}
 
-                {/* Reviews */}
-                <Text style={styles.label}>Reviews</Text>
+        {/* Reviews */}
+        <Text style={styles.label}>Reviews</Text>
 
-                <ReviewCard
-                    name="The Grand Hotel"
-                    role="Event Server"
-                    time="2d ago"
-                    rating="5.0"
-                    text="Alex was fantastic! Showed up early and handled the rush perfectly. Highly recommended."
-                />
-                <ReviewCard
-                    name="The Grand Hotel"
-                    role="Event Server"
-                    time="2d ago"
-                    rating="5.0"
-                    text="Great energy and very skilled with cocktails. Good vibes only."
-                />
-            </ScrollView>
+        <ReviewCard
+          name="The Grand Hotel"
+          role="Event Server"
+          time="2d ago"
+          rating="5.0"
+          text="Alex was fantastic! Showed up early and handled the rush perfectly. Highly recommended."
+        />
+        <ReviewCard
+          name="The Grand Hotel"
+          role="Event Server"
+          time="2d ago"
+          rating="5.0"
+          text="Great energy and very skilled with cocktails. Good vibes only."
+        />
+      </ScrollView>
 
-            {/* Footer */}
-            <View style={styles.footer}>
-                <TouchableOpacity style={styles.mainButton} onPress={handleSendEngagement}>
-                    <CalendarCheck2 size={20} color="#000" strokeWidth={2.5} />
-                    <Text style={styles.mainButtonText}>Send Engagement</Text>
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
-    );
+      {/* Footer */}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.mainButton}
+          onPress={handleSendEngagement}
+        >
+          <CalendarCheck2 size={20} color="#000" strokeWidth={2.5} />
+          <Text style={styles.mainButtonText}>Send Engagement</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
 };
 
 export default ViewProfileScreen;

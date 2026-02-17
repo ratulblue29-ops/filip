@@ -29,7 +29,7 @@ const AvailabilityScreen = () => {
           <WorkerCard
             worker={item as Worker}
             isLoading={isLoading}
-            onPress={() => navigation.navigate('sendoffer', { worker: item })}
+            // onPress={() => navigation.navigate('sendoffer', { worker: item })}
           />
         )}
         ListHeaderComponent={

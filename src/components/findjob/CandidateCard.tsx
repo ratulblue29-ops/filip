@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Calendar, Lock, SendHorizontal, MapPin } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -8,6 +8,11 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchCurrentUser } from '../../services/user';
 import { createOrGetChat } from '../../services/chat';
 import Toast from 'react-native-toast-message';
+import {
+  fetchWorkerActivePosts,
+  createEngagement,
+} from '../../services/engagement';
+import ChooseAvailabilityModal from '../availiability/ChooseAvailabilityModal';
 
 interface CandidateCardProps {
   candidate: Worker;
@@ -32,35 +37,62 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
 
   const isPremium = user?.membership?.tier === 'premium';
 
+  // const handleEngage = async () => {
+  //   try {
+  //     // ✅ Create job context from candidate data
+  //     const jobContext = {
+  //       jobId: candidate.id,
+  //       title: candidate.title || 'Seasonal Job',
+  //       type: 'seasonal' as const,
+  //       rate: candidate.rate,
+  //       location: candidate.location,
+  //       schedule: {
+  //         start: candidate.dateRange?.start || '',
+  //         end: candidate.dateRange?.end || '',
+  //       },
+  //     };
+
+  //     // ✅ Pass job context when creating chat
+  //     const chatId = await createOrGetChat(candidate.user.id, jobContext);
+
+  //     // ✅ Navigate to ChatScreen first, with chatId param
+  //     navigation.navigate('chat', {
+  //       autoChatId: chatId,
+  //       autoUserId: candidate.user.id,
+  //     });
+  //   } catch (error: any) {
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: 'Error',
+  //       text2: error.message || 'Failed to start chat',
+  //     });
+  //   }
+  // };
+  const [modalVisible, setModalVisible] = useState(false);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
+
   const handleEngage = async () => {
     try {
-      // ✅ Create job context from candidate data
-      const jobContext = {
-        jobId: candidate.id,
-        title: candidate.title || 'Seasonal Job',
-        type: 'seasonal' as const,
-        rate: candidate.rate,
-        location: candidate.location,
-        schedule: {
-          start: candidate.dateRange?.start || '',
-          end: candidate.dateRange?.end || '',
-        },
-      };
-
-      // ✅ Pass job context when creating chat
-      const chatId = await createOrGetChat(candidate.user.id, jobContext);
-
-      // ✅ Navigate to ChatScreen first, with chatId param
-      navigation.navigate('chat', {
-        autoChatId: chatId,
-        autoUserId: candidate.user.id,
-      });
+      setPostsLoading(true);
+      setModalVisible(true);
+      const activePosts = await fetchWorkerActivePosts(candidate.user.id);
+      setPosts(activePosts);
     } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error.message || 'Failed to start chat',
-      });
+      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
+      setModalVisible(false);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  const handleSelectPost = async (post: any) => {
+    setModalVisible(false);
+    try {
+      await createEngagement(candidate.user.id, post.id);
+      Toast.show({ type: 'success', text1: 'Engagement sent!' });
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
     }
   };
 
@@ -147,6 +179,13 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
           </TouchableOpacity>
         )}
       </View>
+      <ChooseAvailabilityModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        posts={posts}
+        loading={postsLoading}
+        onSelect={handleSelectPost}
+      />
     </View>
   );
 };

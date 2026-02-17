@@ -24,6 +24,10 @@ import {
 } from '../../services/offer';
 import AcceptDeclineBtn from '../../components/AcceptDeclineBtn';
 import Toast from 'react-native-toast-message';
+import {
+  fetchReceivedEngagements,
+  fetchSentEngagements,
+} from '../../services/engagement';
 
 const EngagementScreen = () => {
   const navigation = useNavigation<any>();
@@ -41,8 +45,8 @@ const EngagementScreen = () => {
     isLoading: receivedLoading,
     refetch: refetchReceived,
   } = useQuery({
-    queryKey: ['receivedOffers'],
-    queryFn: fetchReceivedOffers,
+    queryKey: ['receivedEngagements'],
+    queryFn: fetchReceivedEngagements,
     enabled: activeTab === 'received',
   });
 
@@ -51,8 +55,8 @@ const EngagementScreen = () => {
     isLoading: sentLoading,
     refetch: refetchSent,
   } = useQuery({
-    queryKey: ['sentOffers'],
-    queryFn: fetchSentOffers,
+    queryKey: ['sentEngagements'],
+    queryFn: fetchSentEngagements,
     enabled: activeTab === 'sent',
   });
 
@@ -62,40 +66,40 @@ const EngagementScreen = () => {
 
   const isLoading = activeTab === 'received' ? receivedLoading : sentLoading;
 
-  const { mutate: acceptMutation } = useMutation({
-    mutationFn: acceptOffer,
-    onSuccess: () => {
-      Toast.show({
-        type: 'success',
-        text1: 'Offer accepted',
-      });
+  // const { mutate: acceptMutation } = useMutation({
+  //   mutationFn: acceptOffer,
+  //   onSuccess: () => {
+  //     Toast.show({
+  //       type: 'success',
+  //       text1: 'Offer accepted',
+  //     });
 
-      queryClient.invalidateQueries({ queryKey: ['receivedOffers'] });
-    },
-    onError: (error: any) => {
-      Toast.show({
-        type: 'error',
-        text1: error?.message || 'Accept failed',
-      });
-    },
-  });
+  //     queryClient.invalidateQueries({ queryKey: ['receivedOffers'] });
+  //   },
+  //   onError: (error: any) => {
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: error?.message || 'Accept failed',
+  //     });
+  //   },
+  // });
 
-  const { mutate: declineMutation } = useMutation({
-    mutationFn: declineOffer,
-    onSuccess: () => {
-      Toast.show({
-        type: 'success',
-        text1: 'Offer declined',
-      });
-      queryClient.invalidateQueries({ queryKey: ['receivedOffers'] });
-    },
-    onError: (error: any) => {
-      Toast.show({
-        type: 'error',
-        text1: error?.message || 'Decline failed',
-      });
-    },
-  });
+  // const { mutate: declineMutation } = useMutation({
+  //   mutationFn: declineOffer,
+  //   onSuccess: () => {
+  //     Toast.show({
+  //       type: 'success',
+  //       text1: 'Offer declined',
+  //     });
+  //     queryClient.invalidateQueries({ queryKey: ['receivedOffers'] });
+  //   },
+  //   onError: (error: any) => {
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: error?.message || 'Decline failed',
+  //     });
+  //   },
+  // });
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -210,12 +214,10 @@ const EngagementScreen = () => {
                   <View style={styles.cardInfo}>
                     <View style={styles.titleRow}>
                       <Text style={styles.offerTitle}>
-                        {offer.title || 'Job Offer'}
+                        {'Engagement Request'}
                       </Text>
 
-                      <Text style={styles.offerRate}>
-                        €{offer.rate || 0}/Hr
-                      </Text>
+                      <Text style={styles.offerRate}>{'—'}</Text>
 
                       <View style={getStatusStyle(status)}>
                         <Text
@@ -233,7 +235,7 @@ const EngagementScreen = () => {
                     </View>
 
                     <Text style={styles.venue}>
-                      {offer.location || 'Unknown Location'}
+                      {offer.availabilityPostId || '—'}
                     </Text>
 
                     <View style={styles.scheduleRow}>
@@ -287,10 +289,10 @@ const EngagementScreen = () => {
                       //   </TouchableOpacity>
                       // </View>
                       <View style={styles.actionButtons}>
-                        <AcceptDeclineBtn
+                        {/* <AcceptDeclineBtn
                           handleAccept={() => acceptMutation(offer.id)}
                           handleDecline={() => declineMutation(offer.id)}
-                        />
+                        /> */}
                       </View>
                     )}
                   </View>

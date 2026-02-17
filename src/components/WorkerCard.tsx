@@ -1,25 +1,56 @@
 import { Text, View, TouchableOpacity, Image } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import styles from '../screen/availabilty/style';
 import { Check, Dot } from 'lucide-react-native';
 import Worker from '../@types/Worker.type';
 import StarIcon from './svg/StarIcon';
 import { useNavigation } from '@react-navigation/native';
 import WorkerCardSkeleton from './skeleton/WorkerCardSkeleton';
+import {
+  fetchWorkerActivePosts,
+  createEngagement,
+} from '../services/engagement';
+import ChooseAvailabilityModal from './availiability/ChooseAvailabilityModal';
+import Toast from 'react-native-toast-message';
 
 const WorkerCard = ({
   isLoading,
   worker,
-  onPress,
 }: {
   isLoading: boolean;
   worker: Worker;
-  onPress: () => void;
 }) => {
   const navigation = useNavigation<any>();
   if (isLoading) {
     return <WorkerCardSkeleton />;
   }
+  const [modalVisible, setModalVisible] = useState(false);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
+
+  const handleSendOffer = async () => {
+    try {
+      setPostsLoading(true);
+      setModalVisible(true);
+      const activePosts = await fetchWorkerActivePosts(worker.user.id);
+      setPosts(activePosts);
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
+      setModalVisible(false);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  const handleSelectPost = async (post: any) => {
+    setModalVisible(false);
+    try {
+      await createEngagement(worker.user.id, post.id);
+      Toast.show({ type: 'success', text1: 'Engagement sent!' });
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
+    }
+  };
   return (
     <View style={styles.card}>
       <View style={styles.cardTopRow}>
@@ -94,7 +125,10 @@ const WorkerCard = ({
               <Text style={styles.outlineBtnText}>View Profile</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.filledBtn} onPress={onPress}>
+            <TouchableOpacity
+              style={styles.filledBtn}
+              onPress={handleSendOffer}
+            >
               <Text style={styles.filledBtnText}>Send Offer</Text>
             </TouchableOpacity>
           </>
@@ -104,6 +138,13 @@ const WorkerCard = ({
           </TouchableOpacity>
         )}
       </View>
+      <ChooseAvailabilityModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        posts={posts}
+        loading={postsLoading}
+        onSelect={handleSelectPost}
+      />
     </View>
   );
 };

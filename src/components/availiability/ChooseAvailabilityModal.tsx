@@ -103,7 +103,7 @@ const ChooseAvailabilityModal = ({
 
                       {item.location?.length > 0 && (
                         <View style={styles.locationRow}>
-                          <MapPin size={12} color="#9CA3AF" />
+                          <MapPin size={12} color="#FFFFFF" />
                           <Text style={styles.locationText} numberOfLines={1}>
                             {item.location.join(', ')}
                           </Text>
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: '#1e1e1e',
+    backgroundColor: '#111111',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
     color: '#fff',
     fontFamily: 'InterDisplayMedium',
   },
@@ -175,7 +174,7 @@ const styles = StyleSheet.create({
     marginVertical: 30,
   },
   emptyText: {
-    color: '#9CA3AF',
+    color: '#FFFFFF',
     fontSize: 14,
     textAlign: 'center',
     marginVertical: 30,
@@ -184,7 +183,7 @@ const styles = StyleSheet.create({
   postCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2A2A2A',
+    backgroundColor: '#1D1D1D',
     borderRadius: 12,
     padding: 14,
     marginBottom: 12,
@@ -204,7 +203,6 @@ const styles = StyleSheet.create({
   },
   postTitle: {
     fontSize: 15,
-    fontWeight: '600',
     color: '#fff',
     fontFamily: 'InterDisplayMedium',
   },
@@ -226,7 +224,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: '#FFFFFF',
     fontFamily: 'InterDisplayRegular',
     flex: 1,
   },

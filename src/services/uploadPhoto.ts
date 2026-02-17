@@ -1,30 +1,23 @@
-import storage from '@react-native-firebase/storage';
-import auth from '@react-native-firebase/auth';
+import { getStorage, ref, putFile, getDownloadURL } from '@react-native-firebase/storage';
+import { getAuth } from '@react-native-firebase/auth';
 
-export const uploadProfilePhoto = async (localUri: string) => {
-    const user = auth().currentUser;
+// Upload user profile photo to Firebase Storage
+export const uploadProfilePhoto = async (localUri: string): Promise<string> => {
+    const user = getAuth().currentUser;
     if (!user) throw new Error('User not logged in');
 
-    const ref = storage().ref(`users/${user.uid}/profile.jpg`);
-
-    await ref.putFile(localUri);
-
-    const downloadURL = await ref.getDownloadURL();
-    return downloadURL;
+    const storageRef = ref(getStorage(), `users/${user.uid}/profile.jpg`);
+    await putFile(storageRef, localUri);
+    return getDownloadURL(storageRef);
 };
 
-
-// upload banner seasonal job
-
-export const uploadJobBanner = async (localUri: string) => {
-    const user = auth().currentUser;
+// Upload seasonal job banner to Firebase Storage
+export const uploadJobBanner = async (localUri: string): Promise<string> => {
+    const user = getAuth().currentUser;
     if (!user) throw new Error('User not logged in');
 
     const fileName = `job_banner_${user.uid}_${Date.now()}.jpg`;
-    const ref = storage().ref(`jobBanners/${fileName}`);
-
-    await ref.putFile(localUri);
-
-    const downloadURL = await ref.getDownloadURL();
-    return downloadURL;
+    const storageRef = ref(getStorage(), `jobBanners/${fileName}`);
+    await putFile(storageRef, localUri);
+    return getDownloadURL(storageRef);
 };

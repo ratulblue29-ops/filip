@@ -20,10 +20,7 @@ import ProfileHead from './ProfileHead';
 import { UserType } from '../../@types/ViewProfile.type';
 import Toast from 'react-native-toast-message';
 import { useState } from 'react';
-import {
-  fetchWorkerActivePosts,
-  createEngagement,
-} from '../../services/engagement';
+import { fetchWorkerActivePosts } from '../../services/engagement';
 import ChooseAvailabilityModal from '../../components/availiability/ChooseAvailabilityModal';
 
 // interface Day {
@@ -100,14 +97,12 @@ const ViewProfileScreen: React.FC = () => {
     }
   };
 
-  const handleSelectPost = async (post: any) => {
+  const handleSelectPost = (post: any) => {
     setModalVisible(false);
-    try {
-      await createEngagement(user?.id || '', post.id);
-      Toast.show({ type: 'success', text1: 'Engagement sent!' });
-    } catch (error: any) {
-      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
-    }
+    navigation.navigate('SendOffer', {
+      workerId: user?.id || '',
+      selectedPost: post,
+    });
   };
 
   // Loading UI

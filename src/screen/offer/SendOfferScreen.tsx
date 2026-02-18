@@ -1,310 +1,329 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Image,
   StatusBar,
-  Alert,
-  ToastAndroid,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
-import { X, ArrowRight } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  ArrowLeft,
+  MapPin,
+  Clock,
+  CalendarDays,
+  FileText,
+  Banknote,
+} from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import styles from './SendOver';
-import StarIcon from '../../components/svg/StarIcon';
-import MapView, { Marker } from 'react-native-maps';
-import { useMutation } from '@tanstack/react-query';
-import { sendOffer } from '../../services/offer';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Toast from 'react-native-toast-message';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import styles from './sendOfferStyle';
+import { createEngagement } from '../../services/engagement';
+import { createOrGetChat, sendMessage } from '../../services/chat';
 
-const SendOfferScreen: React.FC = () => {
-  const navigation = useNavigation<any>();
-  const route = useRoute<any>();
+// ─── Types ────────────────────────────────────────────────
+type RootStackParamList = {
+  SendOffer: { workerId: string; selectedPost: SelectedPost };
+  ChatDetailScreen: { chatId: string; otherUserId: string };
+};
 
-  const { worker } = route.params;
+type SelectedPost = {
+  id: string;
+  title: string;
+  location: string[];
+  rate: { amount: number; unit: string };
+  type: string;
+};
 
-  // --------------------------
-  // Dynamic worker info
-  // --------------------------
-  const workerName = worker?.user?.name || 'Unknown Worker';
-  const workerPhoto =
-    worker?.user?.photo || 'https://i.pravatar.cc/150?u=default';
-  const workerRating = worker?.user?.rating ?? 0;
-  const workerTitle = worker?.title || 'No Title';
-  const workerLocation =
-    worker?.location?.length > 0 ? worker.location[0] : 'No Location';
-
-  // --------------------------
-  // Inputs (editable)
-  // --------------------------
-  const [shiftDate, setShiftDate] = useState<string>('Oct 24, 2023');
-  const [startTime, setStartTime] = useState<string>('18:00');
-  const [endTime, setEndTime] = useState<string>('02:00');
-
-  const [hourlyRate, setHourlyRate] = useState<string>('25');
-  const [hours, setHours] = useState<string>('8');
-
-  const [context, setContext] = useState<string>('');
-
-  // --------------------------
-  // Estimated Total
-  // --------------------------
-  const estimatedTotal = useMemo(() => {
-    const rate = Number(hourlyRate);
-    const totalHours = Number(hours);
-
-    if (isNaN(rate) || isNaN(totalHours)) return 0;
-
-    return rate * totalHours;
-  }, [hourlyRate, hours]);
-
-  // --------------------------
-  // Mutation (Tanstack Query)
-  // --------------------------
-  const { mutate: sendOfferMutation, isPending } = useMutation({
-    mutationFn: sendOffer,
-    onSuccess: () => {
-      const msg = `Offer sent to ${workerName}`;
-
-      if (Platform.OS === 'android') {
-        ToastAndroid.showWithGravity(
-          msg,
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM,
-        );
-      } else {
-        Alert.alert('Success', msg);
-      }
-
-      navigation.goBack();
-    },
-    onError: (error: any) => {
-      if (Platform.OS === 'android') {
-        ToastAndroid.showWithGravity(
-          error?.message || 'Offer failed',
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM,
-        );
-      } else {
-        Alert.alert('Error', error?.message || 'Offer failed');
-      }
-    },
+// ─── Helpers ──────────────────────────────────────────────
+const formatDate = (d: Date): string =>
+  d.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
   });
 
-  // --------------------------
-  // Submit offer
-  // --------------------------
-  const handleSendEngagement = () => {
-    if (!shiftDate.trim()) {
-      return Alert.alert('Error', 'Shift date is required');
+const formatTime = (d: Date): string =>
+  d.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+// ─── Component ────────────────────────────────────────────
+const SendOfferScreen = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<any>();
+
+  const {
+    workerId,
+    selectedPost,
+  }: { workerId: string; selectedPost: SelectedPost } = route.params;
+
+  // ── Form state ──
+  const [workDate, setWorkDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [workDateText, setWorkDateText] = useState(formatDate(new Date()));
+
+  const [startTime, setStartTime] = useState(new Date());
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [startTimeText, setStartTimeText] = useState(formatTime(new Date()));
+
+  const [endTime, setEndTime] = useState(new Date());
+  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [endTimeText, setEndTimeText] = useState(formatTime(new Date()));
+
+  const [wage, setWage] = useState('');
+  const [location, setLocation] = useState(selectedPost?.location?.[0] ?? '');
+  const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // ── Submit ──
+  const handleSubmit = async () => {
+    if (!wage.trim()) {
+      Toast.show({ type: 'error', text1: 'Offered wage is required' });
+      return;
+    }
+    if (!location.trim()) {
+      Toast.show({ type: 'error', text1: 'Location is required' });
+      return;
     }
 
-    if (!startTime.trim()) {
-      return Alert.alert('Error', 'Start time is required');
+    setLoading(true);
+    try {
+      // 1. Create engagement doc (status: pending)
+      const engagementId = await createEngagement(workerId, selectedPost.id);
+
+      // 2. Create or get chat between employer and worker
+      const chatId = await createOrGetChat(workerId);
+
+      // 3. Send structured offer card as job_attachment message
+      await sendMessage(chatId, '', 'job_attachment', {
+        offerCard: {
+          engagementId,
+          postTitle: selectedPost.title,
+          workDate: workDateText,
+          startTime: startTimeText,
+          endTime: endTimeText,
+          wage: `\u20ac${wage}`,
+          location,
+          description,
+          status: 'pending', // pending | accepted | declined | withdrawn
+        },
+      });
+
+      Toast.show({ type: 'success', text1: 'Offer sent!' });
+
+      // 4. Navigate into chat
+      navigation.navigate('ChatDetailScreen', {
+        chatId,
+        otherUserId: workerId,
+      });
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
+    } finally {
+      setLoading(false);
     }
-
-    if (!endTime.trim()) {
-      return Alert.alert('Error', 'End time is required');
-    }
-
-    if (!hourlyRate.trim() || Number(hourlyRate) <= 0) {
-      return Alert.alert('Error', 'Hourly rate must be valid');
-    }
-
-    if (!hours.trim() || Number(hours) <= 0) {
-      return Alert.alert('Error', 'Hours must be valid');
-    }
-
-    if (!context.trim()) {
-      return Alert.alert('Error', 'Job context is required');
-    }
-
-    // schedule string
-    const schedule = `${shiftDate} | ${startTime} - ${endTime}`;
-
-    sendOfferMutation({
-      applicationId: worker?.id,
-      jobId: worker?.id,
-      workerId: worker?.userId,
-      rate: Number(hourlyRate),
-      schedule,
-      location: workerLocation,
-      message: context,
-    });
   };
 
-  // --------------------------
-  // Google Map dummy lat/lng
-  // (later worker doc e latitude/longitude add korte hobe)
-  // --------------------------
-  const defaultLat = 48.8738;
-  const defaultLng = 2.295;
-
+  // ── UI ──
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
 
-      {/* Header */}
+      {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <X color="#FFFFFF" size={20} />
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
+        >
+          <ArrowLeft size={24} color="#fff" />
         </TouchableOpacity>
+
         <Text style={styles.headerTitle}>Send Offer</Text>
-        <View />
+
+        {/* spacer so title stays centred */}
+        <View style={{ width: 24 }} />
       </View>
 
       <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContainer}
       >
-        {/* Worker Card */}
-        <View style={styles.card}>
-          <Image source={{ uri: workerPhoto }} style={styles.avatar} />
-          <View>
-            <Text style={styles.labelSmall}>Sending Offer To</Text>
-            <Text style={styles.name}>{workerName}</Text>
-
-            <View style={styles.rowAlign}>
-              <Text style={styles.rating}>{workerRating}</Text>
-              <StarIcon width={16} height={16} />
-              <Text style={styles.role}> • {workerTitle}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Shift Details: Date */}
-        <Text style={styles.sectionTitle}>Shift Details</Text>
-        <View style={styles.inputBox}>
-          <TextInput
-            style={styles.inputText}
-            value={shiftDate}
-            onChangeText={setShiftDate}
-            placeholder="Shift Date"
-            placeholderTextColor="rgba(245,245,245,0.5)"
-          />
-        </View>
-
-        {/* Shift Details: Time */}
-        <View style={styles.row}>
-          <View style={styles.inputBox}>
-            <TextInput
-              style={[styles.inputText, styles.inputTexttime]}
-              value={startTime}
-              onChangeText={setStartTime}
-              placeholder="Start"
-              placeholderTextColor="rgba(245,245,245,0.5)"
-            />
-          </View>
-
-          <View style={styles.inputBox}>
-            <TextInput
-              style={[styles.inputText, styles.inputTexttime]}
-              value={endTime}
-              onChangeText={setEndTime}
-              placeholder="End"
-              placeholderTextColor="rgba(245,245,245,0.5)"
-            />
-          </View>
-        </View>
-
-        {/* Shift Details: Money */}
-        <Text style={styles.sectionTitle}>Payment</Text>
-        <View style={[styles.card, styles.shiftCard]}>
-          <Text style={styles.labelRate}>Hourly Rate</Text>
-
-          <View>
-            <View style={styles.shiftWrapper}>
-              <View style={styles.rateInputContainer}>
-                <TextInput
-                  style={styles.rateInput}
-                  value={hourlyRate}
-                  onChangeText={setHourlyRate}
-                  keyboardType="numeric"
-                  placeholder="Rate"
-                  placeholderTextColor="#555"
-                />
-              </View>
-
-              <Text style={styles.mathText}>×</Text>
-
-              <TextInput
-                style={styles.hoursText}
-                value={hours}
-                onChangeText={setHours}
-                keyboardType="numeric"
-                placeholder="Hours"
-                placeholderTextColor="rgba(245,245,245,0.4)"
-              />
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.shiftPrice}>
-              <Text style={styles.totalLabel}>Estimated Total</Text>
-              <Text style={styles.totalValue}>€{estimatedTotal}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Location Section */}
-        <Text style={styles.sectionTitle}>Location</Text>
-        <View style={styles.mapContainer}>
-          <TouchableOpacity style={styles.locationLabelBox}>
-            <Text style={[styles.inputText, styles.buttonText]}>
-              {workerLocation}
+        <View style={styles.container}>
+          {/* ── Availability Post (read-only) ── */}
+          <Text style={styles.label}>Availability Post</Text>
+          <View style={styles.inputWithIcon}>
+            <FileText size={20} color="#FFD900" />
+            <Text
+              style={[styles.flexInput, { color: '#FFD900' }]}
+              numberOfLines={1}
+            >
+              {selectedPost?.title ?? '\u2014'}
             </Text>
+          </View>
+
+          {/* ── Work Date ── */}
+          <Text style={styles.label}>Work Date</Text>
+          <TouchableOpacity
+            style={styles.inputWithIcon}
+            onPress={() => setShowDatePicker(true)}
+            activeOpacity={0.8}
+          >
+            <CalendarDays size={20} color="#9CA3AF" />
+            {/* Editable: user can tap picker OR clear and type manually */}
+            <TextInput
+              style={styles.flexInput}
+              value={workDateText}
+              onChangeText={setWorkDateText}
+              placeholderTextColor="#9CA3AF"
+            />
           </TouchableOpacity>
 
-          {/* Google Map (design same frame) */}
-          <View style={styles.mapFrame}>
-            <MapView
-              style={styles.webview} // same style use korlam
-              initialRegion={{
-                latitude: defaultLat,
-                longitude: defaultLng,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
+          {showDatePicker && (
+            <DateTimePicker
+              value={workDate}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              minimumDate={new Date()}
+              onChange={(_, selected) => {
+                setShowDatePicker(false);
+                if (selected) {
+                  setWorkDate(selected);
+                  setWorkDateText(formatDate(selected));
+                }
               }}
-              scrollEnabled={false}
-              zoomEnabled={false}
-              rotateEnabled={false}
-              pitchEnabled={false}
+            />
+          )}
+
+          {/* ── Work Hours ── */}
+          <Text style={styles.label}>Work Hours</Text>
+          <View style={styles.rowBetween}>
+            {/* Start */}
+            <TouchableOpacity
+              style={[styles.inputWithIcon, { flex: 1 }]}
+              onPress={() => setShowStartPicker(true)}
+              activeOpacity={0.8}
             >
-              <Marker
-                coordinate={{ latitude: defaultLat, longitude: defaultLng }}
+              <Clock size={18} color="#9CA3AF" />
+              <TextInput
+                style={styles.flexInput}
+                value={startTimeText}
+                onChangeText={setStartTimeText}
+                placeholderTextColor="#9CA3AF"
               />
-            </MapView>
+            </TouchableOpacity>
+
+            <Text style={styles.arrowText}>{'\u2192'}</Text>
+
+            {/* End */}
+            <TouchableOpacity
+              style={[styles.inputWithIcon, { flex: 1 }]}
+              onPress={() => setShowEndPicker(true)}
+              activeOpacity={0.8}
+            >
+              <Clock size={18} color="#9CA3AF" />
+              <TextInput
+                style={styles.flexInput}
+                value={endTimeText}
+                onChangeText={setEndTimeText}
+                placeholderTextColor="#9CA3AF"
+              />
+            </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Job Context */}
-        <Text style={styles.sectionTitle}>Job Context</Text>
-        <View style={styles.card}>
+          {showStartPicker && (
+            <DateTimePicker
+              value={startTime}
+              mode="time"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={(_, selected) => {
+                setShowStartPicker(false);
+                if (selected) {
+                  setStartTime(selected);
+                  setStartTimeText(formatTime(selected));
+                }
+              }}
+            />
+          )}
+
+          {showEndPicker && (
+            <DateTimePicker
+              value={endTime}
+              mode="time"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={(_, selected) => {
+                setShowEndPicker(false);
+                if (selected) {
+                  setEndTime(selected);
+                  setEndTimeText(formatTime(selected));
+                }
+              }}
+            />
+          )}
+
+          {/* ── Offered Wage ── */}
+          <Text style={styles.label}>Offered Wage ({'\u20ac'}/hr)</Text>
+          <View style={styles.inputWithIcon}>
+            <Banknote size={20} color="#9CA3AF" />
+            <TextInput
+              style={styles.flexInput}
+              value={wage}
+              onChangeText={setWage}
+              keyboardType="numeric"
+              placeholder="e.g. 20"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* ── Location ── */}
+          <Text style={styles.label}>Location</Text>
+          <View style={styles.inputWithIcon}>
+            <MapPin size={20} color="#9CA3AF" />
+            <TextInput
+              style={styles.flexInput}
+              value={location}
+              onChangeText={setLocation}
+              placeholder="Work location"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* ── Description (optional) ── */}
+          <Text style={styles.label}>Description (Optional)</Text>
           <TextInput
-            style={styles.contextInput}
+            style={styles.textArea}
+            value={description}
+            onChangeText={setDescription}
             multiline
-            placeholder="Describe the role briefly..."
-            placeholderTextColor="rgba(245, 245, 245, 0.6)"
-            maxLength={200}
-            value={context}
-            onChangeText={setContext}
+            maxLength={300}
+            placeholder="Any extra details about the role..."
+            placeholderTextColor="#9CA3AF"
           />
-        </View>
+          <Text style={styles.counter}>{description.length}/300</Text>
 
-        {/* Send Button */}
-        <TouchableOpacity
-          onPress={handleSendEngagement}
-          style={[styles.sendButton, isPending && { opacity: 0.6 }]}
-          disabled={isPending}
-        >
-          <Text style={styles.sendButtonText}>
-            {isPending ? 'Sending...' : 'Send Offer'}
-          </Text>
-          <ArrowRight color="#000" size={24} strokeWidth={3} />
-        </TouchableOpacity>
+          {/* ── Submit ── */}
+          <TouchableOpacity
+            style={styles.saveBtn}
+            onPress={handleSubmit}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color="#1F2937" />
+            ) : (
+              <Text style={styles.saveText}>Send Offer</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

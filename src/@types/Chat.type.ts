@@ -34,6 +34,18 @@ export interface ChatMessage {
 
   metadata?: {
     jobAttachment?: JobAttachment;
+    offerCard?: {
+      engagementId: string;
+      postTitle: string;
+      workDate: string;
+      startTime: string;
+      endTime: string;
+      wage: string;
+      location: string;
+      description: string;
+      status: 'pending' | 'accepted' | 'declined' | 'withdrawn';
+    };
+    chatId?: string;
   };
 }
 

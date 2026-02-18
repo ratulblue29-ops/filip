@@ -48,7 +48,8 @@ export type RootStackParamList = {
   notification: undefined;
   HelpSupport: undefined;
   TermsConditions: undefined;
-  sendoffer: undefined;
+  // sendoffer: undefined;
+  SendOffer: { workerId: string; selectedPost: any };
   referral: undefined;
   profile: undefined;
   viewProfile: undefined;
@@ -131,7 +132,8 @@ const RootNavigator: React.FC = () => {
         name="TermsConditions"
         component={withPrivate(TermsConditionsScreen)}
       />
-      <Stack.Screen name="sendoffer" component={withPrivate(SendOfferScreen)} />
+      {/* <Stack.Screen name="sendoffer" component={withPrivate(SendOfferScreen)} /> */}
+      <Stack.Screen name="SendOffer" component={withPrivate(SendOfferScreen)} />
       <Stack.Screen name="referral" component={withPrivate(ReferralScreen)} />
       <Stack.Screen name="profile" component={withPrivate(SettingScreen)} />
       <Stack.Screen

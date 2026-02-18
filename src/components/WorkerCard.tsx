@@ -6,10 +6,7 @@ import Worker from '../@types/Worker.type';
 import StarIcon from './svg/StarIcon';
 import { useNavigation } from '@react-navigation/native';
 import WorkerCardSkeleton from './skeleton/WorkerCardSkeleton';
-import {
-  fetchWorkerActivePosts,
-  createEngagement,
-} from '../services/engagement';
+import { fetchWorkerActivePosts } from '../services/engagement';
 import ChooseAvailabilityModal from './availiability/ChooseAvailabilityModal';
 import Toast from 'react-native-toast-message';
 
@@ -42,14 +39,12 @@ const WorkerCard = ({
     }
   };
 
-  const handleSelectPost = async (post: any) => {
+  const handleSelectPost = (post: any) => {
     setModalVisible(false);
-    try {
-      await createEngagement(worker.user.id, post.id);
-      Toast.show({ type: 'success', text1: 'Engagement sent!' });
-    } catch (error: any) {
-      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
-    }
+    navigation.navigate('SendOffer', {
+      workerId: worker.user.id,
+      selectedPost: post,
+    });
   };
   return (
     <View style={styles.card}>

@@ -44,6 +44,7 @@ const ChatDetailScreen = () => {
   const [message, setMessage] = useState('');
   const [otherUser, setOtherUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [chatUnlocked, setChatUnlocked] = useState(false);
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -74,6 +75,13 @@ const ChatDetailScreen = () => {
   useEffect(() => {
     const unsubscribe = subscribeToMessages(chatId, msgs => {
       setMessages(msgs);
+
+      const hasAccepted = msgs.some(
+        (m: any) =>
+          m.type === 'job_attachment' &&
+          m.metadata?.offerCard?.status === 'accepted',
+      );
+      setChatUnlocked(hasAccepted);
 
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -162,7 +170,7 @@ const ChatDetailScreen = () => {
                 isMe,
                 avatar: isMe ? undefined : otherUser?.photo,
                 type: item.type,
-                metadata: item.metadata,
+                metadata: { ...(item.metadata ?? {}), chatId },
               }}
             />
           );
@@ -176,19 +184,34 @@ const ChatDetailScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       >
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Type a message..."
-            placeholderTextColor="#666"
-            value={message}
-            onChangeText={setMessage}
-          />
-
-          <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-            <Send width={14} height={14} color="#fff" />
-          </TouchableOpacity>
-        </View>
+        {chatUnlocked ? (
+          // Normal input when chat is unlocked
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Type a message..."
+              placeholderTextColor="#666"
+              value={message}
+              onChangeText={setMessage}
+            />
+            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+              <Send width={14} height={14} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          // Disabled state — waiting for worker to accept
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.textInput, { opacity: 0.4 }]}
+              placeholder="Waiting for acceptance..."
+              placeholderTextColor="#666"
+              editable={false}
+            />
+            <View style={[styles.sendButton, { opacity: 0.4 }]}>
+              <Send width={14} height={14} color="#fff" />
+            </View>
+          </View>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

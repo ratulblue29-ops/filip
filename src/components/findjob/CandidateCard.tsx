@@ -6,12 +6,8 @@ import { styles } from '../../screen/seasonAvailabilty/style';
 import Worker from '../../@types/Worker.type';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCurrentUser } from '../../services/user';
-import { createOrGetChat } from '../../services/chat';
 import Toast from 'react-native-toast-message';
-import {
-  fetchWorkerActivePosts,
-  createEngagement,
-} from '../../services/engagement';
+import { fetchWorkerActivePosts } from '../../services/engagement';
 import ChooseAvailabilityModal from '../availiability/ChooseAvailabilityModal';
 
 interface CandidateCardProps {
@@ -86,14 +82,12 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
     }
   };
 
-  const handleSelectPost = async (post: any) => {
+  const handleSelectPost = (post: any) => {
     setModalVisible(false);
-    try {
-      await createEngagement(candidate.user.id, post.id);
-      Toast.show({ type: 'success', text1: 'Engagement sent!' });
-    } catch (error: any) {
-      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
-    }
+    navigation.navigate('SendOffer', {
+      workerId: candidate.user.id,
+      selectedPost: post,
+    });
   };
 
   return (

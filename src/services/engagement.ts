@@ -9,7 +9,9 @@ import {
   where,
   orderBy,
   serverTimestamp,
+  updateDoc,
 } from '@react-native-firebase/firestore';
+import { deductCredit, refundCredit } from './credit';
 
 // Fetch active availability posts for a specific worker (employer calls this)
 export const fetchWorkerActivePosts = async (workerId: string) => {
@@ -62,11 +64,14 @@ export const createEngagement = async (
     throw new Error('You already sent an engagement for this post');
   }
 
+  // Deduct 1 credit — throws if balance < 1, blocking engagement creation
+  await deductCredit('pre-check');
+
   const engagementRef = await addDoc(collection(db, 'engagements'), {
-    fromUserId: user.uid,         // employer
-    workerId,                      // worker
-    availabilityPostId,            // REQUIRED — strict 1:1
-    status: 'pending',             // pending | accepted | declined
+    fromUserId: user.uid,       // employer
+    workerId,                    // worker
+    availabilityPostId,          // REQUIRED — strict 1:1
+    status: 'pending',           // pending | accepted | declined | withdrawn
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -87,6 +92,31 @@ export const createEngagement = async (
   });
 
   return engagementRef.id;
+};
+
+// Update engagement status + handle credit refund automatically
+// accepted = no refund | declined = refund to employer | withdrawn = refund to employer
+export const updateEngagementStatus = async (
+  engagementId: string,
+  status: 'accepted' | 'declined' | 'withdrawn',
+  fromUserId: string, // employer's userId — needed for refund
+): Promise<void> => {
+  const db = getFirestore();
+  const engRef = doc(db, 'engagements', engagementId);
+
+  await updateDoc(engRef, {
+    status,
+    updatedAt: serverTimestamp(),
+  });
+
+  if (status === 'declined') {
+    // Worker declined → refund the employer
+    await refundCredit(engagementId, 'worker_declined', fromUserId);
+  } else if (status === 'withdrawn') {
+    // Employer withdrew → refund themselves
+    await refundCredit(engagementId, 'employer_withdrew', fromUserId);
+  }
+  // 'accepted' → no refund, credit stays deducted
 };
 
 // Fetch engagements received by current user (worker view)

@@ -22,6 +22,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Toast from 'react-native-toast-message';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { getAuth } from '@react-native-firebase/auth';
 import styles from './sendOfferStyle';
 import { createEngagement } from '../../services/engagement';
 import { createOrGetChat, sendMessage } from '../../services/chat';
@@ -98,7 +99,11 @@ const SendOfferScreen = () => {
 
     setLoading(true);
     try {
-      // 1. Create engagement doc (status: pending)
+      // Get current employer uid — needed for credit refund tracking
+      const currentUser = getAuth().currentUser;
+      if (!currentUser) throw new Error('Login required');
+
+      // 1. Create engagement doc (status: pending) — deducts 1 credit
       const engagementId = await createEngagement(workerId, selectedPost.id);
 
       // 2. Create or get chat between employer and worker
@@ -108,6 +113,7 @@ const SendOfferScreen = () => {
       await sendMessage(chatId, '', 'job_attachment', {
         offerCard: {
           engagementId,
+          fromUserId: currentUser.uid, // employer uid — required for credit refund
           postTitle: selectedPost.title,
           workDate: workDateText,
           startTime: startTimeText,

@@ -14,6 +14,7 @@ import PurchaseScreen from '../screen/purchase/PurchaseScreen';
 import ChatScreen from '../screen/chat/ChatScreen';
 import ChatDetailScreen from '../screen/chat/ChatDetailScreen';
 import CreditsScreen from '../screen/credit/CreditScreen';
+import CreditHistoryScreen from '../screen/credit/CreditHistoryScreen';
 import OfferScreen from '../screen/offer/OfferScreen';
 import LanguageScreen from '../screen/Language/language';
 import EngagementScreen from '../screen/Engagement/EngagementScreen';
@@ -42,6 +43,7 @@ export type RootStackParamList = {
   chat: { autoChatId?: string; autoUserId?: string } | undefined;
   ChatDetailScreen: { chatId: string; otherUserId: string };
   credit: undefined;
+  CreditHistory: undefined;
   offer: undefined;
   language: undefined;
   engagement: undefined;
@@ -114,6 +116,10 @@ const RootNavigator: React.FC = () => {
         component={withPrivate(ChatDetailScreen)}
       />
       <Stack.Screen name="credit" component={withPrivate(CreditsScreen)} />
+      <Stack.Screen
+        name="CreditHistory"
+        component={withPrivate(CreditHistoryScreen)}
+      />
       <Stack.Screen name="offer" component={withPrivate(OfferScreen)} />
       <Stack.Screen name="language" component={withPrivate(LanguageScreen)} />
       <Stack.Screen

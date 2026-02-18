@@ -20,6 +20,7 @@ import {
 } from 'lucide-react-native';
 import { getFirestore, doc, updateDoc } from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
+import { updateEngagementStatus } from '../../services/engagement';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -47,23 +48,29 @@ const OfferCard = ({
   const isDeclined = offerCard.status === 'declined';
   const isWithdrawn = offerCard.status === 'withdrawn';
 
-  // Update offer status in Firestore message metadata
+  // Update offer status in Firestore message metadata + engagement doc + credit refund
   const updateStatus = async (
-    status: string,
+    status: 'accepted' | 'declined' | 'withdrawn',
     action: 'accept' | 'decline' | 'withdraw',
   ) => {
     if (!chatId) return;
     setActionLoading(action);
     try {
       const db = getFirestore();
+
+      // 1. Update the offer card status in the chat message
       const msgRef = doc(db, 'chats', chatId, 'messages', messageId);
       await updateDoc(msgRef, {
         'metadata.offerCard.status': status,
       });
-      // Also update engagement doc if needed
-      if (offerCard.engagementId) {
-        const engRef = doc(db, 'engagements', offerCard.engagementId);
-        await updateDoc(engRef, { status });
+
+      // 2. Update engagement status + trigger credit refund if declined/withdrawn
+      if (offerCard.engagementId && offerCard.fromUserId) {
+        await updateEngagementStatus(
+          offerCard.engagementId,
+          status,
+          offerCard.fromUserId, // employer userId — needed for refund
+        );
       }
     } catch (err: any) {
       Toast.show({ type: 'error', text1: 'Error', text2: err.message });
@@ -218,9 +225,16 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message }) => {
           </Text>
         )}
 
-        {!message.isMe && message.avatar && (
+        {!message.isMe && (
           <View style={styles.otherMessageRow}>
-            <Image source={{ uri: message.avatar }} style={styles.chatAvatar} />
+            {message.avatar ? (
+              <Image
+                source={{ uri: message.avatar }}
+                style={styles.chatAvatar}
+              />
+            ) : (
+              <View style={styles.chatAvatar} />
+            )}
             <OfferCard
               offerCard={message.metadata.offerCard}
               isMe={message.isMe}

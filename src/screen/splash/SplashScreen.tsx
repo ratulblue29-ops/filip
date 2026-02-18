@@ -33,10 +33,12 @@ const SplashScreen = ({ navigation }: Props) => {
         source={require('../../../assets/images/logofinal.png')}
       />
       <View style={styles.text_wrapper}>
-        <Text style={styles.title}>Find the Best Talent</Text>
+        <Text style={styles.title}>
+          When staff is needed, GoldShift connects
+        </Text>
         <Text style={styles.description}>
-          Browse through a wide range of talented workers ready to fill
-          short-term gigs or full-time positions.
+          Restaurants and hospitality professionals connect quickly, easily, and
+          without hassle
         </Text>
       </View>
     </SafeAreaView>

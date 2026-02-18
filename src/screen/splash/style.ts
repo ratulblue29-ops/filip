@@ -18,18 +18,19 @@ const styles = StyleSheet.create({
   title: {
     color: '#fff',
     fontSize: 32,
-    fontWeight: 500,
+    // fontWeight: 500,
     marginBottom: 12,
     textAlign: 'center',
     fontFamily: 'InterDisplayMedium',
   },
   description: {
-    textAlign: 'center',
     color: '#fff',
-    maxWidth: 290,
+    // maxWidth: 290,
     fontSize: 12,
+    textAlign: 'center',
     fontFamily: 'InterDisplayRegular',
-    fontWeight: 400,
+    // fontWeight: 400,
+    marginHorizontal: 50,
   },
 });
 export default styles;

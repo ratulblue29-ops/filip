@@ -18,8 +18,13 @@ import { useQuery } from '@tanstack/react-query';
 import { getUserById } from '../../services/user';
 import ProfileHead from './ProfileHead';
 import { UserType } from '../../@types/ViewProfile.type';
-import { createOrGetChat } from '../../services/chat';
 import Toast from 'react-native-toast-message';
+import { useState } from 'react';
+import {
+  fetchWorkerActivePosts,
+  createEngagement,
+} from '../../services/engagement';
+import ChooseAvailabilityModal from '../../components/availiability/ChooseAvailabilityModal';
 
 // interface Day {
 //     day: string;
@@ -77,22 +82,31 @@ const ViewProfileScreen: React.FC = () => {
   //     navigation.goBack();
   //   };
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
+
   const handleSendEngagement = async () => {
     try {
-      // Pass job context when creating chat
-      const chatId = await createOrGetChat(user?.id || '');
+      setPostsLoading(true);
+      setModalVisible(true);
+      const activePosts = await fetchWorkerActivePosts(user?.id || '');
+      setPosts(activePosts);
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
+      setModalVisible(false);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
 
-      // Navigate to ChatScreen first, with chatId param
-      navigation.navigate('chat', {
-        autoChatId: chatId,
-        autoUserId: user?.id,
-      });
-    } catch {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to start chat',
-      });
+  const handleSelectPost = async (post: any) => {
+    setModalVisible(false);
+    try {
+      await createEngagement(user?.id || '', post.id);
+      Toast.show({ type: 'success', text1: 'Engagement sent!' });
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
     }
   };
 
@@ -277,6 +291,14 @@ const ViewProfileScreen: React.FC = () => {
           text="Great energy and very skilled with cocktails. Good vibes only."
         />
       </ScrollView>
+
+      <ChooseAvailabilityModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        posts={posts}
+        loading={postsLoading}
+        onSelect={handleSelectPost}
+      />
 
       {/* Footer */}
       <View style={styles.footer}>

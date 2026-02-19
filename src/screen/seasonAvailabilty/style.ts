@@ -79,6 +79,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 24,
     marginTop: 20,
+    alignItems: 'center',
   },
   countText: {
     color: '#FFF',

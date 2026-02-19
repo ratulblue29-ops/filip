@@ -30,7 +30,7 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  // Query Mutation
+
   const mutation = useMutation({
     mutationFn: signUpUser,
     onSuccess: () => {
@@ -38,7 +38,8 @@ const SignUpScreen = () => {
         type: 'success',
         text1: 'Sign Up Successful',
       });
-      navigation.navigate('Login');
+      // Hard reset — clears Splash/Login/Signup from stack, no back button
+      navigation.reset({ index: 0, routes: [{ name: 'BottomTabs' }] });
     },
     onError: (error: any) => {
       Toast.show({
@@ -140,19 +141,19 @@ const SignUpScreen = () => {
             {acceptedTerms && <View style={styles.radioInner} />}
           </View>
           <Text style={styles.text}>
-            I Agree To The{' '}
+            I agree to the{' '}
             <Text
               style={styles.link}
               onPress={() => Linking.openURL('https://example.com/terms')}
             >
-              Terms & Condition
+              Terms & Conditions
             </Text>{' '}
-            And{' '}
+            and{' '}
             <Text
               style={styles.link}
               onPress={() => Linking.openURL('https://example.com/privacy')}
             >
-              Privacy Policy
+              Privacy Policy.
             </Text>
             .
           </Text>

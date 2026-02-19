@@ -66,14 +66,20 @@ export const fetchMyJobs = async () => {
 
 type JobType = 'seasonal' | 'fulltime';
 
-interface CreateJobPayload {
+// Workplace type options matching the UI toggle in SeasonalAvailabilityCreation
+type WorkplaceType = 'On-site' | 'Remote' | 'Hybrid';
+
+// Rate unit options matching the UI toggle in SeasonalAvailabilityCreation
+type RateUnit = 'hourly' | 'daily' | 'monthly';
+
+type CreateJobPayload = {
   title: string;
   type?: JobType;
   description?: string;
   bannerImage?: string;
   schedule?: { start: string; end: string };
   location?: string[];
-  rate?: { amount: number; unit: string };
+  rate?: { amount: number; unit: RateUnit | string };
   requiredSkills?: string[];
   positions?: { total: number; filled: number };
   visibility?: {
@@ -81,9 +87,14 @@ interface CreateJobPayload {
   };
   contact?: { phone: string; email: string };
   daysPerWeek?: number;
-}
+  // New fields per client spec (seasonal only)
+  workplaceType?: WorkplaceType;
+  targetPosition?: string;
+  // Currency is always EUR per spec — stored for display/filtering
+  currency?: string;
+};
 
-const jobMothlykey = () => {
+const jobMonthlyKey = () => {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -104,12 +115,16 @@ export const createJob = async ({
   bannerImage = '',
   schedule = { start: '', end: '' },
   location = [],
-  rate = { amount: 0, unit: 'hour' },
+  rate = { amount: 0, unit: 'hourly' },
   requiredSkills = [],
   positions = { total: 5, filled: 0 },
   visibility = { priority: 'active' },
   contact = { phone: '', email: '' },
   daysPerWeek = 0,
+  // New seasonal fields — default values keep backwards compatibility
+  workplaceType = 'On-site',
+  targetPosition = '',
+  currency = 'EUR',
 }: CreateJobPayload) => {
   const auth = getAuth();
   const user = auth.currentUser;
@@ -147,7 +162,7 @@ export const createJob = async ({
       const usedCredits = Number(userData?.credits?.used ?? 0);
 
       const now = new Date();
-      const currentMonthKey = jobMothlykey();
+      const currentMonthKey = jobMonthlyKey();
 
       if (
         membershipTier !== 'free' &&
@@ -225,6 +240,11 @@ export const createJob = async ({
 
       if (type === 'seasonal') {
         jobPost.schedule = schedule;
+        // Store new client-spec fields on seasonal posts
+        jobPost.workplaceType = workplaceType;
+        jobPost.targetPosition = targetPosition;
+        // EUR is the only supported currency — stored explicitly for query/display
+        jobPost.currency = currency;
       }
 
       if (type === 'fulltime') {
@@ -235,7 +255,8 @@ export const createJob = async ({
       transaction.set(jobRef, jobPost);
     });
 
-    return { success: true };
+    // Return jobRef.id so callers can use it as a ledger reference if needed
+    return { success: true, jobId: jobRef.id };
   } catch (error: any) {
     console.log('CREATE JOB FAILED FULL:', error);
     throw error;
@@ -352,7 +373,6 @@ export const fetchFullTimeJobs = async (): Promise<Job[]> => {
   return fullTimeJobs;
 };
 
-// ✅ UPDATED: Return complete job data for chat context
 export const fetchSeasonalJobs = async () => {
   const db = getFirestore();
 
@@ -398,21 +418,19 @@ export const fetchSeasonalJobs = async () => {
 
         bannerImage: jobData.bannerImage ?? null,
         title: jobData.title ?? 'Seasonal Availability',
-
-        // ✅ ADDED: Complete schedule object for chat context
         schedule: jobData.schedule ?? { start: null, end: null },
-
-        // ✅ ADDED: Rate data for chat context
-        rate: jobData.rate ?? { amount: 0, unit: 'hour' },
-
-        // ✅ ADDED: Location array for chat context
+        rate: jobData.rate ?? { amount: 0, unit: 'hourly' },
         location: jobData.location ?? [],
 
-        // Keep for display
         dateRange: {
           start: jobData?.schedule?.start ?? null,
           end: jobData?.schedule?.end ?? null,
         },
+
+        // New fields surfaced for feed/card display
+        workplaceType: jobData.workplaceType ?? 'On-site',
+        targetPosition: jobData.targetPosition ?? '',
+        currency: jobData.currency ?? 'EUR',
 
         tags: jobData.requiredSkills ?? [],
         locationText,

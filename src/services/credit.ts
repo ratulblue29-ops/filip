@@ -12,9 +12,10 @@ import {
   serverTimestamp,
 } from '@react-native-firebase/firestore';
 
-// Deduct 1 credit from current user — call before creating engagement
-// Throws if balance < 1 to block engagement creation
-export const deductCredit = async (engagementId: string): Promise<void> => {
+// Deduct 1 credit from current user — call before creating engagement.
+// Returns ledgerTransactionId for audit trail linkage.
+// Throws if balance < 1 to block engagement creation.
+export const deductCredit = async (engagementId: string): Promise<string> => {
   const user = getAuth().currentUser;
   if (!user) throw new Error('Login required');
 
@@ -44,8 +45,8 @@ export const deductCredit = async (engagementId: string): Promise<void> => {
     });
   });
 
-  // Write deduction to ledger
-  await addDoc(collection(db, 'creditTransactions'), {
+  // Write deduction to ledger and return the document id as ledgerTransactionId
+  const ledgerRef = await addDoc(collection(db, 'creditTransactions'), {
     userId: user.uid,
     type: 'deduction',
     amount: 1,
@@ -53,10 +54,12 @@ export const deductCredit = async (engagementId: string): Promise<void> => {
     engagementId,
     createdAt: serverTimestamp(),
   });
+
+  return ledgerRef.id;
 };
 
-// Refund 1 credit to a specific user (employer)
-// targetUserId: the employer who originally spent the credit
+// Refund 1 credit to a specific user (employer).
+// targetUserId: the employer who originally spent the credit.
 export const refundCredit = async (
   engagementId: string,
   reason: 'worker_declined' | 'employer_withdrew' | 'expired',

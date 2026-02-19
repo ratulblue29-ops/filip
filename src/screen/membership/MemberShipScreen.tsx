@@ -191,7 +191,7 @@ const MemberShipScreen = () => {
               <Text style={styles.featureText}>10 Monthly Credits</Text>
             </View>
             <View style={styles.featureItem}>
-              <Check width={22} height={22} color="#FFD900" />{' '}
+              <Check width={22} height={22} color="#FFD900" />
               <Text style={styles.featureText}>1 Job Ad Post</Text>
             </View>
             <View style={styles.featureItem}>

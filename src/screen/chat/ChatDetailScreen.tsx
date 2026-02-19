@@ -30,6 +30,7 @@ import {
 
 import { ChatMessage } from '../../@types/Chat.type';
 import { getFirestore } from '@react-native-firebase/firestore';
+import { checkChatAccess } from '../../services/chat';
 
 const db = getFirestore();
 
@@ -76,12 +77,12 @@ const ChatDetailScreen = () => {
     const unsubscribe = subscribeToMessages(chatId, msgs => {
       setMessages(msgs);
 
-      const hasAccepted = msgs.some(
-        (m: any) =>
-          m.type === 'job_attachment' &&
-          m.metadata?.offerCard?.status === 'accepted',
-      );
-      setChatUnlocked(hasAccepted);
+      // const hasAccepted = msgs.some(
+      //   (m: any) =>
+      //     m.type === 'job_attachment' &&
+      //     m.metadata?.offerCard?.status === 'accepted',
+      // );
+      // setChatUnlocked(hasAccepted);
 
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -92,6 +93,23 @@ const ChatDetailScreen = () => {
 
     return () => unsubscribe();
   }, [chatId]);
+
+  /* ================= CHECK CHAT ACCESS ================= */
+  useEffect(() => {
+    const verifyAccess = async () => {
+      if (!otherUser?.id) return;
+
+      // Read current user membership from Firestore
+      const db = getFirestore();
+      const userSnap = await getDoc(doc(db, 'users', currentUserId));
+      const tier = userSnap.data()?.membership?.tier ?? 'free';
+
+      const access = await checkChatAccess(otherUser.id, tier);
+      setChatUnlocked(access);
+    };
+
+    verifyAccess();
+  }, [otherUser]); // re-run when otherUser loads
 
   /* ================= SEND MESSAGE ================= */
   const handleSend = async () => {

@@ -9,6 +9,8 @@ import { fetchCurrentUser } from '../../services/user';
 import Toast from 'react-native-toast-message';
 import { fetchWorkerActivePosts } from '../../services/engagement';
 import ChooseAvailabilityModal from '../availiability/ChooseAvailabilityModal';
+import { checkChatAccess } from '../../services/chat';
+import ChatAccessModal from '../message/ChatAccessModal';
 
 interface CandidateCardProps {
   candidate: Worker;
@@ -67,9 +69,22 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [posts, setPosts] = useState<any[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [accessModalVisible, setAccessModalVisible] = useState(false);
 
   const handleEngage = async () => {
     try {
+      // Gate check: premium OR accepted engagement
+      const membershipTier = user?.membership?.tier ?? 'free';
+      const hasAccess = await checkChatAccess(
+        candidate.user.id,
+        membershipTier,
+      );
+
+      if (!hasAccess) {
+        setAccessModalVisible(true);
+        return;
+      }
+
       setPostsLoading(true);
       setModalVisible(true);
       const activePosts = await fetchWorkerActivePosts(candidate.user.id);
@@ -158,20 +173,10 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
           </View>
         </View>
 
-        {!isPremium ? (
-          <TouchableOpacity
-            style={styles.lockButton}
-            onPress={() => navigation.navigate('membership')}
-          >
-            <Lock size={18} color="#FFF" />
-            <Text style={styles.lockButtonText}>Upgrade To Contact</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.engageButton} onPress={handleEngage}>
-            <Text style={styles.engageButtonText}>Engage Candidate</Text>
-            <SendHorizontal width={18} height={18} color="#1F2937" />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity style={styles.engageButton} onPress={handleEngage}>
+          <Text style={styles.engageButtonText}>Engage Candidate</Text>
+          <SendHorizontal width={18} height={18} color="#1F2937" />
+        </TouchableOpacity>
       </View>
       <ChooseAvailabilityModal
         visible={modalVisible}
@@ -179,6 +184,10 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
         posts={posts}
         loading={postsLoading}
         onSelect={handleSelectPost}
+      />
+      <ChatAccessModal
+        visible={accessModalVisible}
+        onClose={() => setAccessModalVisible(false)}
       />
     </View>
   );

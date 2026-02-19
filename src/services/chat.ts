@@ -30,6 +30,32 @@ const db = getFirestore(app);
 const getChatId = (userId1: string, userId2: string): string =>
   [userId1, userId2].sort().join('_');
 
+/* ================= CHECK CHAT ACCESS ================= */
+// Returns true if user can chat: either Premium OR has accepted engagement with otherUser
+export const checkChatAccess = async (
+  otherUserId: string,
+  membershipTier: string,
+): Promise<boolean> => {
+  // Premium users always have access
+  if (membershipTier === 'premium') return true;
+
+  const auth = getAuth(app);
+  const currentUser = auth.currentUser;
+  if (!currentUser) return false;
+
+  // Check for accepted engagement between currentUser (employer) and otherUser (worker)
+  const db = getFirestore(app);
+  const q = query(
+    collection(db, 'engagements'),
+    where('fromUserId', '==', currentUser.uid),
+    where('workerId', '==', otherUserId),
+    where('status', '==', 'accepted'),
+  );
+
+  const snap = await getDocs(q);
+  return !snap.empty;
+};
+
 /* ================= CREATE OR GET CHAT ================= */
 
 export const createOrGetChat = async (

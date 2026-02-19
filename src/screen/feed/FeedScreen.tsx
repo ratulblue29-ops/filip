@@ -260,7 +260,7 @@ const FeedContent = ({ navigation }: any) => {
       <View style={styles.searchContainer}>
         <Search width={20} height={20} color="white" />
         <TextInput
-          placeholder="Search jobs..."
+          placeholder="Search availability…"
           placeholderTextColor={COLORS.secondaryText}
           style={styles.input}
           value={searchText}

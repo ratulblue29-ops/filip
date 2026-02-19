@@ -104,6 +104,11 @@ const MainProfile: React.FC = () => {
       return;
     }
 
+    if (skills.length === 0) {
+      Toast.show({ type: 'error', text1: 'Please add at least one skill' });
+      return;
+    }
+
     let finalPhotoUrl = photo;
 
     if (localPhoto && localPhoto.startsWith('file://')) {

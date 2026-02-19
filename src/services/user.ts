@@ -55,6 +55,7 @@ export const updateUserProfile = async (payload: UpdateProfilePayload) => {
       payload.hourlyRate !== '' ? Number(payload.hourlyRate) : null,
     'profile.experienceYears': payload.experienceYears ?? 0,
     'profile.openToWork': payload.openToWork,
+    'profile.opentowork': payload.openToWork,
     updatedAt: serverTimestamp(),
   };
 

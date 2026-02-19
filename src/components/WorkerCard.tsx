@@ -112,9 +112,7 @@ const WorkerCard = ({
             <TouchableOpacity
               style={styles.outlineBtn}
               onPress={() =>
-                navigation.navigate('viewprofile', {
-                  workerId: worker.id,
-                })
+                navigation.navigate('viewProfile', { workerId: worker.id })
               }
             >
               <Text style={styles.outlineBtnText}>View Profile</Text>

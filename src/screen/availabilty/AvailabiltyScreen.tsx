@@ -38,7 +38,14 @@ const AvailabilityScreen = () => {
           />
         }
         ListFooterComponent={
-          <PremiumBanner onPress={() => navigation.navigate('sendoffer')} />
+          <PremiumBanner
+            onPress={() =>
+              navigation.navigate('SendOffer', {
+                workerId: '',
+                selectedPost: null,
+              })
+            }
+          />
         }
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}

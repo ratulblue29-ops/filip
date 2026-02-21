@@ -5,6 +5,7 @@ import {
   doc,
   addDoc,
   getDocs,
+  getDoc,
   query,
   where,
   orderBy,
@@ -63,6 +64,15 @@ export const createEngagement = async (
   if (!existingSnap.empty) {
     throw new Error('You already sent an engagement for this post');
   }
+
+  const postRef = doc(db, 'jobs', availabilityPostId);
+  const postSnap = await getDoc(postRef);
+  if (!postSnap.exists()) throw new Error('Availability post not found');
+  const postPriority = postSnap.data()?.visibility?.priority;
+  if (postPriority !== 'active') {
+    throw new Error('This availability post is no longer accepting engagements');
+  }
+
 
   // Deduct 1 credit — throws if balance < 1, blocking engagement creation
   await deductCredit('pre-check');

@@ -13,6 +13,7 @@ export interface JobCardProps {
       name?: string;
       photo?: string;
     };
+    isApplied?: boolean;
   };
   onBookmark: () => void;
 }

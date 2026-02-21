@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 import { Search, SlidersHorizontal } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useInfiniteQuery } from '@tanstack/react-query';
-
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { styles } from './style';
 import FilterItem from '../../components/FilterItem';
 import { JobCard } from '../../components/fulltime/JobCard';
@@ -20,6 +19,7 @@ import { fetchRecommendedJobsPaginated } from '../../services/jobs';
 import JobCardSkeleton from '../../components/skeleton/JobCardSkeleton';
 import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
 import NotificationDot from '../../components/feed/NotificationDot';
+import { fetchMyOffers } from '../../services/applyToJob';
 
 // TYPES
 type Filter = {
@@ -51,6 +51,16 @@ const FulltimeScreen = () => {
         return lastPage?.hasMore ? lastPage?.lastDoc : undefined;
       },
     });
+
+  const { data: myOffers = [] } = useQuery({
+    queryKey: ['my-offers'],
+    queryFn: fetchMyOffers,
+  });
+
+  const appliedJobIds = useMemo(
+    () => new Set(myOffers.map((o: any) => o.job.id)),
+    [myOffers],
+  );
 
   /* ---------------- FIX ESLINT WARNING ---------------- */
   const jobs = useMemo(() => {
@@ -126,8 +136,13 @@ const FulltimeScreen = () => {
   );
 
   const renderJobItem: ListRenderItem<any> = useCallback(
-    ({ item }) => <JobCard job={item} onBookmark={() => {}} />,
-    [],
+    ({ item }) => (
+      <JobCard
+        job={{ ...item, isApplied: appliedJobIds.has(item.id) }}
+        onBookmark={() => { }}
+      />
+    ),
+    [appliedJobIds],
   );
 
   // notification get for dot

@@ -14,7 +14,7 @@ import styles from './style';
 import { ArrowLeft, Check } from 'lucide-react-native';
 
 import { getApp } from '@react-native-firebase/app';
-import { getAuth } from '@react-native-firebase/auth';
+import { getAuth, getIdToken } from '@react-native-firebase/auth';
 import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
 import { useStripe } from '@stripe/stripe-react-native';
@@ -45,7 +45,7 @@ const MemberShipScreen = () => {
         return;
       }
 
-      await user.getIdToken(true);
+      await getIdToken(user, true);
 
       const app = getApp();
       const functions = getFunctions(app, 'us-central1');

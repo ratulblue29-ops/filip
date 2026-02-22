@@ -254,6 +254,7 @@ import {
   LogOut,
   X,
   PlusCircleIcon,
+  MessageCircle,
 } from 'lucide-react-native';
 
 import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
@@ -381,6 +382,20 @@ const MainDrawer = () => {
                 <UsersAddIcon width={20} height={18} color="#FFF" />
               </View>
               <Text style={styles.menuText}>Referral Program</Text>
+            </View>
+            <ChevronRight width={20} height={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('chat')}
+          >
+            <View style={styles.menuLeft}>
+              <View style={styles.iconCircle}>
+                <MessageCircle width={20} height={18} color="#FFF" />
+              </View>
+              <Text style={styles.menuText}>My Chats</Text>
             </View>
             <ChevronRight width={20} height={20} color="#9CA3AF" />
           </TouchableOpacity>

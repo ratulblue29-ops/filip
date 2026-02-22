@@ -25,7 +25,7 @@ import UsersAddIcon from '../../components/svg/UsersAddIcon';
 import Toast from 'react-native-toast-message';
 
 import { getApp } from '@react-native-firebase/app';
-import { getAuth } from '@react-native-firebase/auth';
+import { getAuth, getIdToken } from '@react-native-firebase/auth';
 import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
 import { useStripe } from '@stripe/stripe-react-native';
@@ -71,7 +71,7 @@ const CreditsScreen = () => {
         return;
       }
 
-      await firebaseUser.getIdToken(true);
+      await getIdToken(firebaseUser, true);
 
       const app = getApp();
       const functions = getFunctions(app, 'us-central1');

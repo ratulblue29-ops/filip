@@ -22,6 +22,9 @@ import Toast from 'react-native-toast-message';
 import { useState } from 'react';
 import { fetchWorkerActivePosts } from '../../services/engagement';
 import ChooseAvailabilityModal from '../../components/availiability/ChooseAvailabilityModal';
+import { checkChatAccess } from '../../services/chat';
+import ChatAccessModal from '../../components/message/ChatAccessModal';
+import { fetchCurrentUser } from '../../services/user';
 
 // interface Day {
 //     day: string;
@@ -82,9 +85,21 @@ const ViewProfileScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [posts, setPosts] = useState<any[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [accessModalVisible, setAccessModalVisible] = useState(false);
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: fetchCurrentUser,
+  });
 
   const handleSendEngagement = async () => {
     try {
+      // Gate check before showing engagement modal
+      const membershipTier = currentUser?.membership?.tier ?? 'free';
+      const hasAccess = await checkChatAccess(user?.id || '', membershipTier);
+      if (!hasAccess) {
+        setAccessModalVisible(true);
+        return;
+      }
       setPostsLoading(true);
       setModalVisible(true);
       const activePosts = await fetchWorkerActivePosts(user?.id || '');
@@ -293,6 +308,10 @@ const ViewProfileScreen: React.FC = () => {
         posts={posts}
         loading={postsLoading}
         onSelect={handleSelectPost}
+      />
+      <ChatAccessModal
+        visible={accessModalVisible}
+        onClose={() => setAccessModalVisible(false)}
       />
 
       {/* Footer */}

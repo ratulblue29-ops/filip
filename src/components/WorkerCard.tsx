@@ -9,6 +9,10 @@ import WorkerCardSkeleton from './skeleton/WorkerCardSkeleton';
 import { fetchWorkerActivePosts } from '../services/engagement';
 import ChooseAvailabilityModal from './availiability/ChooseAvailabilityModal';
 import Toast from 'react-native-toast-message';
+import { fetchCurrentUser } from '../services/user';
+import { useQuery } from '@tanstack/react-query';
+import { checkChatAccess } from '../services/chat';
+import ChatAccessModal from './message/ChatAccessModal';
 
 const WorkerCard = ({
   isLoading,
@@ -24,9 +28,21 @@ const WorkerCard = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [posts, setPosts] = useState<any[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [accessModalVisible, setAccessModalVisible] = useState(false);
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: fetchCurrentUser,
+  });
 
   const handleSendOffer = async () => {
     try {
+      // Gate check before showing offer modal
+      const membershipTier = currentUser?.membership?.tier ?? 'free';
+      const hasAccess = await checkChatAccess(worker.user.id, membershipTier);
+      if (!hasAccess) {
+        setAccessModalVisible(true);
+        return;
+      }
       setPostsLoading(true);
       setModalVisible(true);
       const activePosts = await fetchWorkerActivePosts(worker.user.id);
@@ -137,6 +153,10 @@ const WorkerCard = ({
         posts={posts}
         loading={postsLoading}
         onSelect={handleSelectPost}
+      />
+      <ChatAccessModal
+        visible={accessModalVisible}
+        onClose={() => setAccessModalVisible(false)}
       />
     </View>
   );

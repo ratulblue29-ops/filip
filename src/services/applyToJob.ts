@@ -1,45 +1,62 @@
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import { getApp } from '@react-native-firebase/app';
+import {
+  getAuth,
+} from '@react-native-firebase/auth';
+import {
+  getFirestore,
+  collection,
+  doc,
+  query,
+  where,
+  limit,
+  getDocs,
+  getDoc,
+  runTransaction,
+  serverTimestamp,
+} from '@react-native-firebase/firestore';
 import { OfferItem } from '../@types/jobApplication.type';
 
+// Singleton accessors — avoids repeated getApp() calls across functions
+const getDb = () => getFirestore(getApp());
+const getCurrentUser = () => getAuth(getApp()).currentUser;
+
 export const applyToJob = async (job: { id: string; userId: string }) => {
-  const user = auth().currentUser;
-  if (!user) {
-    throw new Error('Please login to apply');
-  }
+  const user = getCurrentUser();
+  if (!user) throw new Error('Please login to apply');
 
   if (job.userId === user.uid) {
     throw new Error('You cannot apply to your own job');
   }
 
-  const db = firestore();
+  const db = getDb();
 
-  //already applied
-  const existingSnap = await db
-    .collection('jobApplications')
-    .where('jobId', '==', job.id)
-    .where('applicantId', '==', user.uid)
-    .limit(1)
-    .get();
+  // Guard: check for existing application before writing
+  const existingSnap = await getDocs(
+    query(
+      collection(db, 'jobApplications'),
+      where('jobId', '==', job.id),
+      where('applicantId', '==', user.uid),
+      limit(1),
+    ),
+  );
 
   if (!existingSnap.empty) {
     throw new Error('You already applied for this job');
   }
 
-  const applicationRef = db.collection('jobApplications').doc();
-  const notifRef = db.collection('notifications').doc();
+  const applicationRef = doc(collection(db, 'jobApplications'));
+  const notifRef = doc(collection(db, 'notifications'));
 
-  await db.runTransaction(async transaction => {
-    // job application
+  // Atomic write: application + notification in one transaction
+  await runTransaction(db, async transaction => {
     transaction.set(applicationRef, {
       jobId: job.id,
       applicantId: user.uid,
       jobOwnerId: job.userId,
       status: 'pending',
-      createdAt: firestore.FieldValue.serverTimestamp(),
+      createdAt: serverTimestamp(),
     });
 
-    // notification
     transaction.set(notifRef, {
       toUserId: job.userId,
       fromUserId: user.uid,
@@ -51,34 +68,37 @@ export const applyToJob = async (job: { id: string; userId: string }) => {
         applicationId: applicationRef.id,
       },
       isRead: false,
-      createdAt: firestore.FieldValue.serverTimestamp(),
+      createdAt: serverTimestamp(),
     });
   });
 
   return true;
 };
 
-// fetch my application (offer)
+// Fetch all job applications submitted by the current user
 export const fetchMyOffers = async (): Promise<OfferItem[]> => {
-  const user = auth().currentUser;
+  const user = getCurrentUser();
   if (!user) throw new Error('User not logged in');
 
-  const snap = await firestore()
-    .collection('jobApplications')
-    .where('applicantId', '==', user.uid)
-    // .orderBy('createdAt', 'desc')
-    .get();
+  const db = getDb();
+
+  const snap = await getDocs(
+    query(
+      collection(db, 'jobApplications'),
+      where('applicantId', '==', user.uid),
+    ),
+  );
 
   const offers: OfferItem[] = [];
-  for (const doc of snap.docs) {
-    const app = doc.data();
 
-    const jobDoc = await firestore().collection('jobs').doc(app.jobId).get();
+  for (const appDoc of snap.docs) {
+    const app = appDoc.data();
 
+    const jobDoc = await getDoc(doc(db, 'jobs', app.jobId));
     if (!jobDoc.exists) continue;
 
     offers.push({
-      id: doc.id,
+      id: appDoc.id,
       status: app.status,
       createdAt: app.createdAt,
       job: {
@@ -87,64 +107,50 @@ export const fetchMyOffers = async (): Promise<OfferItem[]> => {
       },
     });
   }
-  console.log('abckendoffer', offers);
+
   return offers;
 };
 
-// update offer status
+// Update the status of a job application (accepted | rejected)
 export const updateOfferStatus = async (
   applicationId: string,
   status: 'accepted' | 'rejected',
 ) => {
-  const db = firestore();
+  const db = getDb();
+  const user = getCurrentUser();
 
-  // Update the offer status
-  await db.collection('jobApplications').doc(applicationId).update({
-    status,
-    updatedAt: firestore.FieldValue.serverTimestamp(),
+  const applicationRef = doc(db, 'jobApplications', applicationId);
+
+  await runTransaction(db, async transaction => {
+    const appDoc = await transaction.get(applicationRef);
+    if (!appDoc.exists) return;
+
+    const appData = appDoc.data();
+    if (!appData) return;
+
+    // Update status
+    transaction.update(applicationRef, {
+      status,
+      updatedAt: serverTimestamp(),
+    });
+
+    // Notify the job owner of the decision
+    const notifRef = doc(collection(db, 'notifications'));
+    transaction.set(notifRef, {
+      toUserId: appData.jobOwnerId,
+      fromUserId: user?.uid ?? '',
+      type: status === 'accepted' ? 'OFFER_ACCEPTED' : 'OFFER_REJECTED',
+      title: status === 'accepted' ? 'Offer Accepted' : 'Offer Rejected',
+      body:
+        status === 'accepted'
+          ? 'Your applicant has accepted the offer'
+          : 'Your applicant has rejected the offer',
+      data: {
+        applicationId,
+        jobId: appData.jobId,
+      },
+      isRead: false,
+      createdAt: serverTimestamp(),
+    });
   });
-
-  // Send notification for both accepted & rejected
-  const appDoc = await db
-    .collection('jobApplications')
-    .doc(applicationId)
-    .get();
-  if (!appDoc.exists) return;
-
-  const appData = appDoc.data();
-  if (!appData) return;
-
-  const notifRef = db.collection('notifications').doc();
-
-  if (status === 'rejected') {
-    await notifRef.set({
-      toUserId: appData.jobOwnerId,
-      fromUserId: auth().currentUser?.uid || '',
-      type: 'OFFER_REJECTED',
-      title: 'Offer Rejected',
-      body: 'Your applicant has rejected the offer',
-      data: {
-        applicationId,
-        jobId: appData.jobId,
-      },
-      isRead: false,
-      createdAt: firestore.FieldValue.serverTimestamp(),
-    });
-  }
-
-  if (status === 'accepted') {
-    await notifRef.set({
-      toUserId: appData.jobOwnerId,
-      fromUserId: auth().currentUser?.uid || '',
-      type: 'OFFER_ACCEPTED',
-      title: 'Offer Accepted',
-      body: 'Your applicant has accepted the offer',
-      data: {
-        applicationId,
-        jobId: appData.jobId,
-      },
-      isRead: false,
-      createdAt: firestore.FieldValue.serverTimestamp(),
-    });
-  }
 };

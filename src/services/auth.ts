@@ -1,16 +1,29 @@
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithCredential,
+  GoogleAuthProvider,
+} from '@react-native-firebase/auth';
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  serverTimestamp,
+} from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { SignUpData } from '../@types/Signup.type';
 
+const auth = getAuth();
+const db = getFirestore();
 
-
-// helper for monthKey
+// helper for monthKey e.g. 2026-02
 const getMonthKey = () => {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
-  return `${year}-${month}`; // 2026-02
+  return `${year}-${month}`;
 };
 
 // email signup
@@ -27,59 +40,56 @@ export const signUpUser = async (data: SignUpData) => {
 
   const normalizedEmail = email.trim().toLowerCase();
 
-  const userCredential = await auth().createUserWithEmailAndPassword(
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
     normalizedEmail,
     password,
   );
 
   const user = userCredential.user;
 
-  await firestore()
-    .collection('users')
-    .doc(user.uid)
-    .set({
-      email: normalizedEmail,
+  await setDoc(doc(collection(db, 'users'), user.uid), {
+    email: normalizedEmail,
 
-      profile: {
-        name: fullName,
-        aboutMe: '',
-        photo: null,
-        city,
-        skills: [],
-        hourlyRate: null,
-        experienceYears: 0,
-        rating: 0,
-        reviewsCount: 0,
-        verified: false,
-        opentowork: true,
-      },
+    profile: {
+      name: fullName,
+      aboutMe: '',
+      photo: null,
+      city,
+      skills: [],
+      hourlyRate: null,
+      experienceYears: 0,
+      rating: 0,
+      reviewsCount: 0,
+      verified: false,
+      opentowork: true,
+    },
 
-      membership: {
-        tier: 'free', // free | basic | premium
-        startedAt: null,
-        expiresAt: null,
+    membership: {
+      tier: 'free', // free | basic | premium
+      startedAt: null,
+      expiresAt: null,
+      monthKey: getMonthKey(),
+      fullTimeAdsPostedThisMonth: 0,
+      fullTimeAdsLimit: 0, // free = 0, basic = 1, premium = unlimited (null)
+    },
 
-        monthKey: getMonthKey(),
-        fullTimeAdsPostedThisMonth: 0,
-        fullTimeAdsLimit: 0, // free = 0, basic = 1, premium = unlimited (null)
-      },
+    credits: {
+      balance: 10,
+      lifetimeEarned: 10,
+      used: 0,
+    },
 
-      credits: {
-        balance: 10,
-        lifetimeEarned: 10,
-        used: 0,
-      },
+    terms: {
+      accepted: true,
+      acceptedAt: serverTimestamp(),
+    },
 
-      terms: {
-        accepted: true,
-        acceptedAt: firestore.FieldValue.serverTimestamp(),
-      },
+    active: true,
 
-      active: true,
-
-      createdAt: firestore.FieldValue.serverTimestamp(),
-      updatedAt: firestore.FieldValue.serverTimestamp(),
-    });
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
 
   return user;
 };
@@ -96,21 +106,21 @@ export const signInWithGoogle = async () => {
     const { idToken } = await GoogleSignin.getTokens();
     if (!idToken) throw new Error('Google ID token not found');
 
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-    const userCredential = await auth().signInWithCredential(googleCredential);
+    const googleCredential = GoogleAuthProvider.credential(idToken);
+    const userCredential = await signInWithCredential(auth, googleCredential);
     const user = userCredential.user;
 
-    const userRef = firestore().collection('users').doc(user.uid);
-    const snap = await userRef.get();
+    const userRef = doc(collection(db, 'users'), user.uid);
+    const snap = await getDoc(userRef);
 
-    const existingProfile = snap.exists() ? snap.data()?.profile : null;
+    const existingProfile = snap.exists() ? (snap.data() as Record<string, any>)?.profile : null;
 
     const finalPhoto = existingProfile?.photo || user.photoURL || null;
     const finalName = existingProfile?.name || user.displayName || '';
 
-    // first time user
-    if (!snap.exists) {
-      await userRef.set({
+    // first time user — seed full document
+    if (!snap.exists()) {
+      await setDoc(userRef, {
         email: user.email?.trim().toLowerCase() ?? '',
 
         profile: {
@@ -132,16 +142,17 @@ export const signInWithGoogle = async () => {
           acceptedAt: null,
         },
 
-        createdAt: firestore.FieldValue.serverTimestamp(),
-        updatedAt: firestore.FieldValue.serverTimestamp(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
     }
 
-
-    await userRef.set(
+    // merge latest auth data on every login
+    await setDoc(
+      userRef,
       {
         email: user.email?.trim().toLowerCase() ?? '',
-        updatedAt: firestore.FieldValue.serverTimestamp(),
+        updatedAt: serverTimestamp(),
 
         profile: {
           name: finalName,
@@ -165,7 +176,7 @@ export const signInWithGoogle = async () => {
 
         active: true,
       },
-      { merge: true }
+      { merge: true },
     );
 
     return user;
@@ -174,4 +185,3 @@ export const signInWithGoogle = async () => {
     throw error;
   }
 };
-

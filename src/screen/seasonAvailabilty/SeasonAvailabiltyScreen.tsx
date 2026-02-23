@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   FlatList,
   StatusBar,
+  RefreshControl,
 } from 'react-native';
+import useRefresh from '../../hooks/useRefresh';
 import { ArrowLeft, Search, ChevronDown } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './style';
@@ -40,10 +42,16 @@ const SeasonAvailabilityScreen = () => {
     navigation.goBack();
   };
 
-  const { data: workers, isPending } = useQuery({
+  const {
+    data: workers,
+    isPending,
+    refetch,
+  } = useQuery({
     queryKey: ['workers'],
     queryFn: fetchSeasonalJobs,
   });
+
+  const { refreshing, onRefresh } = useRefresh(refetch);
 
   // notification get for dot
   const { hasUnread } = useUnreadNotifications();
@@ -282,6 +290,13 @@ const SeasonAvailabilityScreen = () => {
           )
         }
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#FFD900"
+          />
+        }
       />
     </SafeAreaView>
   );

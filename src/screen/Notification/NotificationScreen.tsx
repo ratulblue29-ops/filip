@@ -7,7 +7,9 @@ import {
   StatusBar,
   TextInput,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
+import useRefresh from '../../hooks/useRefresh';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ArrowLeft,
@@ -144,10 +146,15 @@ const NotificationScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: notifications = [], isLoading } = useQuery({
+  const {
+    data: notifications = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['notifications'],
     queryFn: fetchMyNotifications,
   });
+  const { refreshing, onRefresh } = useRefresh(refetch);
 
   /* Mark all as read — uses modular writeBatch (replaces deprecated .batch()) */
   const { mutate: markAllRead, isPending } = useMutation({
@@ -254,7 +261,16 @@ const NotificationScreen = () => {
           <ActivityIndicator size="large" color="#FFD900" />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#FFD900"
+            />
+          }
+        >
           {sections.map(section => {
             const items = filteredNotifications.filter(
               n => n.section === section,

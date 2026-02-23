@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 
 import styles from '../../screen/feed/style';
@@ -16,7 +17,12 @@ import FeedCardSkeleton from '../skeleton/FeedCardSkeleton';
 import { fetchRecommendedJobsPaginated } from '../../services/jobs';
 import { fetchWishlistIds } from '../../services/wishlist';
 
-const Gig = () => {
+type GigProps = {
+  refreshing: boolean;
+  onRefresh: () => void;
+};
+
+const Gig = ({ refreshing, onRefresh }: GigProps) => {
   // RECOMMENDED JOBS
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
@@ -40,7 +46,20 @@ const Gig = () => {
   }, [data]);
 
   if (isPending || wishlistLoading) {
-    return <FeedCardSkeleton />;
+    return (
+      <FlatList
+        data={[]}
+        renderItem={null}
+        ListHeaderComponent={<FeedCardSkeleton />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#FFD900"
+          />
+        }
+      />
+    );
   }
 
   return (
@@ -61,6 +80,13 @@ const Gig = () => {
           </View>
         }
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#FFD900"
+          />
+        }
         ListFooterComponent={
           <View style={styles.gigContainer}>
             {hasNextPage ? (

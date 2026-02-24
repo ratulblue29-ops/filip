@@ -87,7 +87,6 @@ const LoginScreen = () => {
       setGoogleLoading(true);
 
       const { isNewUser } = await signInWithGoogle();
-      console.log('[handleGoogleLogin] isNewUser:', isNewUser); // DEBUG
 
       Toast.show({
         type: 'success',

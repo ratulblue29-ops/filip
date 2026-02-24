@@ -86,11 +86,12 @@ const LoginScreen = () => {
     try {
       setGoogleLoading(true);
 
-      await signInWithGoogle();
+      const { isNewUser } = await signInWithGoogle();
+      console.log('[handleGoogleLogin] isNewUser:', isNewUser); // DEBUG
 
       Toast.show({
         type: 'success',
-        text1: 'Signed in with Google',
+        text1: isNewUser ? 'Signed in with Google' : 'Logged in with Google',
       });
 
       navigation.replace('BottomTabs');

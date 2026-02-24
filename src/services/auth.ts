@@ -112,6 +112,8 @@ export const signInWithGoogle = async () => {
 
     const userRef = doc(collection(db, 'users'), user.uid);
     const snap = await getDoc(userRef);
+    const isNewUser = !snap.exists();
+    console.log('[signInWithGoogle] isNewUser:', isNewUser, '| uid:', user.uid); // DEBUG
 
     const existingProfile = snap.exists() ? (snap.data() as Record<string, any>)?.profile : null;
 
@@ -168,18 +170,18 @@ export const signInWithGoogle = async () => {
           fullTimeAdsLimit: 0,
         },
 
-        credits: {
-          balance: 10,
-          lifetimeEarned: 10,
-          used: 0,
-        },
+        // credits: {
+        //   balance: 10,
+        //   lifetimeEarned: 10,
+        //   used: 0,
+        // },
 
         active: true,
       },
       { merge: true },
     );
 
-    return user;
+    return { user, isNewUser };
   } catch (error) {
     console.log('Google Signup Error:', error);
     throw error;

@@ -136,18 +136,6 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
           // Daily: show target position + time range
           <View style={styles.dailyInfoBox}>
             <View style={styles.dailyInfoItem}>
-              <Briefcase width={22} height={22} color="#FFD900" />
-              <View>
-                <Text style={styles.dailyInfoLabel}>Target Position</Text>
-                <Text style={styles.dailyInfoValue} numberOfLines={1}>
-                  {item.targetPosition || 'Not specified'}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.dailyDivider} />
-
-            <View style={styles.dailyInfoItem}>
               <Clock width={22} height={22} color="#FFD900" />
               <View>
                 <Text style={styles.dailyInfoLabel}>Time</Text>
@@ -155,6 +143,20 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
                   {item.startTime && item.endTime
                     ? `${item.startTime} – ${item.endTime}`
                     : 'Not specified'}
+                </Text>
+                {item.date ? (
+                  <Text style={styles.dailyInfoLabel}>{item.date}</Text>
+                ) : null}
+              </View>
+            </View>
+
+            <View style={styles.dailyDivider} />
+
+            <View style={styles.dailyInfoItem}>
+              <View>
+                <Text style={styles.dailyInfoLabel}>Target Position</Text>
+                <Text style={styles.dailyInfoValue} numberOfLines={1}>
+                  {item.targetPosition || 'Not specified'}
                 </Text>
               </View>
             </View>

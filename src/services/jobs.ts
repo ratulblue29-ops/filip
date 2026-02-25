@@ -277,6 +277,7 @@ export const createJob = async ({
           end: `${date}T${endTime}:59Z`,
         };
         jobPost.currency = currency;
+        jobPost.targetPosition = targetPosition;
         jobPost.visibility = {
           priority: 'active',
           creditUsed: DAILY_JOB_CREDIT_COST,

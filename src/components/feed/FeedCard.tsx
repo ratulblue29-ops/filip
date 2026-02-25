@@ -7,7 +7,7 @@ import {
   Image,
 } from 'react-native';
 
-import { BadgeCheck, Clock, Heart } from 'lucide-react-native';
+import { BadgeCheck, Clock, Heart, Briefcase } from 'lucide-react-native';
 import styles from '../../screen/feed/style';
 import { useNavigation } from '@react-navigation/native';
 import { Feedtype } from '../../@types/Feed.type';
@@ -132,26 +132,54 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
 
         <Text style={styles.locationText}>{locationText}</Text>
 
-        <View style={styles.availabilityBox}>
-          <Clock width={24} height={24} color="#FFD900" />
-          <View>
-            <Text style={styles.availLabel}>
-              {item.subAvailability ? 'Availability' : 'Next Available'}
-            </Text>
+        {item.type === 'daily' ? (
+          // Daily: show target position + time range
+          <View style={styles.dailyInfoBox}>
+            <View style={styles.dailyInfoItem}>
+              <Briefcase width={22} height={22} color="#FFD900" />
+              <View>
+                <Text style={styles.dailyInfoLabel}>Target Position</Text>
+                <Text style={styles.dailyInfoValue} numberOfLines={1}>
+                  {item.targetPosition || 'Not specified'}
+                </Text>
+              </View>
+            </View>
 
-            <Text style={styles.availValue}>
-              {item?.schedule?.start && item?.schedule?.end
-                ? `${formatDate(item.schedule.start)} - ${formatDate(
-                    item.schedule.end,
-                  )}`
-                : 'Date not available'}
-            </Text>
+            <View style={styles.dailyDivider} />
 
-            {item.subAvailability && (
-              <Text style={styles.availSub}>{item.subAvailability}</Text>
-            )}
+            <View style={styles.dailyInfoItem}>
+              <Clock width={22} height={22} color="#FFD900" />
+              <View>
+                <Text style={styles.dailyInfoLabel}>Time</Text>
+                <Text style={styles.dailyInfoValue}>
+                  {item.startTime && item.endTime
+                    ? `${item.startTime} – ${item.endTime}`
+                    : 'Not specified'}
+                </Text>
+              </View>
+            </View>
           </View>
-        </View>
+        ) : (
+          // Seasonal / fulltime: existing availability box
+          <View style={styles.availabilityBox}>
+            <Clock width={24} height={24} color="#FFD900" />
+            <View>
+              <Text style={styles.availLabel}>
+                {item.subAvailability ? 'Availability' : 'Next Available'}
+              </Text>
+              <Text style={styles.availValue}>
+                {item?.schedule?.start && item?.schedule?.end
+                  ? `${formatDate(item.schedule.start)} - ${formatDate(
+                      item.schedule.end,
+                    )}`
+                  : 'Date not available'}
+              </Text>
+              {item.subAvailability && (
+                <Text style={styles.availSub}>{item.subAvailability}</Text>
+              )}
+            </View>
+          </View>
+        )}
 
         <View style={styles.tagRow}>
           {Array.isArray(item?.requiredSkills) &&

@@ -576,6 +576,43 @@ const styles = StyleSheet.create({
     fontFamily: 'InterDisplayRegular',
     fontWeight: 400,
   },
+  // Daily post info box
+dailyInfoBox: {
+  backgroundColor: '#262626',
+  paddingHorizontal: 17,
+  paddingVertical: 15,
+  borderRadius: 12,
+  marginVertical: 12,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+dailyInfoItem: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 6,
+  flex: 1,
+},
+dailyInfoLabel: {
+  color: '#F5F5F5',
+  opacity: 0.84,
+  fontSize: 12,
+  fontFamily: 'InterDisplayRegular',
+  fontWeight: 400,
+  marginBottom: 2,
+},
+dailyInfoValue: {
+  color: '#F5F5F5',
+  fontSize: 14,
+  fontWeight: 500,
+  fontFamily: 'InterDisplayMedium',
+},
+dailyDivider: {
+  width: 1,
+  height: 36,
+  backgroundColor: '#3A3A3A',
+  marginHorizontal: 12,
+},
 });
 
 export default styles;

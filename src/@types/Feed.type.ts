@@ -38,7 +38,7 @@ export interface Feedtype {
   title: string;
   description: string;
 
-  type: 'seasonal' | 'fulltime';
+  type: 'seasonal' | 'fulltime' | 'daily';
   location: string[];
 
   bannerImage: string;
@@ -48,6 +48,10 @@ export interface Feedtype {
 
   requiredSkills: string[];
   subAvailability?: string;
+  date?: string;        
+  startTime?: string;   
+  endTime?: string;     
+  targetPosition?: string;
 
   userId: string;
   user: JobUser;

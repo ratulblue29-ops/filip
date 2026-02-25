@@ -30,6 +30,7 @@ import ReferralScreen from '../screen/referral/ReferralScreen ';
 import FullTimeAvailabilityCreation from '../screen/availabilty/FullTimeAvailabilityCreation';
 import MainProfile from '../screen/profile/MainProfile';
 import ViewProfileScreen from '../screen/profile/ViewProfileScreen';
+import DailyAvailabilityCreation from '../screen/DailyAvailabilityCreation/DailyAvailabilityCreation';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -60,6 +61,7 @@ export type RootStackParamList = {
   FullTimeAvailabilityCreation: undefined;
   GetProfile: undefined;
   role: undefined;
+  DailyAvailabilityCreation: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -157,6 +159,10 @@ const RootNavigator: React.FC = () => {
       <Stack.Screen
         name="FullTimeAvailabilityCreation"
         component={withPrivate(FullTimeAvailabilityCreation)}
+      />
+      <Stack.Screen
+        name="DailyAvailabilityCreation"
+        component={withPrivate(DailyAvailabilityCreation)}
       />
       <Stack.Screen name="GetProfile" component={withPrivate(MainProfile)} />
       <Stack.Screen name="role" component={withPrivate(RoleScreen)} />

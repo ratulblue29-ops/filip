@@ -64,7 +64,7 @@ export const fetchMyJobs = async () => {
   });
 };
 
-type JobType = 'seasonal' | 'fulltime';
+type JobType = 'seasonal' | 'fulltime' | 'daily';
 
 // Workplace type options matching the UI toggle in SeasonalAvailabilityCreation
 type WorkplaceType = 'On-site' | 'Remote' | 'Hybrid';
@@ -92,6 +92,10 @@ type CreateJobPayload = {
   targetPosition?: string;
   // Currency is always EUR per spec — stored for display/filtering
   currency?: string;
+  // Daily availability fields
+  date?: string;       // ISO date string e.g. "2026-02-27"
+  startTime?: string;  // "HH:MM"
+  endTime?: string;    // "HH:MM"
 };
 
 const jobMonthlyKey = () => {
@@ -125,6 +129,9 @@ export const createJob = async ({
   workplaceType = 'On-site',
   targetPosition = '',
   currency = 'EUR',
+  date = '',
+  startTime = '',
+  endTime = '',
 }: CreateJobPayload) => {
   const auth = getAuth();
   const user = auth.currentUser;
@@ -138,6 +145,7 @@ export const createJob = async ({
 
   const priority = computePrioritySafe(visibility, schedule);
   const SEASONAL_JOB_CREDIT_COST = 5;
+  const DAILY_JOB_CREDIT_COST = 1;
 
   try {
     await runTransaction(db, async transaction => {
@@ -218,6 +226,17 @@ export const createJob = async ({
         });
       }
 
+      if (type === 'daily') {
+        const newBalance = credits - DAILY_JOB_CREDIT_COST;
+        if (newBalance < 0) {
+          throw new Error('Not enough credits to post daily availability.');
+        }
+        transaction.update(userRef, {
+          'credits.balance': newBalance,
+          'credits.used': usedCredits + DAILY_JOB_CREDIT_COST,
+        });
+      }
+
       const jobPost: any = {
         userId: user.uid,
         title,
@@ -245,6 +264,23 @@ export const createJob = async ({
         jobPost.targetPosition = targetPosition;
         // EUR is the only supported currency — stored explicitly for query/display
         jobPost.currency = currency;
+      }
+
+      if (type === 'daily') {
+        // Store individual time fields for display + lifecycle logic
+        jobPost.date = date;
+        jobPost.startTime = startTime;
+        jobPost.endTime = endTime;
+        // Build ISO schedule so existing feed/expiry logic works
+        jobPost.schedule = {
+          start: `${date}T${startTime}:00Z`,
+          end: `${date}T${endTime}:59Z`,
+        };
+        jobPost.currency = currency;
+        jobPost.visibility = {
+          priority: 'active',
+          creditUsed: DAILY_JOB_CREDIT_COST,
+        };
       }
 
       if (type === 'fulltime') {

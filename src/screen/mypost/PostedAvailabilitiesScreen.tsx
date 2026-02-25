@@ -14,6 +14,7 @@ import {
   CircleSlash,
   CalendarRange,
   BriefcaseBusiness,
+  Sun,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
@@ -130,6 +131,8 @@ const PostedAvailabilitiesScreen = () => {
                     <CalendarRange size={24} color="#1F2937" />
                   ) : item?.type === 'seasonal' ? (
                     <BriefcaseBusiness size={24} color="#1F2937" />
+                  ) : item?.type === 'daily' ? (
+                    <Sun size={24} color="#1F2937" />
                   ) : (
                     <CircleSlash size={24} color="#1F2937" />
                   )}
@@ -180,6 +183,10 @@ const PostedAvailabilitiesScreen = () => {
         onSelectSeasonal={() => {
           setShowPostTypeModal(false);
           navigation.navigate('SeosonalAvailabilityCreation');
+        }}
+        onSelectDaily={() => {
+          setShowPostTypeModal(false);
+          navigation.navigate('DailyAvailabilityCreation');
         }}
       />
     </SafeAreaView>

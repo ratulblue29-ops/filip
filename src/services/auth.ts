@@ -115,7 +115,11 @@ export const signInWithGoogle = async () => {
     const isNewUser = !snap.exists();
     console.log('[signInWithGoogle] isNewUser:', isNewUser, '| uid:', user.uid); // DEBUG
 
-    const existingProfile = snap.exists() ? (snap.data() as Record<string, any>)?.profile : null;
+    const existingData = snap.exists() ? (snap.data() as Record<string, any>) : null;
+    const existingProfile = existingData?.profile ?? null;
+
+    // Patch: existing Google accounts missing credits (one-time heal)
+    const existingCredits = existingData?.credits ?? null;
 
     const finalPhoto = existingProfile?.photo || user.photoURL || null;
     const finalName = existingProfile?.name || user.displayName || '';
@@ -137,6 +141,13 @@ export const signInWithGoogle = async () => {
           reviewsCount: 0,
           verified: false,
           openToWork: true,
+        },
+
+        // Seed credits for new Google users
+        credits: {
+          balance: 10,
+          lifetimeEarned: 10,
+          used: 0,
         },
 
         terms: {
@@ -170,11 +181,14 @@ export const signInWithGoogle = async () => {
           fullTimeAdsLimit: 0,
         },
 
-        // credits: {
-        //   balance: 10,
-        //   lifetimeEarned: 10,
-        //   used: 0,
-        // },
+        // Only seed credits if missing — never overwrite existing balance
+        ...(!existingCredits && {
+          credits: {
+            balance: 10,
+            lifetimeEarned: 10,
+            used: 0,
+          },
+        }),
 
         active: true,
       },

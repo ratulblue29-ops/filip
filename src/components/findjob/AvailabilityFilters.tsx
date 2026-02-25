@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import styles from '../../screen/availabilty/style';
 
-const AvailabilityFilters = ({ onSeasonal }: any) => {
+const AvailabilityFilters = ({ onSeasonal, onDaily }: any) => {
   return (
     <View>
       <View style={styles.filterRow}>
@@ -12,6 +12,10 @@ const AvailabilityFilters = ({ onSeasonal }: any) => {
 
         <TouchableOpacity style={styles.chip} onPress={onSeasonal}>
           <Text style={styles.chipText}>Seasonal</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.chip} onPress={onDaily}>
+          <Text style={styles.chipText}>Daily</Text>
         </TouchableOpacity>
       </View>
 

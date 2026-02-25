@@ -113,7 +113,11 @@ const ChooseAvailabilityModal = ({
 
                     <View style={styles.typeBadge}>
                       <Text style={styles.typeBadgeText}>
-                        {item.type === 'fulltime' ? 'Full Time' : 'Seasonal'}
+                        {item.type === 'fulltime'
+                          ? 'Full Time'
+                          : item.type === 'daily'
+                          ? 'Daily'
+                          : 'Seasonal'}
                       </Text>
                     </View>
                   </View>

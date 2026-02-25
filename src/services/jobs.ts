@@ -518,3 +518,54 @@ export const searchJobs = async (searchText: string) => {
 
   return filtered;
 };
+
+export const fetchDailyJobs = async () => {
+  const db = getFirestore();
+
+  const q = query(
+    collection(db, 'jobs'),
+    where('type', '==', 'daily'),
+    // where('visibility.priority', '==', 'active'),
+    // orderBy('createdAt', 'desc'),
+  );
+
+  const snap = await getDocs(q);
+
+  const results = await Promise.all(
+    snap.docs.map(async (jobDoc: any) => {
+      const jobData = jobDoc.data();
+
+      let userData: any = null;
+      if (jobData?.userId) {
+        const userRef = doc(db, 'users', jobData.userId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) userData = userSnap.data();
+      }
+
+      return {
+        id: jobDoc.id,
+        title: jobData.title ?? 'Daily Availability',
+        targetPosition: jobData.targetPosition ?? '',
+        date: jobData.date ?? '',
+        startTime: jobData.startTime ?? '',
+        endTime: jobData.endTime ?? '',
+        location: jobData.location ?? [],
+        rate: jobData.rate ?? { amount: 0, unit: 'hourly' },
+        currency: jobData.currency ?? 'EUR',
+        user: {
+          id: jobData.userId,
+          name: userData?.profile?.fullName || userData?.profile?.name || 'Unknown',
+          photo: userData?.profile?.photo ?? null,
+          city: userData?.profile?.city || '',
+          verified: userData?.profile?.verified ?? false,
+        },
+      };
+    }),
+  );
+
+  // Filter expired posts in memory — avoids composite index requirement
+  const active = results.filter((job: { date: string }) => job.date >= new Date().toISOString().split('T')[0]);
+  return active;
+
+  return results;
+};

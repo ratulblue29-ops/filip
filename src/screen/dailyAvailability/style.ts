@@ -1,0 +1,165 @@
+import { StyleSheet } from 'react-native';
+
+const COLORS = {
+  background: '#111111',
+  cardBg: '#1E1E1E',
+  inputBg: '#1A1A1A',
+  yellow: '#FFD900',
+  white: '#FFFFFF',
+  gray: '#9CA3AF',
+  border: '#2A2A2A',
+};
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    paddingHorizontal: 20,
+    paddingBottom: 60,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 15,
+    marginBottom: 24,
+  },
+  headerTitle: {
+    color: COLORS.white,
+    fontSize: 18,
+    fontWeight: 'bold',
+    fontFamily: 'InterDisplayMedium',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+  },
+  input: {
+    flex: 1,
+    color: COLORS.gray,
+    marginLeft: 12,
+    fontSize: 16,
+    fontFamily: 'InterDisplayRegular',
+  },
+  listHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  countText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontFamily: 'InterDisplayMedium',
+    fontWeight: '500',
+  },
+
+  // ── DailyCard ──
+  card: {
+    backgroundColor: COLORS.cardBg,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  userRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: COLORS.yellow,
+  },
+  userInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  userName: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'InterDisplaySemiBold',
+    marginBottom: 2,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  locationText: {
+    color: COLORS.gray,
+    fontSize: 12,
+    fontFamily: 'InterDisplayRegular',
+  },
+  rateChip: {
+    backgroundColor: '#121212',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#6D6D6D',
+  },
+  rateText: {
+    color: COLORS.yellow,
+    fontSize: 12,
+    fontFamily: 'InterDisplayMedium',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#262626',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 14,
+  },
+  infoItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  infoLabel: {
+    color: COLORS.gray,
+    fontSize: 11,
+    fontFamily: 'InterDisplayRegular',
+    marginBottom: 2,
+  },
+  infoValue: {
+    color: COLORS.white,
+    fontSize: 13,
+    fontWeight: '500',
+    fontFamily: 'InterDisplayMedium',
+  },
+  divider: {
+    width: 1,
+    height: 36,
+    backgroundColor: '#3A3A3A',
+    marginHorizontal: 12,
+  },
+  engageButton: {
+    backgroundColor: COLORS.yellow,
+    borderRadius: 12,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  engageButtonText: {
+    color: '#1F2937',
+    fontSize: 14,
+    fontFamily: 'InterDisplayMedium',
+    fontWeight: '500',
+  },
+});

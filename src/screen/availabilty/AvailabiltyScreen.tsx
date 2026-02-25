@@ -37,6 +37,7 @@ const AvailabilityScreen = () => {
         ListHeaderComponent={
           <AvailabilityFilters
             onSeasonal={() => navigation.navigate('Seasonal')}
+            onDaily={() => navigation.navigate('Daily')}
           />
         }
         ListFooterComponent={

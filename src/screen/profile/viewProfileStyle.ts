@@ -182,17 +182,20 @@ const styles = StyleSheet.create({
         fontFamily: 'InterDisplay-Regular'
     },
     footer: {
+        flexDirection: 'row',
         position: 'absolute',
         bottom: 0,
         width: '100%',
-        height: '15%',
         padding: 20,
         backgroundColor: '#111',
         alignSelf: 'center',
+        justifyContent: 'center',
+        gap: 20,
     },
     mainButton: {
         backgroundColor: '#FFD900',
-        paddingVertical: 16,
+        paddingVertical: 10,
+        paddingHorizontal: 25,
         borderRadius: 30,
         flexDirection: 'row',
         alignItems: 'center',
@@ -200,6 +203,25 @@ const styles = StyleSheet.create({
     },
     mainButtonText: {
         color: '#102217',
+        fontSize: 16,
+        marginLeft: 10,
+        fontFamily: 'InterDisplay-Bold',
+        fontWeight: 700,
+        lineHeight: 24
+    },
+    chatButton: {
+        // backgroundColor: '#FFD900',
+        borderColor: '#FFD900',
+        borderWidth: 1,
+        paddingVertical: 10,
+        paddingHorizontal: 25,
+        borderRadius: 30,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    chatButtonText: {
+        color: '#FFD900',
         fontSize: 16,
         marginLeft: 10,
         fontFamily: 'InterDisplay-Bold',

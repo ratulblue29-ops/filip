@@ -9,8 +9,8 @@ import { fetchCurrentUser } from '../../services/user';
 import Toast from 'react-native-toast-message';
 import { fetchWorkerActivePosts } from '../../services/engagement';
 import ChooseAvailabilityModal from '../availiability/ChooseAvailabilityModal';
-import { checkChatAccess } from '../../services/chat';
-import ChatAccessModal from '../message/ChatAccessModal';
+// import { checkChatAccess } from '../../services/chat';
+// import ChatAccessModal from '../message/ChatAccessModal';
 
 interface CandidateCardProps {
   candidate: Worker;
@@ -33,7 +33,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
     queryFn: fetchCurrentUser,
   });
 
-  const isPremium = user?.membership?.tier === 'premium';
+  // const isPremium = user?.membership?.tier === 'premium';
 
   // const handleEngage = async () => {
   //   try {
@@ -69,22 +69,35 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [posts, setPosts] = useState<any[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
-  const [accessModalVisible, setAccessModalVisible] = useState(false);
+  // const [accessModalVisible, setAccessModalVisible] = useState(false);
 
+  // const handleEngage = async () => {
+  //   try {
+  //     // Gate check: premium OR accepted engagement
+  //     const membershipTier = user?.membership?.tier ?? 'free';
+  //     const hasAccess = await checkChatAccess(
+  //       candidate.user.id,
+  //       membershipTier,
+  //     );
+
+  //     if (!hasAccess) {
+  //       setAccessModalVisible(true);
+  //       return;
+  //     }
+
+  //     setPostsLoading(true);
+  //     setModalVisible(true);
+  //     const activePosts = await fetchWorkerActivePosts(candidate.user.id);
+  //     setPosts(activePosts);
+  //   } catch (error: any) {
+  //     Toast.show({ type: 'error', text1: 'Error', text2: error.message });
+  //     setModalVisible(false);
+  //   } finally {
+  //     setPostsLoading(false);
+  //   }
+  // };
   const handleEngage = async () => {
     try {
-      // Gate check: premium OR accepted engagement
-      const membershipTier = user?.membership?.tier ?? 'free';
-      const hasAccess = await checkChatAccess(
-        candidate.user.id,
-        membershipTier,
-      );
-
-      if (!hasAccess) {
-        setAccessModalVisible(true);
-        return;
-      }
-
       setPostsLoading(true);
       setModalVisible(true);
       const activePosts = await fetchWorkerActivePosts(candidate.user.id);
@@ -185,10 +198,10 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
         loading={postsLoading}
         onSelect={handleSelectPost}
       />
-      <ChatAccessModal
+      {/* <ChatAccessModal
         visible={accessModalVisible}
         onClose={() => setAccessModalVisible(false)}
-      />
+      /> */}
     </View>
   );
 };

@@ -7,7 +7,12 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
-import { X, MapPin, CalendarCheck2 } from 'lucide-react-native';
+import {
+  X,
+  MapPin,
+  CalendarCheck2,
+  MessageCircleMore,
+} from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './viewProfileStyle';
 import ReviewCard from '../../components/profile/ReviewCard';
@@ -91,15 +96,42 @@ const ViewProfileScreen: React.FC = () => {
     queryFn: fetchCurrentUser,
   });
 
-  const handleSendEngagement = async () => {
+  const handleChat = async () => {
     try {
-      // Gate check before showing engagement modal
       const membershipTier = currentUser?.membership?.tier ?? 'free';
       const hasAccess = await checkChatAccess(user?.id || '', membershipTier);
       if (!hasAccess) {
         setAccessModalVisible(true);
         return;
       }
+      // premium: chat logic here later
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
+    }
+  };
+
+  // const handleSendEngagement = async () => {
+  //   try {
+  //     // Gate check before showing engagement modal
+  //     const membershipTier = currentUser?.membership?.tier ?? 'free';
+  //     const hasAccess = await checkChatAccess(user?.id || '', membershipTier);
+  //     if (!hasAccess) {
+  //       setAccessModalVisible(true);
+  //       return;
+  //     }
+  //     setPostsLoading(true);
+  //     setModalVisible(true);
+  //     const activePosts = await fetchWorkerActivePosts(user?.id || '');
+  //     setPosts(activePosts);
+  //   } catch (error: any) {
+  //     Toast.show({ type: 'error', text1: 'Error', text2: error.message });
+  //     setModalVisible(false);
+  //   } finally {
+  //     setPostsLoading(false);
+  //   }
+  // };
+  const handleSendEngagement = async () => {
+    try {
       setPostsLoading(true);
       setModalVisible(true);
       const activePosts = await fetchWorkerActivePosts(user?.id || '');
@@ -316,6 +348,10 @@ const ViewProfileScreen: React.FC = () => {
 
       {/* Footer */}
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.chatButton} onPress={handleChat}>
+          <MessageCircleMore size={20} color="#FFD900" strokeWidth={2.5} />
+          <Text style={styles.chatButtonText}>Chat</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.mainButton}
           onPress={handleSendEngagement}

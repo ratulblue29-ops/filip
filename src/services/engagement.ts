@@ -14,6 +14,8 @@ import {
   runTransaction,
 } from '@react-native-firebase/firestore';
 import { deductCredit, refundCredit } from './credit';
+import { getApp } from '@react-native-firebase/app';
+import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
 // Fetch active availability posts for a specific worker (employer calls this)
 export const fetchWorkerActivePosts = async (workerId: string) => {
@@ -75,7 +77,7 @@ export const createEngagement = async (
   }
 
 
-  // Deduct 1 credit — throws if balance < 1, blocking engagement creation
+  // Deduct 2 credits — throws if balance < 2, blocking engagement creation
   await deductCredit('pre-check');
 
   const engagementRef = await addDoc(collection(db, 'engagements'), {
@@ -166,11 +168,26 @@ export const updateEngagementStatus = async (
     }
   }
 
+  if (status === 'declined') {
+    const functions = getFunctions(getApp(), 'us-central1');
+    const declineEngagement = httpsCallable(functions, 'declineEngagement');
+    await declineEngagement({ engagementId });
+    return;
+  } 
+
   await updateDoc(engRef, { status, updatedAt: serverTimestamp() });
 
-  if (status === 'declined') {
-    await refundCredit(engagementId, 'worker_declined', fromUserId);
-  } else if (status === 'withdrawn') {
+  // if (status === 'withdrawn') {
+  //   // Refund handled server-side — worker cannot update employer's user doc (Firestore rules)
+  //   const functions = getFunctions(getApp(), 'us-central1');
+  //   const declineEngagement = httpsCallable(functions, 'declineEngagement');
+  //   await declineEngagement({ engagementId });
+  //   return; // status already updated inside Cloud Function transaction
+  // } else if (status === 'withdrawn') {
+  //   await refundCredit(engagementId, 'employer_withdrew', fromUserId);
+  // }
+  if (status === 'withdrawn') {
+    // Employer refunds themselves — client-side write to own doc is allowed by Firestore rules
     await refundCredit(engagementId, 'employer_withdrew', fromUserId);
   }
 };

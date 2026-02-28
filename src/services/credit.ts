@@ -33,15 +33,12 @@ export const deductCredit = async (engagementId: string): Promise<string> => {
       lifetimeEarned: 0,
     };
 
-    if ((credits.balance ?? 0) < 1) {
-      throw new Error(
-        'Insufficient credits. Please purchase more credits to send an engagement.',
-      );
+    if ((credits.balance ?? 0) < 2) {
+      throw new Error('Insufficient credits...');
     }
-
     tx.update(userRef, {
-      'credits.balance': credits.balance - 1,
-      'credits.used': (credits.used ?? 0) + 1,
+      'credits.balance': credits.balance - 2,
+      'credits.used': (credits.used ?? 0) + 2,
     });
   });
 
@@ -49,7 +46,7 @@ export const deductCredit = async (engagementId: string): Promise<string> => {
   const ledgerRef = await addDoc(collection(db, 'creditTransactions'), {
     userId: user.uid,
     type: 'deduction',
-    amount: 1,
+    amount: 2,
     reason: 'Engagement sent',
     engagementId,
     createdAt: serverTimestamp(),
@@ -76,8 +73,8 @@ export const refundCredit = async (
     const credits = userSnap.data()?.credits ?? { balance: 0, used: 0 };
 
     tx.update(userRef, {
-      'credits.balance': (credits.balance ?? 0) + 1,
-      'credits.used': Math.max(0, (credits.used ?? 0) - 1),
+      'credits.balance': (credits.balance ?? 0) + 2,
+      'credits.used': Math.max(0, (credits.used ?? 0) - 2),
     });
   });
 
@@ -91,7 +88,7 @@ export const refundCredit = async (
   await addDoc(collection(db, 'creditTransactions'), {
     userId: targetUserId,
     type: 'refund',
-    amount: 1,
+    amount: 2,
     reason: reasonLabel[reason],
     engagementId,
     createdAt: serverTimestamp(),

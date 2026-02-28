@@ -330,3 +330,64 @@ exports.expireSeasonalJobs = onSchedule(
     console.log("expireSeasonalJobs cron completed");
   }
 );
+
+/**
+ * =====================================
+ * DECLINE ENGAGEMENT (Callable)
+ * =====================================
+ * Called by worker to decline an engagement.
+ * Refunds 2 credits to employer server-side (bypasses Firestore rules).
+ * engagementId: string
+ */
+exports.declineEngagement = onCall(
+  { region: "us-central1" },
+  async (request) => {
+    if (!request.auth) throw new Error("UNAUTHENTICATED");
+
+    const { engagementId } = request.data;
+    if (!engagementId) throw new Error("engagementId required");
+
+    const db = admin.firestore();
+    const engRef = db.collection("engagements").doc(engagementId);
+    const now = admin.firestore.FieldValue.serverTimestamp();
+
+    await db.runTransaction(async (tx) => {
+      const engSnap = await tx.get(engRef);
+      if (!engSnap.exists) throw new Error("Engagement not found");
+
+      const eng = engSnap.data();
+
+      // Security: only the worker can decline
+      if (eng.workerId !== request.auth.uid) throw new Error("Not authorized");
+      if (eng.status !== "pending") throw new Error("Only pending engagements can be declined");
+
+      const employerRef = db.collection("users").doc(eng.fromUserId);
+      const employerSnap = await tx.get(employerRef);
+      if (!employerSnap.exists) throw new Error("Employer not found");
+
+      const credits = employerSnap.data().credits ?? { balance: 0, used: 0 };
+
+      // Update engagement status
+      tx.update(engRef, { status: "declined", updatedAt: now });
+
+      // Refund 2 credits to employer
+      tx.update(employerRef, {
+        "credits.balance": credits.balance + 2,
+        "credits.used": Math.max(0, (credits.used ?? 0) - 2),
+      });
+    });
+
+    // Write refund to ledger (outside transaction — non-critical audit trail)
+    const engSnap = await engRef.get();
+    await db.collection("creditTransactions").add({
+      userId: engSnap.data().fromUserId,
+      type: "refund",
+      amount: 2,
+      reason: "Worker declined — credit refunded",
+      engagementId,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return { success: true };
+  }
+);

@@ -62,10 +62,13 @@ const EngagementScreen = () => {
     mutationFn: ({
       engagementId,
       fromUserId,
+      workerId,
     }: {
       engagementId: string;
       fromUserId: string;
-    }) => updateEngagementStatus(engagementId, 'accepted', fromUserId),
+      workerId: string;
+    }) =>
+      updateEngagementStatus(engagementId, 'accepted', fromUserId, workerId),
     onSuccess: () => {
       Toast.show({ type: 'success', text1: 'Engagement accepted' });
       queryClient.invalidateQueries({ queryKey: ['receivedEngagements'] });
@@ -243,6 +246,7 @@ const EngagementScreen = () => {
                             acceptMutation({
                               engagementId: offer.id,
                               fromUserId: offer.fromUserId,
+                              workerId: offer.workerId,
                             })
                           }
                           disabled={isMutating}

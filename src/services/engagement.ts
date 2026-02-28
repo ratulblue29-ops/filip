@@ -111,6 +111,7 @@ export const updateEngagementStatus = async (
   engagementId: string,
   status: 'accepted' | 'declined' | 'withdrawn',
   fromUserId: string,
+  workerId?: string,
 ): Promise<void> => {
   const db = getFirestore();
   const engRef = doc(db, 'engagements', engagementId);
@@ -140,6 +141,18 @@ export const updateEngagementStatus = async (
         'visibility.priority': 'consumed',
         updatedAt: serverTimestamp(),
       });
+
+      // const workerId = engData.workerId;
+      // const chatId = [fromUserId, workerId].sort().join('_');
+      // const chatRef = doc(db, 'chats', chatId);
+      if (workerId) {
+        const chatId = [fromUserId, workerId].sort().join('_');
+        const chatRef = doc(db, 'chats', chatId);
+        tx.update(chatRef, {
+          offerStatus: 'Accepted',
+          updatedAt: serverTimestamp(),
+        });
+      }
     });
 
     return;

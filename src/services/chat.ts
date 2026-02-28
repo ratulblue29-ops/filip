@@ -45,15 +45,21 @@ export const checkChatAccess = async (
 
   // Check for accepted engagement between currentUser (employer) and otherUser (worker)
   const db = getFirestore(app);
-  const q = query(
-    collection(db, 'engagements'),
-    where('fromUserId', '==', currentUser.uid),
-    where('workerId', '==', otherUserId),
-    where('status', '==', 'accepted'),
-  );
-
-  const snap = await getDocs(q);
-  return !snap.empty;
+  const [asEmployer, asWorker] = await Promise.all([
+    getDocs(query(
+      collection(db, 'engagements'),
+      where('fromUserId', '==', currentUser.uid),
+      where('workerId', '==', otherUserId),
+      where('status', '==', 'accepted'),
+    )),
+    getDocs(query(
+      collection(db, 'engagements'),
+      where('workerId', '==', currentUser.uid),
+      where('fromUserId', '==', otherUserId),
+      where('status', '==', 'accepted'),
+    )),
+  ]);
+  return !asEmployer.empty || !asWorker.empty;
 };
 
 /* ================= CREATE OR GET CHAT ================= */

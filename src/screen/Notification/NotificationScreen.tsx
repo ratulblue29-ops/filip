@@ -34,6 +34,7 @@ import styles from './style';
 import WalletIcon from '../../components/svg/WalletIcon';
 import { fetchMyNotifications } from '../../services/notification';
 import { NotificationItem } from '../../@types/notificationIte.type';
+import { createOrGetChat } from '../../services/chat';
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 
@@ -122,6 +123,22 @@ const ICON_MAP: Record<string, (isNew: boolean) => React.ReactNode> = {
   engagement_sent: isNew => (
     <View style={styles.iconContainer}>
       <BriefcaseBusiness width={28} height={28} color="#FFD900" />
+      {isNew && <View style={styles.newDot} />}
+    </View>
+  ),
+
+  engagement_accepted: isNew => (
+    <View style={styles.iconContainer}>
+      <CircleCheck width={28} height={28} color="#16A34A" />
+      {isNew && <View style={styles.newDot} />}
+    </View>
+  ),
+
+  engagement_declined: isNew => (
+    <View style={styles.iconContainer}>
+      <View style={styles.iconContainerRed}>
+        <X width={22} height={22} color="#DC2626" />
+      </View>
       {isNew && <View style={styles.newDot} />}
     </View>
   ),
@@ -219,6 +236,18 @@ const NotificationScreen = () => {
       }
 
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      const engagementTypes = [
+        'ENGAGEMENT_SENT',
+        'ENGAGEMENT_ACCEPTED',
+        'ENGAGEMENT_DECLINED',
+      ];
+      if (engagementTypes.includes(notif.type) && notif.fromUserId) {
+        const chatId = await createOrGetChat(notif.fromUserId);
+        navigation.navigate('ChatDetailScreen', {
+          chatId,
+          otherUserId: notif.fromUserId,
+        });
+      }
     } catch (err) {
       console.log('Notification update failed', err);
     }

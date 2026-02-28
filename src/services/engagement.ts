@@ -76,7 +76,6 @@ export const createEngagement = async (
     throw new Error('This availability post is no longer accepting engagements');
   }
 
-
   // Deduct 2 credits — throws if balance < 2, blocking engagement creation
   await deductCredit('pre-check');
 
@@ -144,9 +143,6 @@ export const updateEngagementStatus = async (
         updatedAt: serverTimestamp(),
       });
 
-      // const workerId = engData.workerId;
-      // const chatId = [fromUserId, workerId].sort().join('_');
-      // const chatRef = doc(db, 'chats', chatId);
       if (workerId) {
         const chatId = [fromUserId, workerId].sort().join('_');
         const chatRef = doc(db, 'chats', chatId);
@@ -155,6 +151,19 @@ export const updateEngagementStatus = async (
           updatedAt: serverTimestamp(),
         });
       }
+
+      // Notify employer — engagement accepted
+      const acceptNotifRef = doc(collection(db, 'notifications'));
+      tx.set(acceptNotifRef, {
+        toUserId: fromUserId,
+        fromUserId: workerId ?? '',
+        type: 'ENGAGEMENT_ACCEPTED',
+        title: 'Engagement Accepted',
+        body: 'A worker has accepted your engagement request',
+        data: { engagementId },
+        isRead: false,
+        createdAt: serverTimestamp(),
+      });
     });
 
     return;
@@ -169,23 +178,31 @@ export const updateEngagementStatus = async (
   }
 
   if (status === 'declined') {
+    const currentUser = getAuth().currentUser;
+
+    // Notify employer — engagement declined (before delegating to cloud function)
+    if (currentUser) {
+      await addDoc(collection(db, 'notifications'), {
+        toUserId: fromUserId,
+        fromUserId: currentUser.uid,
+        type: 'ENGAGEMENT_DECLINED',
+        title: 'Engagement Declined',
+        body: 'A worker has declined your engagement request',
+        data: { engagementId },
+        isRead: false,
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    // Refund + status update handled server-side via cloud function
     const functions = getFunctions(getApp(), 'us-central1');
     const declineEngagement = httpsCallable(functions, 'declineEngagement');
     await declineEngagement({ engagementId });
     return;
-  } 
+  }
 
   await updateDoc(engRef, { status, updatedAt: serverTimestamp() });
 
-  // if (status === 'withdrawn') {
-  //   // Refund handled server-side — worker cannot update employer's user doc (Firestore rules)
-  //   const functions = getFunctions(getApp(), 'us-central1');
-  //   const declineEngagement = httpsCallable(functions, 'declineEngagement');
-  //   await declineEngagement({ engagementId });
-  //   return; // status already updated inside Cloud Function transaction
-  // } else if (status === 'withdrawn') {
-  //   await refundCredit(engagementId, 'employer_withdrew', fromUserId);
-  // }
   if (status === 'withdrawn') {
     // Employer refunds themselves — client-side write to own doc is allowed by Firestore rules
     await refundCredit(engagementId, 'employer_withdrew', fromUserId);

@@ -32,6 +32,7 @@ const MainProfile: React.FC = () => {
   const [hourlyRate, setHourlyRate] = useState('');
   const [bannerImage, setBannerImage] = useState<string | null>(null);
   const [localPhoto, setLocalPhoto] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -83,6 +84,7 @@ const MainProfile: React.FC = () => {
         text2: 'Profile saved successfully',
       });
       setLocalPhoto(null);
+      setIsEditing(false);
     },
     onError: (err: any) => {
       Toast.show({
@@ -136,6 +138,95 @@ const MainProfile: React.FC = () => {
     });
   };
 
+  if (!isEditing) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.headerTitle}>Profile</Text>
+
+          <View style={styles.container}>
+            {/* Banner */}
+            <View style={styles.profileBanner}>
+              {bannerImage ? (
+                <Image
+                  source={{ uri: bannerImage }}
+                  style={{ width: '100%', height: '100%' }}
+                />
+              ) : null}
+            </View>
+
+            {/* Avatar */}
+            <Image
+              source={{
+                uri:
+                  photo ||
+                  'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg',
+              }}
+              style={styles.viewAvatar}
+            />
+
+            <Text style={styles.viewName}>{fullName || '—'}</Text>
+            <Text style={styles.viewCity}>{city || '—'}</Text>
+
+            {/* About */}
+            <View style={styles.viewSection}>
+              <Text style={styles.viewSectionLabel}>About Me</Text>
+              <Text style={styles.viewSectionValue}>{about || '—'}</Text>
+            </View>
+
+            {/* Hourly Rate */}
+            <View style={styles.viewSection}>
+              <Text style={styles.viewSectionLabel}>Hourly Rate</Text>
+              <Text style={styles.viewSectionValue}>
+                {hourlyRate ? `€${hourlyRate}` : '—'}
+              </Text>
+            </View>
+
+            {/* Skills */}
+            <View style={styles.viewSection}>
+              <Text style={styles.viewSectionLabel}>Skills</Text>
+              <View style={styles.skillWrap}>
+                {skills.length > 0 ? (
+                  skills.map((skill, i) => (
+                    <View key={i} style={styles.skillChip}>
+                      <Text style={styles.skillText}>{skill}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.viewSectionValue}>—</Text>
+                )}
+              </View>
+            </View>
+
+            {/* Open To Work */}
+            <View style={styles.openToWorkBadge}>
+              <View
+                style={[
+                  styles.openToWorkDot,
+                  { backgroundColor: openToWork ? '#22C55E' : '#6B7280' },
+                ]}
+              />
+              <Text style={styles.viewSectionValue}>
+                {openToWork ? 'Open To Work' : 'Not Available'}
+              </Text>
+            </View>
+
+            {/* Edit Button */}
+            <TouchableOpacity
+              style={styles.editBtn}
+              onPress={() => setIsEditing(true)}
+            >
+              <Text style={styles.editBtnText}>Edit Profile</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -144,6 +235,20 @@ const MainProfile: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
+          <TouchableOpacity
+            onPress={() => setIsEditing(false)}
+            style={{ marginBottom: 8 }}
+          >
+            <Text
+              style={{
+                color: '#9CA3AF',
+                fontSize: 14,
+                fontFamily: 'InterDisplay-Regular',
+              }}
+            >
+              ← Back
+            </Text>
+          </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
 
           {/* Photo */}

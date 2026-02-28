@@ -221,6 +221,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     marginVertical: 30,
+    marginBottom: 40,
   },
 
   saveText: {
@@ -273,6 +274,85 @@ const styles = StyleSheet.create({
   photoSection: {
     alignItems: 'center',
   },
+viewModeContainer: {
+  paddingBottom: 40,
+},
+profileBanner: {
+  width: '100%',
+  height: '15%',
+  backgroundColor: '#1D1D1D',
+  borderRadius: 16,
+  overflow: 'hidden',
+},
+viewAvatar: {
+  width: 80,
+  height: 80,
+  borderRadius: 40,
+  borderWidth: 3,
+  borderColor: '#111',
+  marginTop: '-10%',
+  marginLeft: 16,
+},
+viewName: {
+  color: '#fff',
+  fontSize: 20,
+  fontWeight: '700',
+  fontFamily: 'InterDisplay-SemiBold',
+  marginTop: 10,
+  marginLeft: 16,
+},
+viewCity: {
+  color: '#9CA3AF',
+  fontSize: 13,
+  fontFamily: 'InterDisplay-Regular',
+  marginLeft: 16,
+  marginTop: 4,
+},
+viewSection: {
+  backgroundColor: '#1D1D1D',
+  borderRadius: 14,
+  padding: 16,
+  marginTop: 16,
+},
+viewSectionLabel: {
+  color: '#9CA3AF',
+  fontSize: 12,
+  fontFamily: 'InterDisplay-Regular',
+  marginBottom: 6,
+},
+viewSectionValue: {
+  color: '#fff',
+  fontSize: 14,
+  fontFamily: 'InterDisplay-Medium',
+},
+openToWorkBadge: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#1D1D1D',
+  borderRadius: 14,
+  padding: 16,
+  marginTop: 16,
+  gap: 10,
+},
+openToWorkDot: {
+  width: 10,
+  height: 10,
+  borderRadius: 5,
+},
+editBtn: {
+  backgroundColor: '#FFD900',
+  paddingVertical: 11,
+  borderRadius: 14,
+  alignItems: 'center',
+  marginTop: 24,
+  marginBottom: 150,
+},
+editBtnText: {
+  color: '#1F2937',
+  fontSize: 16,
+  fontWeight: '600',
+  fontFamily: 'InterDisplay-SemiBold',
+},
 });
 
 export default styles;

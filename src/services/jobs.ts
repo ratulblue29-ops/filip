@@ -307,14 +307,20 @@ export const fetchRecommendedJobsPaginated = async (
   const db = getFirestore();
   const jobsCol = collection(db, 'jobs');
 
-  let q = query(jobsCol, orderBy('createdAt', 'desc'), limit(pageSize));
+  let q = query(
+    jobsCol,
+    where('visibility.priority', '==', 'active'),
+    orderBy('createdAt', 'desc'),
+    limit(pageSize)
+  );
 
   if (lastDoc) {
     q = query(
       jobsCol,
+      where('visibility.priority', '==', 'active'),
       orderBy('createdAt', 'desc'),
       startAfter(lastDoc),
-      limit(pageSize),
+      limit(pageSize)
     );
   }
 
@@ -567,5 +573,5 @@ export const fetchDailyJobs = async () => {
   const active = results.filter((job: { date: string }) => job.date >= new Date().toISOString().split('T')[0]);
   return active;
 
-  return results;
+  // return results;
 };

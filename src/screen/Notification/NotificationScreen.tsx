@@ -29,12 +29,12 @@ import {
   doc,
   updateDoc,
 } from '@react-native-firebase/firestore';
-
 import styles from './style';
 import WalletIcon from '../../components/svg/WalletIcon';
 import { fetchMyNotifications } from '../../services/notification';
 import { NotificationItem } from '../../@types/notificationIte.type';
 import { createOrGetChat } from '../../services/chat';
+import { updateEngagementStatus } from '../../services/engagement';
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 
@@ -163,6 +163,10 @@ const NotificationScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [engagementLoading, setEngagementLoading] = useState<string | null>(
+    null,
+  );
+
   const {
     data: notifications = [],
     isLoading,
@@ -236,20 +240,47 @@ const NotificationScreen = () => {
       }
 
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      const engagementTypes = [
-        'ENGAGEMENT_SENT',
-        'ENGAGEMENT_ACCEPTED',
-        'ENGAGEMENT_DECLINED',
-      ];
-      if (engagementTypes.includes(notif.type) && notif.fromUserId) {
+      if (notif.type === 'ENGAGEMENT_SENT' && notif.fromUserId) {
+        // Worker receives this — navigate to chat with employer
         const chatId = await createOrGetChat(notif.fromUserId);
         navigation.navigate('ChatDetailScreen', {
           chatId,
           otherUserId: notif.fromUserId,
         });
       }
+
+      if (notif.type === 'ENGAGEMENT_ACCEPTED' && notif.fromUserId) {
+        // Employer receives this — fromUserId is the worker
+        const chatId = await createOrGetChat(notif.fromUserId);
+        navigation.navigate('ChatDetailScreen', {
+          chatId,
+          otherUserId: notif.fromUserId,
+        });
+      }
+
+      if (notif.type === 'ENGAGEMENT_DECLINED') {
+        // No chat navigation needed
+      }
     } catch (err) {
       console.log('Notification update failed', err);
+    }
+  };
+
+  const handleEngagementAction = async (
+    notif: NotificationItem,
+    action: 'accepted' | 'declined',
+  ) => {
+    const engagementId = notif.data?.engagementId;
+    if (!engagementId) return;
+
+    setEngagementLoading(engagementId + action);
+    try {
+      await updateEngagementStatus(engagementId, action, notif.fromUserId);
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    } catch (err: any) {
+      console.log('Engagement action failed:', err);
+    } finally {
+      setEngagementLoading(null);
     }
   };
 
@@ -353,6 +384,62 @@ const NotificationScreen = () => {
                         </Text>
                       )}
                     </View>
+                    {/* Accept/Decline for ENGAGEMENT_SENT only */}
+                    {item.type === 'ENGAGEMENT_SENT' && (
+                      <View
+                        style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}
+                      >
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            backgroundColor: '#2BEE79',
+                            borderRadius: 8,
+                            paddingVertical: 8,
+                            alignItems: 'center',
+                          }}
+                          disabled={!!engagementLoading}
+                          onPress={() =>
+                            handleEngagementAction(item.raw, 'accepted')
+                          }
+                        >
+                          {engagementLoading ===
+                          item.raw.data?.engagementId + 'accepted' ? (
+                            <ActivityIndicator size="small" color="#000" />
+                          ) : (
+                            <Text style={{ color: '#000', fontWeight: '600' }}>
+                              Accept
+                            </Text>
+                          )}
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            backgroundColor: '#1a1a1a',
+                            borderRadius: 8,
+                            paddingVertical: 8,
+                            alignItems: 'center',
+                            borderWidth: 1,
+                            borderColor: '#DC2626',
+                          }}
+                          disabled={!!engagementLoading}
+                          onPress={() =>
+                            handleEngagementAction(item.raw, 'declined')
+                          }
+                        >
+                          {engagementLoading ===
+                          item.raw.data?.engagementId + 'declined' ? (
+                            <ActivityIndicator size="small" color="#DC2626" />
+                          ) : (
+                            <Text
+                              style={{ color: '#DC2626', fontWeight: '600' }}
+                            >
+                              Decline
+                            </Text>
+                          )}
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   </TouchableOpacity>
                 ))}
               </View>

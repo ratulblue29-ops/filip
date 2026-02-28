@@ -11,23 +11,19 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
-
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, MoreVertical, Send } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getAuth } from '@react-native-firebase/auth';
-import { doc, getDoc } from '@react-native-firebase/firestore';
-
+import { doc, getDoc, onSnapshot } from '@react-native-firebase/firestore';
 import { styles } from './chatDetailStyle';
 import ChatMessageItem from '../../components/message/ChatMessageItem';
-
 import {
   subscribeToMessages,
   sendMessage,
   markAsRead,
   getOtherUserInfoFromChat,
 } from '../../services/chat';
-
 import { ChatMessage } from '../../@types/Chat.type';
 import { getFirestore } from '@react-native-firebase/firestore';
 import { checkChatAccess } from '../../services/chat';
@@ -96,20 +92,21 @@ const ChatDetailScreen = () => {
 
   /* ================= CHECK CHAT ACCESS ================= */
   useEffect(() => {
-    const verifyAccess = async () => {
-      if (!otherUser?.id) return;
+    if (!otherUser?.id) return;
 
-      // Read current user membership from Firestore
-      const db = getFirestore();
+    // Real-time listener on the chat doc — re-checks access whenever offerStatus changes
+    const chatRef = doc(db, 'chats', chatId);
+
+    const unsubscribe = onSnapshot(chatRef, async (chatSnap: any) => {
+      if (!chatSnap.exists()) return;
       const userSnap = await getDoc(doc(db, 'users', currentUserId));
       const tier = userSnap.data()?.membership?.tier ?? 'free';
-
       const access = await checkChatAccess(otherUser.id, tier);
       setChatUnlocked(access);
-    };
+    });
 
-    verifyAccess();
-  }, [otherUser]); // re-run when otherUser loads
+    return () => unsubscribe();
+  }, [otherUser]);
 
   /* ================= SEND MESSAGE ================= */
   const handleSend = async () => {

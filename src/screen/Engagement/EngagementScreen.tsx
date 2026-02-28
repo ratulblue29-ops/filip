@@ -16,17 +16,11 @@ import TrophyIcon from '../../components/svg/TrophyIcon';
 import BadgeIcon from '../../components/svg/BadgeIcon';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  acceptOffer,
-  declineOffer,
-  fetchReceivedOffers,
-  fetchSentOffers,
-} from '../../services/offer';
-import AcceptDeclineBtn from '../../components/AcceptDeclineBtn';
 import Toast from 'react-native-toast-message';
 import {
   fetchReceivedEngagements,
   fetchSentEngagements,
+  updateEngagementStatus,
 } from '../../services/engagement';
 
 const EngagementScreen = () => {
@@ -35,13 +29,10 @@ const EngagementScreen = () => {
 
   const [activeTab, setActiveTab] = useState('received');
 
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
+  const handleGoBack = () => navigation.goBack();
 
-  // query
   const {
-    data: receivedOffers = [],
+    data: receivedEngagements = [],
     isLoading: receivedLoading,
     refetch: refetchReceived,
   } = useQuery({
@@ -51,7 +42,7 @@ const EngagementScreen = () => {
   });
 
   const {
-    data: sentOffers = [],
+    data: sentEngagements = [],
     isLoading: sentLoading,
     refetch: refetchSent,
   } = useQuery({
@@ -60,46 +51,49 @@ const EngagementScreen = () => {
     enabled: activeTab === 'sent',
   });
 
-  const offersToShow = useMemo(() => {
-    return activeTab === 'received' ? receivedOffers : sentOffers;
-  }, [activeTab, receivedOffers, sentOffers]);
+  const engagementsToShow = useMemo(() => {
+    return activeTab === 'received' ? receivedEngagements : sentEngagements;
+  }, [activeTab, receivedEngagements, sentEngagements]);
 
   const isLoading = activeTab === 'received' ? receivedLoading : sentLoading;
 
-  // const { mutate: acceptMutation } = useMutation({
-  //   mutationFn: acceptOffer,
-  //   onSuccess: () => {
-  //     Toast.show({
-  //       type: 'success',
-  //       text1: 'Offer accepted',
-  //     });
+  // Accept — worker accepts incoming engagement
+  const { mutate: acceptMutation, isPending: acceptPending } = useMutation({
+    mutationFn: ({
+      engagementId,
+      fromUserId,
+    }: {
+      engagementId: string;
+      fromUserId: string;
+    }) => updateEngagementStatus(engagementId, 'accepted', fromUserId),
+    onSuccess: () => {
+      Toast.show({ type: 'success', text1: 'Engagement accepted' });
+      queryClient.invalidateQueries({ queryKey: ['receivedEngagements'] });
+    },
+    onError: (error: any) => {
+      Toast.show({ type: 'error', text1: error?.message || 'Accept failed' });
+    },
+  });
 
-  //     queryClient.invalidateQueries({ queryKey: ['receivedOffers'] });
-  //   },
-  //   onError: (error: any) => {
-  //     Toast.show({
-  //       type: 'error',
-  //       text1: error?.message || 'Accept failed',
-  //     });
-  //   },
-  // });
+  // Decline — worker declines incoming engagement, employer credit refunded
+  const { mutate: declineMutation, isPending: declinePending } = useMutation({
+    mutationFn: ({
+      engagementId,
+      fromUserId,
+    }: {
+      engagementId: string;
+      fromUserId: string;
+    }) => updateEngagementStatus(engagementId, 'declined', fromUserId),
+    onSuccess: () => {
+      Toast.show({ type: 'success', text1: 'Engagement declined' });
+      queryClient.invalidateQueries({ queryKey: ['receivedEngagements'] });
+    },
+    onError: (error: any) => {
+      Toast.show({ type: 'error', text1: error?.message || 'Decline failed' });
+    },
+  });
 
-  // const { mutate: declineMutation } = useMutation({
-  //   mutationFn: declineOffer,
-  //   onSuccess: () => {
-  //     Toast.show({
-  //       type: 'success',
-  //       text1: 'Offer declined',
-  //     });
-  //     queryClient.invalidateQueries({ queryKey: ['receivedOffers'] });
-  //   },
-  //   onError: (error: any) => {
-  //     Toast.show({
-  //       type: 'error',
-  //       text1: error?.message || 'Decline failed',
-  //     });
-  //   },
-  // });
+  const isMutating = acceptPending || declinePending;
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -182,10 +176,10 @@ const EngagementScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {isLoading ? (
           <ActivityIndicator size="large" color="#FFD900" />
-        ) : offersToShow.length === 0 ? (
+        ) : engagementsToShow.length === 0 ? (
           <Text style={styles.emptyStateText}>No offers found</Text>
         ) : (
-          offersToShow.map((offer: any) => {
+          engagementsToShow.map((offer: any) => {
             const status = offer.status || 'pending';
 
             return (
@@ -213,12 +207,8 @@ const EngagementScreen = () => {
 
                   <View style={styles.cardInfo}>
                     <View style={styles.titleRow}>
-                      <Text style={styles.offerTitle}>
-                        {'Engagement Request'}
-                      </Text>
-
+                      <Text style={styles.offerTitle}>Engagement Request</Text>
                       <Text style={styles.offerRate}>{'—'}</Text>
-
                       <View style={getStatusStyle(status)}>
                         <Text
                           style={[
@@ -245,54 +235,42 @@ const EngagementScreen = () => {
                       </Text>
                     </View>
 
-                    {/* ✅ Accept / Decline only for Received Offers + Pending */}
+                    {/* Accept / Decline — only for received + pending engagements */}
                     {activeTab === 'received' && status === 'pending' && (
-                      // <View
-                      //   style={{
-                      //     flexDirection: 'row',
-                      //     gap: 10,
-                      //     marginTop: 12,
-                      //   }}
-                      // >
-                      //   <TouchableOpacity
-                      //     onPress={() => acceptMutation(offer.id)}
-                      //     disabled={acceptLoading || declineLoading}
-                      //     style={{
-                      //       flex: 1,
-                      //       backgroundColor: '#00C853',
-                      //       paddingVertical: 10,
-                      //       borderRadius: 10,
-                      //       alignItems: 'center',
-                      //       opacity: acceptLoading ? 0.7 : 1,
-                      //     }}
-                      //   >
-                      //     <Text style={{ color: '#000', fontWeight: '700' }}>
-                      //       Accept
-                      //     </Text>
-                      //   </TouchableOpacity>
-
-                      //   <TouchableOpacity
-                      //     onPress={() => declineMutation(offer.id)}
-                      //     disabled={acceptLoading || declineLoading}
-                      //     style={{
-                      //       flex: 1,
-                      //       backgroundColor: '#FF3D00',
-                      //       paddingVertical: 10,
-                      //       borderRadius: 10,
-                      //       alignItems: 'center',
-                      //       opacity: declineLoading ? 0.7 : 1,
-                      //     }}
-                      //   >
-                      //     <Text style={{ color: '#fff', fontWeight: '700' }}>
-                      //       Decline
-                      //     </Text>
-                      //   </TouchableOpacity>
-                      // </View>
                       <View style={styles.actionButtons}>
-                        {/* <AcceptDeclineBtn
-                          handleAccept={() => acceptMutation(offer.id)}
-                          handleDecline={() => declineMutation(offer.id)}
-                        /> */}
+                        <TouchableOpacity
+                          onPress={() =>
+                            acceptMutation({
+                              engagementId: offer.id,
+                              fromUserId: offer.fromUserId,
+                            })
+                          }
+                          disabled={isMutating}
+                          activeOpacity={0.8}
+                          style={[
+                            styles.acceptBtn,
+                            isMutating && { opacity: 0.6 },
+                          ]}
+                        >
+                          <Text style={styles.acceptBtnText}>Accept</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          onPress={() =>
+                            declineMutation({
+                              engagementId: offer.id,
+                              fromUserId: offer.fromUserId,
+                            })
+                          }
+                          disabled={isMutating}
+                          activeOpacity={0.8}
+                          style={[
+                            styles.declineBtn,
+                            isMutating && { opacity: 0.6 },
+                          ]}
+                        >
+                          <Text style={styles.declineBtnText}>Decline</Text>
+                        </TouchableOpacity>
                       </View>
                     )}
                   </View>

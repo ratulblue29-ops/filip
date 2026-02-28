@@ -11,6 +11,7 @@ import {
   orderBy,
   serverTimestamp,
   updateDoc,
+  runTransaction,
 } from '@react-native-firebase/firestore';
 import { deductCredit, refundCredit } from './credit';
 
@@ -109,24 +110,56 @@ export const createEngagement = async (
 export const updateEngagementStatus = async (
   engagementId: string,
   status: 'accepted' | 'declined' | 'withdrawn',
-  fromUserId: string, // employer's userId — needed for refund
+  fromUserId: string,
 ): Promise<void> => {
   const db = getFirestore();
   const engRef = doc(db, 'engagements', engagementId);
 
-  await updateDoc(engRef, {
-    status,
-    updatedAt: serverTimestamp(),
-  });
+  if (status === 'accepted') {
+    await runTransaction(db, async tx => {
+      const engSnap = await tx.get(engRef);
+      if (!engSnap.exists()) throw new Error('Engagement not found');
+
+      const engData = engSnap.data();
+      if (engData?.status !== 'pending') {
+        throw new Error('Only pending engagements can be accepted');
+      }
+
+      const jobRef = doc(db, 'jobs', engData.availabilityPostId);
+      const jobSnap = await tx.get(jobRef);
+
+      if (!jobSnap.exists()) throw new Error('Availability post not found');
+      if (jobSnap.data()?.visibility?.priority !== 'active') {
+        throw new Error('This availability post is no longer available');
+      }
+
+      tx.update(engRef, { status: 'accepted', updatedAt: serverTimestamp() });
+
+      // Mark job consumed — auto-removes from feed, blocks new engagements
+      tx.update(jobRef, {
+        'visibility.priority': 'consumed',
+        updatedAt: serverTimestamp(),
+      });
+    });
+
+    return;
+  }
+
+  if (status === 'withdrawn') {
+    const engSnap = await getDoc(engRef);
+    if (!engSnap.exists()) throw new Error('Engagement not found');
+    if (engSnap.data()?.status === 'accepted') {
+      throw new Error('Cannot withdraw an already accepted engagement');
+    }
+  }
+
+  await updateDoc(engRef, { status, updatedAt: serverTimestamp() });
 
   if (status === 'declined') {
-    // Worker declined → refund the employer
     await refundCredit(engagementId, 'worker_declined', fromUserId);
   } else if (status === 'withdrawn') {
-    // Employer withdrew → refund themselves
     await refundCredit(engagementId, 'employer_withdrew', fromUserId);
   }
-  // 'accepted' → no refund, credit stays deducted
 };
 
 // Fetch engagements received by current user (worker view)

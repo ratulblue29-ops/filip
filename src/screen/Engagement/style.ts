@@ -185,6 +185,31 @@ const styles = StyleSheet.create({
   actionButtons: {
     marginTop: 16,
   },
+  acceptBtn: {
+    flex: 1,
+    backgroundColor: '#00C853',
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: 'center' as const,
+    marginBottom: 8,
+  },
+  acceptBtnText: {
+    color: '#000',
+    fontWeight: '700' as const,
+    fontFamily: 'InterDisplaySemiBold',
+  },
+  declineBtn: {
+    flex: 1,
+    backgroundColor: '#FF3D00',
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: 'center' as const,
+  },
+  declineBtnText: {
+    color: '#fff',
+    fontWeight: '700' as const,
+    fontFamily: 'InterDisplaySemiBold',
+  },
   emptyStateText: {
     color: '#fff',
     textAlign: 'center',

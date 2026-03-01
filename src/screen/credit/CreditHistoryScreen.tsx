@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   View,
@@ -10,10 +10,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useQuery } from '@tanstack/react-query';
+// import { useQuery } from '@tanstack/react-query';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { fetchCreditTransactions } from '../../services/credit';
+import { subscribeCreditTransactions } from '../../services/credit';
 import styles from './creditHistoryStyle';
 import { RootStackParamList } from '../../navigator/RootNavigator';
 
@@ -34,10 +34,19 @@ const CreditHistoryScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const { data: transactions = [], isLoading } = useQuery({
-    queryKey: ['creditTransactions'],
-    queryFn: fetchCreditTransactions,
-  });
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const unsub = subscribeCreditTransactions(
+      txs => {
+        setTransactions(txs);
+        setIsLoading(false);
+      },
+      () => setIsLoading(false),
+    );
+    return () => unsub();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -107,7 +116,7 @@ const CreditHistoryScreen = () => {
                     isDeduction ? styles.amountDeduction : styles.amountRefund,
                   ]}
                 >
-                  {isDeduction ? '-1' : '+1'}
+                  {isDeduction ? `-${tx.amount}` : `+${tx.amount}`}
                 </Text>
               </View>
             );

@@ -11,6 +11,7 @@ import {
   runTransaction,
   serverTimestamp,
 } from '@react-native-firebase/firestore';
+import { onSnapshot, Unsubscribe } from '@react-native-firebase/firestore';
 
 // Deduct 1 credit from current user — call before creating engagement.
 // Returns ledgerTransactionId for audit trail linkage.
@@ -110,4 +111,33 @@ export const fetchCreditTransactions = async () => {
 
   const snap = await getDocs(q);
   return snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+};
+
+// Real-time listener for credit transactions — newest first
+export const subscribeCreditTransactions = (
+  onUpdate: (txs: any[]) => void,
+  onError?: (err: Error) => void,
+): Unsubscribe => {
+  const user = getAuth().currentUser;
+  if (!user) throw new Error('Login required');
+
+  const db = getFirestore();
+
+  const q = query(
+    collection(db, 'creditTransactions'),
+    where('userId', '==', user.uid),
+    orderBy('createdAt', 'desc'),
+  );
+
+  return onSnapshot(
+    q,
+    snap => {
+      const txs = snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+      onUpdate(txs);
+    },
+    (err: Error) => {
+      console.error('subscribeCreditTransactions error:', err);
+      onError?.(err);
+    },
+  );
 };

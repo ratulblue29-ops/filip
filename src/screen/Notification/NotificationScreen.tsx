@@ -234,6 +234,7 @@ const NotificationScreen = () => {
   /* Mark single notification as read — uses modular updateDoc */
   const handleNotificationPress = async (notif: NotificationItem) => {
     try {
+      console.log('notif.type:', notif.type, '| fromUserId:', notif.fromUserId);
       if (!notif.isRead) {
         const db = getFirestore();
         await updateDoc(doc(db, 'notifications', notif.id), { isRead: true });
@@ -258,9 +259,15 @@ const NotificationScreen = () => {
         });
       }
 
-      if (notif.type === 'ENGAGEMENT_DECLINED') {
-        // No chat navigation needed
-      }
+      // if (notif.type === 'ENGAGEMENT_DECLINED') {
+      //   // No chat navigation needed
+      //   console.log(
+      //     'notif.type:',
+      //     notif.type,
+      //     '| fromUserId:',
+      //     notif.fromUserId,
+      //   );
+      // }
     } catch (err) {
       console.log('Notification update failed', err);
     }
@@ -275,7 +282,12 @@ const NotificationScreen = () => {
 
     setEngagementLoading(engagementId + action);
     try {
-      await updateEngagementStatus(engagementId, action, notif.fromUserId);
+      await updateEngagementStatus(
+        engagementId,
+        action,
+        notif.fromUserId,
+        notif.data?.workerId,
+      );
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     } catch (err: any) {
       console.log('Engagement action failed:', err);
@@ -342,52 +354,154 @@ const NotificationScreen = () => {
                 <Text style={styles.sectionTitle}>{section}</Text>
 
                 {items.map(item => (
+                  // <TouchableOpacity
+                  //   key={item.id}
+                  //   style={styles.notificationCard}
+                  //   onPress={() => handleNotificationPress(item.raw)}
+                  // >
+                  //   {mapNotificationTypeToIcon(item.type, item.isNew)}
+
+                  //   <View style={styles.notificationContent}>
+                  //     <View style={styles.notificationHeader}>
+                  //       <Text style={styles.notificationTitle}>
+                  //         {item.title}
+                  //       </Text>
+                  //       <Text style={styles.notificationTime}>{item.time}</Text>
+                  //     </View>
+
+                  //     {!!item.jobTitle && (
+                  //       <Text
+                  //         style={styles.notificationDescription}
+                  //         numberOfLines={1}
+                  //       >
+                  //         {item.jobTitle}
+                  //       </Text>
+                  //     )}
+
+                  //     {!item.jobTitle && !!item.description && (
+                  //       <Text
+                  //         style={styles.notificationDescription}
+                  //         numberOfLines={2}
+                  //       >
+                  //         {item.description}
+                  //       </Text>
+                  //     )}
+
+                  //     {item.jobRate && item.jobUnit && (
+                  //       <Text
+                  //         style={styles.notificationDescription}
+                  //         numberOfLines={1}
+                  //       >
+                  //         €{item.jobRate}/{item.jobUnit} · Tap to view
+                  //       </Text>
+                  //     )}
+                  //   </View>
+                  //   {/* Accept/Decline for ENGAGEMENT_SENT only */}
+                  //   {item.type === 'ENGAGEMENT_SENT' && (
+                  //     <View
+                  //       style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}
+                  //     >
+                  //       <TouchableOpacity
+                  //         style={{
+                  //           flex: 1,
+                  //           backgroundColor: '#2BEE79',
+                  //           borderRadius: 8,
+                  //           paddingVertical: 8,
+                  //           alignItems: 'center',
+                  //         }}
+                  //         disabled={!!engagementLoading}
+                  //         onPress={() =>
+                  //           handleEngagementAction(item.raw, 'accepted')
+                  //         }
+                  //       >
+                  //         {engagementLoading ===
+                  //         item.raw.data?.engagementId + 'accepted' ? (
+                  //           <ActivityIndicator size="small" color="#000" />
+                  //         ) : (
+                  //           <Text style={{ color: '#000', fontWeight: '600' }}>
+                  //             Accept
+                  //           </Text>
+                  //         )}
+                  //       </TouchableOpacity>
+
+                  //       <TouchableOpacity
+                  //         style={{
+                  //           flex: 1,
+                  //           backgroundColor: '#1a1a1a',
+                  //           borderRadius: 8,
+                  //           paddingVertical: 8,
+                  //           alignItems: 'center',
+                  //           borderWidth: 1,
+                  //           borderColor: '#DC2626',
+                  //         }}
+                  //         disabled={!!engagementLoading}
+                  //         onPress={() =>
+                  //           handleEngagementAction(item.raw, 'declined')
+                  //         }
+                  //       >
+                  //         {engagementLoading ===
+                  //         item.raw.data?.engagementId + 'declined' ? (
+                  //           <ActivityIndicator size="small" color="#DC2626" />
+                  //         ) : (
+                  //           <Text
+                  //             style={{ color: '#DC2626', fontWeight: '600' }}
+                  //           >
+                  //             Decline
+                  //           </Text>
+                  //         )}
+                  //       </TouchableOpacity>
+                  //     </View>
+                  //   )}
+                  // </TouchableOpacity>
+
                   <TouchableOpacity
                     key={item.id}
                     style={styles.notificationCard}
                     onPress={() => handleNotificationPress(item.raw)}
                   >
-                    {mapNotificationTypeToIcon(item.type, item.isNew)}
-
-                    <View style={styles.notificationContent}>
-                      <View style={styles.notificationHeader}>
-                        <Text style={styles.notificationTitle}>
-                          {item.title}
-                        </Text>
-                        <Text style={styles.notificationTime}>{item.time}</Text>
+                    {/* Top row: icon + text */}
+                    <View style={{ flexDirection: 'row', flex: 1 }}>
+                      {mapNotificationTypeToIcon(item.type, item.isNew)}
+                      <View style={styles.notificationContent}>
+                        <View style={styles.notificationHeader}>
+                          <Text style={styles.notificationTitle}>
+                            {item.title}
+                          </Text>
+                          <Text style={styles.notificationTime}>
+                            {item.time}
+                          </Text>
+                        </View>
+                        {!!item.jobTitle && (
+                          <Text
+                            style={styles.notificationDescription}
+                            numberOfLines={1}
+                          >
+                            {item.jobTitle}
+                          </Text>
+                        )}
+                        {!item.jobTitle && !!item.description && (
+                          <Text
+                            style={styles.notificationDescription}
+                            numberOfLines={2}
+                          >
+                            {item.description}
+                          </Text>
+                        )}
+                        {item.jobRate && item.jobUnit && (
+                          <Text
+                            style={styles.notificationDescription}
+                            numberOfLines={1}
+                          >
+                            €{item.jobRate}/{item.jobUnit} · Tap to view
+                          </Text>
+                        )}
                       </View>
-
-                      {!!item.jobTitle && (
-                        <Text
-                          style={styles.notificationDescription}
-                          numberOfLines={1}
-                        >
-                          {item.jobTitle}
-                        </Text>
-                      )}
-
-                      {!item.jobTitle && !!item.description && (
-                        <Text
-                          style={styles.notificationDescription}
-                          numberOfLines={2}
-                        >
-                          {item.description}
-                        </Text>
-                      )}
-
-                      {item.jobRate && item.jobUnit && (
-                        <Text
-                          style={styles.notificationDescription}
-                          numberOfLines={1}
-                        >
-                          €{item.jobRate}/{item.jobUnit} · Tap to view
-                        </Text>
-                      )}
                     </View>
-                    {/* Accept/Decline for ENGAGEMENT_SENT only */}
+
+                    {/* Accept/Decline buttons — full width below */}
                     {item.type === 'ENGAGEMENT_SENT' && (
                       <View
-                        style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}
+                        style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}
                       >
                         <TouchableOpacity
                           style={{
@@ -411,7 +525,6 @@ const NotificationScreen = () => {
                             </Text>
                           )}
                         </TouchableOpacity>
-
                         <TouchableOpacity
                           style={{
                             flex: 1,

@@ -98,6 +98,7 @@ export const createEngagement = async (
     data: {
       engagementId: engagementRef.id,
       availabilityPostId,
+      workerId,
     },
     isRead: false,
     createdAt: serverTimestamp(),
@@ -153,10 +154,11 @@ export const updateEngagementStatus = async (
       }
 
       // Notify employer — engagement accepted
+      const currentUser = getAuth().currentUser;
       const acceptNotifRef = doc(collection(db, 'notifications'));
       tx.set(acceptNotifRef, {
         toUserId: fromUserId,
-        fromUserId: workerId ?? '',
+        fromUserId: currentUser?.uid ?? workerId ?? '',
         type: 'ENGAGEMENT_ACCEPTED',
         title: 'Engagement Accepted',
         body: 'A worker has accepted your engagement request',

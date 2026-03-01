@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Text,
   View,
@@ -28,6 +28,11 @@ import {
   writeBatch,
   doc,
   updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
 } from '@react-native-firebase/firestore';
 import styles from './style';
 import WalletIcon from '../../components/svg/WalletIcon';
@@ -167,6 +172,12 @@ const NotificationScreen = () => {
     null,
   );
 
+  const [engagementDecisions, setEngagementDecisions] = useState<
+    Record<string, 'accepted' | 'declined'>
+  >({});
+
+  const [decisionsLoaded, setDecisionsLoaded] = useState(false);
+
   const {
     data: notifications = [],
     isLoading,
@@ -175,7 +186,51 @@ const NotificationScreen = () => {
     queryKey: ['notifications'],
     queryFn: fetchMyNotifications,
   });
-  const { refreshing, onRefresh } = useRefresh(refetch);
+  const { refreshing, onRefresh: onRefreshBase } = useRefresh(refetch);
+  const onRefresh = () => {
+    setDecisionsLoaded(false);
+    onRefreshBase();
+  };
+
+  useEffect(() => {
+    if (!notifications.length || decisionsLoaded) return;
+
+    const loadEngagementStatuses = async () => {
+      const db = getFirestore();
+      const engagementNotifs = notifications.filter(
+        n => n.type === 'ENGAGEMENT_SENT' && n.data?.engagementId,
+      );
+
+      if (engagementNotifs.length === 0) {
+        setDecisionsLoaded(true);
+        return;
+      }
+
+      const updates: Record<string, 'accepted' | 'declined'> = {};
+
+      await Promise.all(
+        engagementNotifs.map(async n => {
+          try {
+            const engSnap = await getDoc(
+              doc(db, 'engagements', n.data!.engagementId),
+            );
+            if (!engSnap.exists()) return;
+            const status = engSnap.data()?.status;
+            if (status === 'accepted' || status === 'declined') {
+              updates[n.data!.engagementId] = status;
+            }
+          } catch {
+            // skip failed reads
+          }
+        }),
+      );
+
+      setEngagementDecisions(prev => ({ ...prev, ...updates }));
+      setDecisionsLoaded(true);
+    };
+
+    loadEngagementStatuses();
+  }, [notifications, decisionsLoaded]);
 
   /* Mark all as read — uses modular writeBatch (replaces deprecated .batch()) */
   const { mutate: markAllRead, isPending } = useMutation({
@@ -281,6 +336,20 @@ const NotificationScreen = () => {
     if (!engagementId) return;
 
     setEngagementLoading(engagementId + action);
+    // try {
+    //   await updateEngagementStatus(
+    //     engagementId,
+    //     action,
+    //     notif.fromUserId,
+    //     notif.data?.workerId,
+    //   );
+    //   setEngagementDecisions(prev => ({ ...prev, [engagementId]: action }));
+    //   queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    // } catch (err: any) {
+    //   console.log('Engagement action failed:', err);
+    // } finally {
+    //   setEngagementLoading(null);
+    // }
     try {
       await updateEngagementStatus(
         engagementId,
@@ -288,6 +357,43 @@ const NotificationScreen = () => {
         notif.fromUserId,
         notif.data?.workerId,
       );
+
+      // Sync offerCard status in the chat message so ChatDetailScreen reflects the change
+      // The chat message stores engagementId inside metadata.offerCard.engagementId
+      // We query all messages across both possible chat participants to find the matching one
+      try {
+        const db = getFirestore();
+        const currentUid = notif.data?.workerId; // current user is the worker for ENGAGEMENT_SENT
+        const employerUid = notif.fromUserId;
+
+        // Chat ID is deterministic: sorted uids joined by _
+        const chatId = [currentUid, employerUid].sort().join('_');
+        const messagesRef = collection(db, 'chats', chatId, 'messages');
+
+        const msgQuery = query(
+          messagesRef,
+          where('metadata.offerCard.engagementId', '==', engagementId),
+        );
+        const msgSnap = await getDocs(msgQuery);
+
+        if (!msgSnap.empty) {
+          const msgRef = doc(
+            db,
+            'chats',
+            chatId,
+            'messages',
+            msgSnap.docs[0].id,
+          );
+          await updateDoc(msgRef, {
+            'metadata.offerCard.status': action, // 'accepted' | 'declined'
+          });
+        }
+      } catch (syncErr) {
+        // Non-critical — chat will still show correct state on next open via engagement listener
+        console.warn('Chat message sync failed:', syncErr);
+      }
+
+      setEngagementDecisions(prev => ({ ...prev, [engagementId]: action }));
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     } catch (err: any) {
       console.log('Engagement action failed:', err);
@@ -499,14 +605,14 @@ const NotificationScreen = () => {
                     </View>
 
                     {/* Accept/Decline buttons — full width below */}
-                    {item.type === 'ENGAGEMENT_SENT' && (
+                    {/* {item.type === 'ENGAGEMENT_SENT' && (
                       <View
                         style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}
                       >
                         <TouchableOpacity
                           style={{
                             flex: 1,
-                            backgroundColor: '#2BEE79',
+                            backgroundColor: '#FFD900',
                             borderRadius: 8,
                             paddingVertical: 8,
                             alignItems: 'center',
@@ -533,7 +639,7 @@ const NotificationScreen = () => {
                             paddingVertical: 8,
                             alignItems: 'center',
                             borderWidth: 1,
-                            borderColor: '#DC2626',
+                            borderColor: '#FFD900',
                           }}
                           disabled={!!engagementLoading}
                           onPress={() =>
@@ -542,17 +648,108 @@ const NotificationScreen = () => {
                         >
                           {engagementLoading ===
                           item.raw.data?.engagementId + 'declined' ? (
-                            <ActivityIndicator size="small" color="#DC2626" />
+                            <ActivityIndicator size="small" color="#FFD900" />
                           ) : (
                             <Text
-                              style={{ color: '#DC2626', fontWeight: '600' }}
+                              style={{ color: '#FFD900', fontWeight: '600' }}
                             >
                               Decline
                             </Text>
                           )}
                         </TouchableOpacity>
                       </View>
-                    )}
+                    )} */}
+                    {item.type === 'ENGAGEMENT_SENT' &&
+                      (() => {
+                        const engId = item.raw.data?.engagementId;
+                        const decision = engagementDecisions[engId];
+
+                        if (decision) {
+                          return (
+                            <View style={{ marginTop: 12 }}>
+                              <Text
+                                style={{
+                                  color:
+                                    decision === 'accepted'
+                                      ? '#2BEE79'
+                                      : '#DC2626',
+                                  fontWeight: '600',
+                                  fontSize: 13,
+                                }}
+                              >
+                                {decision === 'accepted'
+                                  ? '✓ Accepted'
+                                  : '✕ Declined'}
+                              </Text>
+                            </View>
+                          );
+                        }
+
+                        return (
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              gap: 8,
+                              marginTop: 12,
+                            }}
+                          >
+                            <TouchableOpacity
+                              style={{
+                                flex: 1,
+                                backgroundColor: '#FFD900',
+                                borderRadius: 8,
+                                paddingVertical: 8,
+                                alignItems: 'center',
+                              }}
+                              disabled={!!engagementLoading}
+                              onPress={() =>
+                                handleEngagementAction(item.raw, 'accepted')
+                              }
+                            >
+                              {engagementLoading === engId + 'accepted' ? (
+                                <ActivityIndicator size="small" color="#000" />
+                              ) : (
+                                <Text
+                                  style={{ color: '#000', fontWeight: '600' }}
+                                >
+                                  Accept
+                                </Text>
+                              )}
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{
+                                flex: 1,
+                                backgroundColor: '#1a1a1a',
+                                borderRadius: 8,
+                                paddingVertical: 8,
+                                alignItems: 'center',
+                                borderWidth: 1,
+                                borderColor: '#FFD900',
+                              }}
+                              disabled={!!engagementLoading}
+                              onPress={() =>
+                                handleEngagementAction(item.raw, 'declined')
+                              }
+                            >
+                              {engagementLoading === engId + 'declined' ? (
+                                <ActivityIndicator
+                                  size="small"
+                                  color="#FFD900"
+                                />
+                              ) : (
+                                <Text
+                                  style={{
+                                    color: '#FFD900',
+                                    fontWeight: '600',
+                                  }}
+                                >
+                                  Decline
+                                </Text>
+                              )}
+                            </TouchableOpacity>
+                          </View>
+                        );
+                      })()}
                   </TouchableOpacity>
                 ))}
               </View>

@@ -42,6 +42,9 @@ const ChatDetailScreen = () => {
   const [otherUser, setOtherUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [chatUnlocked, setChatUnlocked] = useState(false);
+  const [engagementStatuses, setEngagementStatuses] = useState<
+    Record<string, string>
+  >({});
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -107,6 +110,37 @@ const ChatDetailScreen = () => {
 
     return () => unsubscribe();
   }, [otherUser]);
+
+  /* ================= SUBSCRIBE ENGAGEMENT STATUSES ================= */
+  useEffect(() => {
+    if (messages.length === 0) return;
+
+    // Collect all engagementIds from offerCard messages
+    const engagementIds = messages
+      .filter(
+        m => m.type === 'job_attachment' && m.metadata?.offerCard?.engagementId,
+      )
+      .map(m => m.metadata!.offerCard!.engagementId as string);
+
+    if (engagementIds.length === 0) return;
+
+    // Subscribe to each engagement doc
+    // const {
+    //   onSnapshot,
+    //   doc: firestoreDoc,
+    // } = require('@react-native-firebase/firestore');
+    const unsubscribes = engagementIds.map((engId: string) => {
+      // const engRef = firestoreDoc(db, 'engagements', engId);
+      const engRef = doc(db, 'engagements', engId);
+      return onSnapshot(engRef, (snap: any) => {
+        if (!snap.exists()) return;
+        const status = snap.data()?.status;
+        setEngagementStatuses(prev => ({ ...prev, [engId]: status }));
+      });
+    });
+
+    return () => unsubscribes.forEach((unsub: any) => unsub());
+  }, [messages]);
 
   /* ================= SEND MESSAGE ================= */
   const handleSend = async () => {
@@ -185,7 +219,23 @@ const ChatDetailScreen = () => {
                 isMe,
                 avatar: isMe ? undefined : otherUser?.photo,
                 type: item.type,
-                metadata: { ...(item.metadata ?? {}), chatId },
+                metadata: {
+                  ...(item.metadata ?? {}),
+                  chatId,
+                  // Override offerCard status with live value from engagements collection
+                  ...(item.metadata?.offerCard?.engagementId &&
+                  engagementStatuses[item.metadata.offerCard.engagementId]
+                    ? {
+                        offerCard: {
+                          ...item.metadata.offerCard,
+                          status:
+                            engagementStatuses[
+                              item.metadata.offerCard.engagementId
+                            ],
+                        },
+                      }
+                    : {}),
+                },
               }}
             />
           );

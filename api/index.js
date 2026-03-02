@@ -61,10 +61,10 @@ exports.createCreditPackPaymentIntent = onCall(
     const { pack } = request.data;
 
     const creditPacks = {
-      credit_1: { amount: 199, credits: 1 },
-      credit_5: { amount: 799, credits: 5 },
-      credit_12: { amount: 1499, credits: 12 },
-      credit_30: { amount: 3499, credits: 30 },
+      credit_1: { amount: 1.99, credits: 1 },
+      credit_5: { amount: 7.99, credits: 5 },
+      credit_12: { amount: 14.99, credits: 12 },
+      credit_30: { amount: 34.99, credits: 30 },
     };
 
     if (!creditPacks[pack]) {
@@ -252,6 +252,7 @@ exports.stripeWebhook = onRequest(
             uid: uid,
             type: type || "unknown",
             stripePaymentIntentId: paymentId,
+              amount: paymentIntent.amount,
             createdAt: now,
           });
         });

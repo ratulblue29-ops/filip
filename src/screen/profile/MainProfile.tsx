@@ -52,7 +52,7 @@ const MainProfile: React.FC = () => {
 
     setPhoto(user.profile?.photo || null);
     setBannerImage(user.profile?.bannerImage || null);
-    setOpenToWork(user.profile?.openToWork ?? true);
+    setOpenToWork(user.profile?.openToWork ?? user.profile?.opentowork ?? true);
   }, [user]);
 
   /* Pick Image */

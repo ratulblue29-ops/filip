@@ -62,7 +62,7 @@ export const signUpUser = async (data: SignUpData) => {
       rating: 0,
       reviewsCount: 0,
       verified: false,
-      opentowork: true,
+      openToWork: true,
     },
 
     membership: {

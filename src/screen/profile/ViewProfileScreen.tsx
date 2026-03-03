@@ -24,7 +24,7 @@ import { UserType } from '../../@types/ViewProfile.type';
 import Toast from 'react-native-toast-message';
 import { fetchWorkerActivePosts } from '../../services/engagement';
 import ChooseAvailabilityModal from '../../components/availiability/ChooseAvailabilityModal';
-import { checkChatAccess } from '../../services/chat';
+import { checkChatAccess, createOrGetChat } from '../../services/chat';
 import ChatAccessModal from '../../components/message/ChatAccessModal';
 
 type RootStackParamList = { viewProfile: { userId: string } };
@@ -76,7 +76,8 @@ const ViewProfileScreen: React.FC = () => {
         setAccessModalVisible(true);
         return;
       }
-      // premium chat navigation goes here
+      const chatId = await createOrGetChat(userId);
+      navigation.navigate('ChatDetailScreen', { chatId, otherUserId: userId });
     } catch (err: any) {
       Toast.show({ type: 'error', text1: 'Error', text2: err.message });
     }

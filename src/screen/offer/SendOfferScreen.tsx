@@ -73,15 +73,21 @@ const SendOfferScreen = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [workDateText, setWorkDateText] = useState(formatDate(new Date()));
 
-  const [startTime, setStartTime] = useState(new Date());
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [startTimeText, setStartTimeText] = useState(formatTime(new Date()));
+  // const [startTime, setStartTime] = useState(new Date());
+  // const [showStartPicker, setShowStartPicker] = useState(false);
+  // const [startTimeText, setStartTimeText] = useState(formatTime(new Date()));
 
-  const [endTime, setEndTime] = useState(new Date());
-  const [showEndPicker, setShowEndPicker] = useState(false);
-  const [endTimeText, setEndTimeText] = useState(formatTime(new Date()));
+  // const [endTime, setEndTime] = useState(new Date());
+  // const [showEndPicker, setShowEndPicker] = useState(false);
+  // const [endTimeText, setEndTimeText] = useState(formatTime(new Date()));
 
+  // const [wage, setWage] = useState('');
+  const [hoursPerDay, setHoursPerDay] = useState('');
   const [wage, setWage] = useState('');
+  const [rateType, setRateType] = useState<'hourly' | 'daily' | 'monthly'>(
+    'hourly',
+  );
+
   const [location, setLocation] = useState(selectedPost?.location?.[0] ?? '');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
@@ -116,8 +122,10 @@ const SendOfferScreen = () => {
           fromUserId: currentUser.uid, // employer uid — required for credit refund
           postTitle: selectedPost.title,
           workDate: workDateText,
-          startTime: startTimeText,
-          endTime: endTimeText,
+          // startTime: startTimeText,
+          // endTime: endTimeText,
+          hoursPerDay: `${hoursPerDay} hrs/day`,
+          rateType,
           wage: `\u20ac${wage}`,
           location,
           description,
@@ -211,9 +219,8 @@ const SendOfferScreen = () => {
           )}
 
           {/* ── Work Hours ── */}
-          <Text style={styles.label}>Work Hours</Text>
+          {/* <Text style={styles.label}>Work Hours</Text>
           <View style={styles.rowBetween}>
-            {/* Start */}
             <TouchableOpacity
               style={[styles.inputWithIcon, { flex: 1 }]}
               onPress={() => setShowStartPicker(true)}
@@ -230,7 +237,6 @@ const SendOfferScreen = () => {
 
             <Text style={styles.arrowText}>{'\u2192'}</Text>
 
-            {/* End */}
             <TouchableOpacity
               style={[styles.inputWithIcon, { flex: 1 }]}
               onPress={() => setShowEndPicker(true)}
@@ -274,10 +280,25 @@ const SendOfferScreen = () => {
                 }
               }}
             />
-          )}
+          )} */}
+
+          {/* ── Work Hours (hours per day) ── */}
+          <Text style={styles.label}>Work Hours (per day)</Text>
+          <View style={styles.inputWithIcon}>
+            <Clock size={20} color="#9CA3AF" />
+            <TextInput
+              style={styles.flexInput}
+              value={hoursPerDay}
+              onChangeText={setHoursPerDay}
+              keyboardType="numeric"
+              placeholder="e.g. 8"
+              placeholderTextColor="#9CA3AF"
+            />
+            <Text style={{ color: '#9CA3AF', fontSize: 13 }}>hrs/day</Text>
+          </View>
 
           {/* ── Offered Wage ── */}
-          <Text style={styles.label}>Offered Wage ({'\u20ac'}/hr)</Text>
+          {/* <Text style={styles.label}>Offered Wage ({'\u20ac'}/hr)</Text>
           <View style={styles.inputWithIcon}>
             <Banknote size={20} color="#9CA3AF" />
             <TextInput
@@ -286,6 +307,46 @@ const SendOfferScreen = () => {
               onChangeText={setWage}
               keyboardType="numeric"
               placeholder="e.g. 20"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View> */}
+
+          {/* ── Offered Wage ── */}
+          <Text style={styles.label}>Offered Wage</Text>
+
+          {/* Rate type toggle — matches SeosonalAvailabilityCreation exactly */}
+          <View style={styles.toggleGroup}>
+            {(['hourly', 'daily', 'monthly'] as const).map(option => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.toggleBtn,
+                  rateType === option && styles.toggleBtnActive,
+                ]}
+                onPress={() => setRateType(option)}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.toggleBtnText,
+                    rateType === option && styles.toggleBtnTextActive,
+                  ]}
+                >
+                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* EUR currency input */}
+          <View style={styles.currencyRow}>
+            <Text style={styles.currencyBadge}>EUR</Text>
+            <TextInput
+              style={styles.currencyInput}
+              value={wage}
+              onChangeText={setWage}
+              keyboardType="numeric"
+              placeholder="0.00"
               placeholderTextColor="#9CA3AF"
             />
           </View>

@@ -9,10 +9,7 @@ import WorkerCardSkeleton from './skeleton/WorkerCardSkeleton';
 import { fetchWorkerActivePosts } from '../services/engagement';
 import ChooseAvailabilityModal from './availiability/ChooseAvailabilityModal';
 import Toast from 'react-native-toast-message';
-// import { fetchCurrentUser } from '../services/user';
 import { useQuery } from '@tanstack/react-query';
-// import { checkChatAccess } from '../services/chat';
-// import ChatAccessModal from './message/ChatAccessModal';
 
 const WorkerCard = ({
   isLoading,
@@ -22,49 +19,28 @@ const WorkerCard = ({
   worker: Worker;
 }) => {
   const navigation = useNavigation<any>();
-  if (isLoading) {
-    return <WorkerCardSkeleton />;
-  }
   const [modalVisible, setModalVisible] = useState(false);
-  const [posts, setPosts] = useState<any[]>([]);
-  const [postsLoading, setPostsLoading] = useState(false);
-  // const [accessModalVisible, setAccessModalVisible] = useState(false);
-  // const { data: currentUser } = useQuery({
-  //   queryKey: ['currentUser'],
-  //   queryFn: fetchCurrentUser,
-  // });
 
-  // const handleSendOffer = async () => {
-  //   try {
-  //     // Gate check before showing offer modal
-  //     const membershipTier = currentUser?.membership?.tier ?? 'free';
-  //     const hasAccess = await checkChatAccess(worker.user.id, membershipTier);
-  //     if (!hasAccess) {
-  //       setAccessModalVisible(true);
-  //       return;
-  //     }
-  //     setPostsLoading(true);
-  //     setModalVisible(true);
-  //     const activePosts = await fetchWorkerActivePosts(worker.user.id);
-  //     setPosts(activePosts);
-  //   } catch (error: any) {
-  //     Toast.show({ type: 'error', text1: 'Error', text2: error.message });
-  //     setModalVisible(false);
-  //   } finally {
-  //     setPostsLoading(false);
-  //   }
-  // };
+  // Prefetch worker posts only when modal opens — avoids waterfall on list render
+  const {
+    data: posts = [],
+    isFetching: postsLoading,
+    refetch: fetchPosts,
+  } = useQuery({
+    queryKey: ['workerActivePosts', worker?.user?.id],
+    queryFn: () => fetchWorkerActivePosts(worker.user.id),
+    enabled: false, // manual trigger only
+  });
+
+  if (isLoading) return <WorkerCardSkeleton />;
+
   const handleSendOffer = async () => {
+    setModalVisible(true);
     try {
-      setPostsLoading(true);
-      setModalVisible(true);
-      const activePosts = await fetchWorkerActivePosts(worker.user.id);
-      setPosts(activePosts);
+      await fetchPosts();
     } catch (error: any) {
       Toast.show({ type: 'error', text1: 'Error', text2: error.message });
       setModalVisible(false);
-    } finally {
-      setPostsLoading(false);
     }
   };
 
@@ -75,6 +51,7 @@ const WorkerCard = ({
       selectedPost: post,
     });
   };
+
   return (
     <View style={styles.card}>
       <View style={styles.cardTopRow}>
@@ -160,6 +137,7 @@ const WorkerCard = ({
           </TouchableOpacity>
         )}
       </View>
+
       <ChooseAvailabilityModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -167,10 +145,6 @@ const WorkerCard = ({
         loading={postsLoading}
         onSelect={handleSelectPost}
       />
-      {/* <ChatAccessModal
-        visible={accessModalVisible}
-        onClose={() => setAccessModalVisible(false)}
-      /> */}
     </View>
   );
 };

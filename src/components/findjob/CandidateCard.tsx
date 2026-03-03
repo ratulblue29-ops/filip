@@ -1,112 +1,48 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { Calendar, Lock, SendHorizontal, MapPin } from 'lucide-react-native';
+import { Calendar, SendHorizontal, MapPin } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../screen/seasonAvailabilty/style';
 import Worker from '../../@types/Worker.type';
 import { useQuery } from '@tanstack/react-query';
-import { fetchCurrentUser } from '../../services/user';
 import Toast from 'react-native-toast-message';
 import { fetchWorkerActivePosts } from '../../services/engagement';
 import ChooseAvailabilityModal from '../availiability/ChooseAvailabilityModal';
-// import { checkChatAccess } from '../../services/chat';
-// import ChatAccessModal from '../message/ChatAccessModal';
 
-interface CandidateCardProps {
+type CandidateCardProps = {
   candidate: Worker;
-}
+};
 
-const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
+const CandidateCard = ({ candidate }: CandidateCardProps) => {
   const navigation = useNavigation<any>();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const formatCustomDate = (dateString?: string) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
     });
   };
 
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: fetchCurrentUser,
+  // Posts fetched on demand — cached per workerId, deduped across cards
+  const {
+    data: posts = [],
+    isFetching: postsLoading,
+    refetch: fetchPosts,
+  } = useQuery({
+    queryKey: ['workerActivePosts', candidate?.user?.id],
+    queryFn: () => fetchWorkerActivePosts(candidate.user.id),
+    enabled: false,
   });
 
-  // const isPremium = user?.membership?.tier === 'premium';
-
-  // const handleEngage = async () => {
-  //   try {
-  //     // ✅ Create job context from candidate data
-  //     const jobContext = {
-  //       jobId: candidate.id,
-  //       title: candidate.title || 'Seasonal Job',
-  //       type: 'seasonal' as const,
-  //       rate: candidate.rate,
-  //       location: candidate.location,
-  //       schedule: {
-  //         start: candidate.dateRange?.start || '',
-  //         end: candidate.dateRange?.end || '',
-  //       },
-  //     };
-
-  //     // ✅ Pass job context when creating chat
-  //     const chatId = await createOrGetChat(candidate.user.id, jobContext);
-
-  //     // ✅ Navigate to ChatScreen first, with chatId param
-  //     navigation.navigate('chat', {
-  //       autoChatId: chatId,
-  //       autoUserId: candidate.user.id,
-  //     });
-  //   } catch (error: any) {
-  //     Toast.show({
-  //       type: 'error',
-  //       text1: 'Error',
-  //       text2: error.message || 'Failed to start chat',
-  //     });
-  //   }
-  // };
-  const [modalVisible, setModalVisible] = useState(false);
-  const [posts, setPosts] = useState<any[]>([]);
-  const [postsLoading, setPostsLoading] = useState(false);
-  // const [accessModalVisible, setAccessModalVisible] = useState(false);
-
-  // const handleEngage = async () => {
-  //   try {
-  //     // Gate check: premium OR accepted engagement
-  //     const membershipTier = user?.membership?.tier ?? 'free';
-  //     const hasAccess = await checkChatAccess(
-  //       candidate.user.id,
-  //       membershipTier,
-  //     );
-
-  //     if (!hasAccess) {
-  //       setAccessModalVisible(true);
-  //       return;
-  //     }
-
-  //     setPostsLoading(true);
-  //     setModalVisible(true);
-  //     const activePosts = await fetchWorkerActivePosts(candidate.user.id);
-  //     setPosts(activePosts);
-  //   } catch (error: any) {
-  //     Toast.show({ type: 'error', text1: 'Error', text2: error.message });
-  //     setModalVisible(false);
-  //   } finally {
-  //     setPostsLoading(false);
-  //   }
-  // };
   const handleEngage = async () => {
+    setModalVisible(true);
     try {
-      setPostsLoading(true);
-      setModalVisible(true);
-      const activePosts = await fetchWorkerActivePosts(candidate.user.id);
-      setPosts(activePosts);
+      await fetchPosts();
     } catch (error: any) {
       Toast.show({ type: 'error', text1: 'Error', text2: error.message });
       setModalVisible(false);
-    } finally {
-      setPostsLoading(false);
     }
   };
 
@@ -136,9 +72,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
         <View
           style={[
             styles.dot,
-            {
-              backgroundColor: candidate?.isAvailable ? '#4ADE80' : '#F59E0B',
-            },
+            { backgroundColor: candidate?.isAvailable ? '#4ADE80' : '#F59E0B' },
           ]}
         />
         <Text style={styles.statusText}>
@@ -191,6 +125,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
           <SendHorizontal width={18} height={18} color="#1F2937" />
         </TouchableOpacity>
       </View>
+
       <ChooseAvailabilityModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -198,10 +133,6 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
         loading={postsLoading}
         onSelect={handleSelectPost}
       />
-      {/* <ChatAccessModal
-        visible={accessModalVisible}
-        onClose={() => setAccessModalVisible(false)}
-      /> */}
     </View>
   );
 };

@@ -68,6 +68,12 @@ const SendOfferScreen = () => {
     selectedPost,
   }: { workerId: string; selectedPost: SelectedPost } = route.params;
 
+  // Derive rate options based on job type — daily posts exclude monthly
+  const RATE_OPTIONS =
+    selectedPost.type === 'daily'
+      ? (['hourly', 'daily'] as const)
+      : (['hourly', 'daily', 'monthly'] as const);
+
   // ── Form state ──
   const [workDate, setWorkDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -316,7 +322,7 @@ const SendOfferScreen = () => {
 
           {/* Rate type toggle — matches SeosonalAvailabilityCreation exactly */}
           <View style={styles.toggleGroup}>
-            {(['hourly', 'daily', 'monthly'] as const).map(option => (
+            {RATE_OPTIONS.map(option => (
               <TouchableOpacity
                 key={option}
                 style={[

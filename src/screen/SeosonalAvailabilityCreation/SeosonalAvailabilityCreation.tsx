@@ -24,8 +24,8 @@ import { createJob } from '../../services/jobs';
 import { uploadJobBanner } from '../../services/uploadPhoto';
 
 // Workplace options for toggle selector
-const WORKPLACE_OPTIONS = ['On-site', 'Remote', 'Hybrid'] as const;
-type WorkplaceType = (typeof WORKPLACE_OPTIONS)[number];
+// const WORKPLACE_OPTIONS = ['On-site', 'Remote', 'Hybrid'] as const;
+// type WorkplaceType = (typeof WORKPLACE_OPTIONS)[number];
 
 // Rate type options for toggle selector
 const RATE_OPTIONS = ['hourly', 'daily', 'monthly'] as const;
@@ -50,7 +50,7 @@ const SeasonalAvailabilityCreationScreen = () => {
   const [rateAmount, setRateAmount] = useState('');
 
   // — Workplace & position
-  const [workplaceType, setWorkplaceType] = useState<WorkplaceType>('On-site');
+  // const [workplaceType, setWorkplaceType] = useState<WorkplaceType>('On-site');
   const [targetPosition, setTargetPosition] = useState('');
 
   // — Locations
@@ -133,7 +133,7 @@ const SeasonalAvailabilityCreationScreen = () => {
         requiredSkills: categories,
         positions: { total: 5, filled: 0 },
         // New required fields per client spec
-        workplaceType,
+        // workplaceType,
         targetPosition,
         currency: 'EUR',
       });
@@ -266,7 +266,7 @@ const SeasonalAvailabilityCreationScreen = () => {
         </View>
 
         {/* ── Workplace Type ── */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Workplace Type</Text>
           <View style={styles.toggleGroup}>
             {WORKPLACE_OPTIONS.map(option => (
@@ -290,7 +290,7 @@ const SeasonalAvailabilityCreationScreen = () => {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </View> */}
 
         {/* ── Rate Type + Amount ── */}
         <View style={styles.section}>

@@ -67,7 +67,7 @@ export const fetchMyJobs = async () => {
 type JobType = 'seasonal' | 'fulltime' | 'daily';
 
 // Workplace type options matching the UI toggle in SeasonalAvailabilityCreation
-type WorkplaceType = 'On-site' | 'Remote' | 'Hybrid';
+// type WorkplaceType = 'On-site' | 'Remote' | 'Hybrid';
 
 // Rate unit options matching the UI toggle in SeasonalAvailabilityCreation
 type RateUnit = 'hourly' | 'daily' | 'monthly';
@@ -88,7 +88,7 @@ type CreateJobPayload = {
   contact?: { phone: string; email: string };
   daysPerWeek?: number;
   // New fields per client spec (seasonal only)
-  workplaceType?: WorkplaceType;
+  // workplaceType?: WorkplaceType;
   targetPosition?: string;
   // Currency is always EUR per spec — stored for display/filtering
   currency?: string;
@@ -126,7 +126,7 @@ export const createJob = async ({
   contact = { phone: '', email: '' },
   daysPerWeek = 0,
   // New seasonal fields — default values keep backwards compatibility
-  workplaceType = 'On-site',
+  // workplaceType = 'On-site',
   targetPosition = '',
   currency = 'EUR',
   date = '',
@@ -260,7 +260,7 @@ export const createJob = async ({
       if (type === 'seasonal') {
         jobPost.schedule = schedule;
         // Store new client-spec fields on seasonal posts
-        jobPost.workplaceType = workplaceType;
+        // jobPost.workplaceType = workplaceType;
         jobPost.targetPosition = targetPosition;
         // EUR is the only supported currency — stored explicitly for query/display
         jobPost.currency = currency;

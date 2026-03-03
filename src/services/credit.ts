@@ -13,10 +13,17 @@ import {
 } from '@react-native-firebase/firestore';
 import { onSnapshot, Unsubscribe } from '@react-native-firebase/firestore';
 
+// Credit costs per action type
+export const CREDIT_COSTS = {
+  ENGAGEMENT_SEASONAL: 5,
+  ENGAGEMENT_DAILY: 5,
+  ENGAGEMENT_FULLTIME: 5,
+} as const;
+
 // Deduct 1 credit from current user — call before creating engagement.
 // Returns ledgerTransactionId for audit trail linkage.
 // Throws if balance < 1 to block engagement creation.
-export const deductCredit = async (engagementId: string): Promise<string> => {
+export const deductCredit = async (engagementId: string, amount: number): Promise<string> => {
   const user = getAuth().currentUser;
   if (!user) throw new Error('Login required');
 
@@ -34,12 +41,12 @@ export const deductCredit = async (engagementId: string): Promise<string> => {
       lifetimeEarned: 0,
     };
 
-    if ((credits.balance ?? 0) < 2) {
+    if ((credits.balance ?? 0) < amount) {
       throw new Error('Insufficient credits...');
     }
     tx.update(userRef, {
-      'credits.balance': credits.balance - 2,
-      'credits.used': (credits.used ?? 0) + 2,
+      'credits.balance': credits.balance - amount,
+      'credits.used': (credits.used ?? 0) + amount,
     });
   });
 
@@ -47,7 +54,7 @@ export const deductCredit = async (engagementId: string): Promise<string> => {
   const ledgerRef = await addDoc(collection(db, 'creditTransactions'), {
     userId: user.uid,
     type: 'deduction',
-    amount: 2,
+    amount,
     reason: 'Engagement sent',
     engagementId,
     createdAt: serverTimestamp(),
@@ -62,6 +69,7 @@ export const refundCredit = async (
   engagementId: string,
   reason: 'worker_declined' | 'employer_withdrew' | 'expired',
   targetUserId: string,
+  amount: number,
 ): Promise<void> => {
   const db = getFirestore();
   const userRef = doc(db, 'users', targetUserId);
@@ -74,8 +82,8 @@ export const refundCredit = async (
     const credits = userSnap.data()?.credits ?? { balance: 0, used: 0 };
 
     tx.update(userRef, {
-      'credits.balance': (credits.balance ?? 0) + 2,
-      'credits.used': Math.max(0, (credits.used ?? 0) - 2),
+      'credits.balance': (credits.balance ?? 0) + amount,
+      'credits.used': Math.max(0, (credits.used ?? 0) - amount),
     });
   });
 
@@ -89,7 +97,7 @@ export const refundCredit = async (
   await addDoc(collection(db, 'creditTransactions'), {
     userId: targetUserId,
     type: 'refund',
-    amount: 2,
+    amount,
     reason: reasonLabel[reason],
     engagementId,
     createdAt: serverTimestamp(),

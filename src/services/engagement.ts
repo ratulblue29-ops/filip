@@ -16,6 +16,7 @@ import {
 import { deductCredit, refundCredit } from './credit';
 import { getApp } from '@react-native-firebase/app';
 import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
+import { CREDIT_COSTS } from './credit';
 
 // Fetch active availability posts for a specific worker (employer calls this)
 export const fetchWorkerActivePosts = async (workerId: string) => {
@@ -76,13 +77,23 @@ export const createEngagement = async (
     throw new Error('This availability post is no longer accepting engagements');
   }
 
-  // Deduct 2 credits — throws if balance < 2, blocking engagement creation
-  await deductCredit('pre-check');
+  // Resolve credit cost based on post type — seasonal costs more
+  const postType: string = postSnap.data()?.type ?? 'seasonal';
+  const creditCost =
+    postType === 'seasonal'
+      ? CREDIT_COSTS.ENGAGEMENT_SEASONAL
+      : postType === 'daily'
+      ? CREDIT_COSTS.ENGAGEMENT_DAILY
+      : CREDIT_COSTS.ENGAGEMENT_FULLTIME;
+
+  // Deduct credits — throws if balance insufficient, blocking engagement creation
+  await deductCredit('pre-check', creditCost);
 
   const engagementRef = await addDoc(collection(db, 'engagements'), {
     fromUserId: user.uid,       // employer
     workerId,                    // worker
     availabilityPostId,          // REQUIRED — strict 1:1
+    creditCost,                  // stored for exact refund on decline/withdraw
     status: 'pending',           // pending | accepted | declined | withdrawn
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -179,6 +190,10 @@ export const updateEngagementStatus = async (
     }
   }
 
+  // Read creditCost for exact refund — stored at engagement creation
+  const engSnapForRefund = await getDoc(engRef);
+  const creditCostToRefund: number = engSnapForRefund.data()?.creditCost ?? 2;
+
   if (status === 'declined') {
     const currentUser = getAuth().currentUser;
 
@@ -207,7 +222,7 @@ export const updateEngagementStatus = async (
 
   if (status === 'withdrawn') {
     // Employer refunds themselves — client-side write to own doc is allowed by Firestore rules
-    await refundCredit(engagementId, 'employer_withdrew', fromUserId);
+    await refundCredit(engagementId, 'employer_withdrew', fromUserId, creditCostToRefund);
   }
 };
 

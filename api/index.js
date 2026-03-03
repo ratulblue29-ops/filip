@@ -371,19 +371,21 @@ exports.declineEngagement = onCall(
       // Update engagement status
       tx.update(engRef, { status: "declined", updatedAt: now });
 
-      // Refund 2 credits to employer
+      // Refund exact creditCost to employer — amount stored at engagement creation
+      const creditCost = eng.creditCost ?? 2;
       tx.update(employerRef, {
-        "credits.balance": credits.balance + 2,
-        "credits.used": Math.max(0, (credits.used ?? 0) - 2),
+        "credits.balance": credits.balance + creditCost,
+        "credits.used": Math.max(0, (credits.used ?? 0) - creditCost),
       });
     });
 
     // Write refund to ledger (outside transaction — non-critical audit trail)
     const engSnap = await engRef.get();
+    const creditCost = engSnap.data().creditCost ?? 2;
     await db.collection("creditTransactions").add({
       userId: engSnap.data().fromUserId,
       type: "refund",
-      amount: 2,
+      amount: creditCost,
       reason: "Worker declined — credit refunded",
       engagementId,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),

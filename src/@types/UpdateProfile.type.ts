@@ -9,3 +9,13 @@ export interface UpdateProfilePayload {
     bannerImage?: string | null;
     experienceYears?: number;
 }
+
+export type UpdateEmployerProfilePayload = {
+  photo?: string | null;
+  companyName: string;
+  industry: string;
+  about: string;
+  address: string;
+  contactName: string;
+  phone: string;
+};

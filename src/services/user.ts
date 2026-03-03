@@ -11,7 +11,7 @@ import {
   updateDoc,
   where,
 } from '@react-native-firebase/firestore';
-import { UpdateProfilePayload } from '../@types/UpdateProfile.type';
+import { UpdateProfilePayload, UpdateEmployerProfilePayload } from '../@types/UpdateProfile.type';
 import { UserInfo } from '../@types/userInfo.type';
 import { WorkerUser } from '../@types/WorkerUser.type';
 import { UserType } from '../@types/ViewProfile.type';
@@ -144,4 +144,29 @@ export const getUserById = async (userId: string): Promise<UserType> => {
     id: snap.id,
     ...(snap.data() as Omit<UserType, 'id'>),
   };
+};
+
+// ADD AT BOTTOM OF FILE
+export const updateEmployerProfile = async (payload: UpdateEmployerProfilePayload): Promise<void> => {
+  const user = getAuth().currentUser;
+  if (!user) throw new Error('User not logged in');
+
+  const db = getFirestore();
+  const userRef = doc(db, 'users', user.uid);
+
+  const data: Record<string, any> = {
+    'profile.companyName': payload.companyName,
+    'profile.industry': payload.industry,
+    'profile.about': payload.about,
+    'employerProfile.address': payload.address,
+    'employerProfile.contactName': payload.contactName,
+    'employerProfile.phone': payload.phone,
+    updatedAt: serverTimestamp(),
+  };
+
+  if (payload.photo?.startsWith('https://')) {
+    data['profile.photo'] = payload.photo;
+  }
+
+  await updateDoc(userRef, data);
 };

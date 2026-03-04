@@ -117,7 +117,7 @@ const recalculateUserRating = async (userId: string): Promise<void> => {
     query(
       collection(db, 'reviews'),
       where('toUserId', '==', userId),
-      where('isRevealed', '==', true),
+      // where('isRevealed', '==', true),
     ),
   );
 
@@ -140,7 +140,7 @@ export const fetchUserReviews = async (userId: string) => {
     query(
       collection(db, 'reviews'),
       where('toUserId', '==', userId),
-      where('isRevealed', '==', true),
+      // where('isRevealed', '==', true),
       orderBy('createdAt', 'desc'),
     ),
   );

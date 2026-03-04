@@ -26,6 +26,13 @@ import { fetchCurrentUser } from '../../services/user';
 import { searchJobs } from '../../services/jobs';
 import { fetchWishlistIds } from '../../services/wishlist';
 import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
+import ReviewModal from '../../components/engagement/ReviewModal';
+import { getReviewEligibleEngagement } from '../../services/review';
+import {
+  fetchReceivedEngagements,
+  fetchSentEngagements,
+} from '../../services/engagement';
+import { getAuth } from '@react-native-firebase/auth';
 
 const COLORS = {
   secondaryText: '#9E9E9E',
@@ -36,6 +43,12 @@ const Drawer = createDrawerNavigator();
 const FeedContent = ({ navigation }: any) => {
   const [searchText, setSearchText] = useState('');
   const [debouncedText, setDebouncedText] = useState('');
+  const [reviewModal, setReviewModal] = useState<{
+    engagementId: string;
+    toUserId: string;
+    toUserName: string;
+    role: 'employer' | 'worker';
+  } | null>(null);
 
   /* ---------------- DEBOUNCE ---------------- */
   useEffect(() => {
@@ -78,6 +91,39 @@ const FeedContent = ({ navigation }: any) => {
 
   /* ---------------- NOTIFICATIONS ---------------- */
   const { hasUnread } = useUnreadNotifications();
+
+  const { data: receivedEngagements = [] } = useQuery({
+    queryKey: ['receivedEngagements'],
+    queryFn: fetchReceivedEngagements,
+    enabled: true,
+  });
+
+  const { data: sentEngagements = [] } = useQuery({
+    queryKey: ['sentEngagements'],
+    queryFn: fetchSentEngagements,
+    enabled: true,
+  });
+
+  useEffect(() => {
+    const allEngagements = [...receivedEngagements, ...sentEngagements];
+    if (allEngagements.length === 0) return;
+
+    const currentUser = getAuth().currentUser;
+    if (!currentUser) return;
+
+    getReviewEligibleEngagement(allEngagements).then(result => {
+      if (!result) return;
+      const { engagement } = result;
+      const isEmployer = engagement.fromUserId === currentUser.uid;
+
+      setReviewModal({
+        engagementId: engagement.id,
+        toUserId: isEmployer ? engagement.workerId : engagement.fromUserId,
+        toUserName: 'your colleague',
+        role: isEmployer ? 'employer' : 'worker',
+      });
+    });
+  }, [receivedEngagements, sentEngagements]);
 
   const getGreeting = () => {
     const hours = new Date().getHours();
@@ -164,6 +210,16 @@ const FeedContent = ({ navigation }: any) => {
         />
       ) : (
         <Gig refreshing={refreshing} onRefresh={onRefresh} />
+      )}
+      {reviewModal && (
+        <ReviewModal
+          visible={!!reviewModal}
+          onClose={() => setReviewModal(null)}
+          engagementId={reviewModal.engagementId}
+          toUserId={reviewModal.toUserId}
+          toUserName={reviewModal.toUserName}
+          role={reviewModal.role}
+        />
       )}
     </SafeAreaView>
   );

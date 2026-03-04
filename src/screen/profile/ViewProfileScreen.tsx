@@ -26,6 +26,9 @@ import { fetchWorkerActivePosts } from '../../services/engagement';
 import ChooseAvailabilityModal from '../../components/availiability/ChooseAvailabilityModal';
 import { checkChatAccess, createOrGetChat } from '../../services/chat';
 import ChatAccessModal from '../../components/message/ChatAccessModal';
+import { fetchUserReviews } from '../../services/review';
+import { ReviewItem } from '../../@types/Review.type';
+import { timeAgo } from '../../helper/timeAgo';
 
 type RootStackParamList = { viewProfile: { userId: string } };
 type ViewProfileRouteProp = RouteProp<RootStackParamList, 'viewProfile'>;
@@ -65,6 +68,12 @@ const ViewProfileScreen: React.FC = () => {
     queryKey: ['workerActivePosts', userId],
     queryFn: () => fetchWorkerActivePosts(userId),
     enabled: false,
+  });
+
+  const { data: reviews = [] } = useQuery<ReviewItem[]>({
+    queryKey: ['userReviews', userId],
+    queryFn: () => fetchUserReviews(userId),
+    enabled: !!userId,
   });
 
   /* ── Chat gate ── */
@@ -205,20 +214,29 @@ const ViewProfileScreen: React.FC = () => {
         </View>
 
         <Text style={styles.label}>Reviews</Text>
-        <ReviewCard
-          name="The Grand Hotel"
-          role="Event Server"
-          time="2d ago"
-          rating="5.0"
-          text="Alex was fantastic! Showed up early and handled the rush perfectly. Highly recommended."
-        />
-        <ReviewCard
-          name="The Grand Hotel"
-          role="Event Server"
-          time="2d ago"
-          rating="5.0"
-          text="Great energy and very skilled with cocktails. Good vibes only."
-        />
+        {reviews.length === 0 ? (
+          <Text
+            style={{
+              color: '#555',
+              marginTop: 12,
+              fontFamily: 'InterDisplayRegular',
+            }}
+          >
+            No reviews yet
+          </Text>
+        ) : (
+          reviews.map(review => (
+            <ReviewCard
+              key={review.id}
+              name={review.fromUserName ?? 'Anonymous'}
+              role={review.fromUserRole ?? ''}
+              time={timeAgo(review.createdAt)}
+              rating={String(review.rating)}
+              text={review.text}
+              photo={review.fromUserPhoto}
+            />
+          ))
+        )}
       </ScrollView>
 
       <ChooseAvailabilityModal

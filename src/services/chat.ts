@@ -281,3 +281,46 @@ export const getOtherUserInfoFromChat = async (chatData: any) => {
     photo: userData.profile?.photo || null,
   };
 };
+
+/* ================= CREATE ENGAGEMENT CHAT ================= */
+// One chat per engagement — chatId IS the engagementId
+// jobName stored for display in ChatScreen list title
+export const createEngagementChat = async (
+  engagementId: string,
+  fromUserId: string,    // employer
+  workerId: string,
+  jobId: string,
+  jobName: string,
+): Promise<void> => {
+  const chatRef = firestoreDoc(db, 'chats', engagementId);
+  const chatSnap = await getDoc(chatRef);
+
+  // Idempotent — skip if already exists
+  if (chatSnap.exists()) return;
+
+  await setDoc(chatRef, {
+    engagementId,
+    jobId,
+    jobName,
+
+    participants: [fromUserId, workerId],
+    participantIds: {
+      [fromUserId]: true,
+      [workerId]: true,
+    },
+
+    lastMessage: '',
+    lastMessageAt: serverTimestamp(),
+    lastMessageBy: '',
+    unreadCount: {
+      [fromUserId]: 0,
+      [workerId]: 0,
+    },
+
+    offerStatus: 'Offer Pending',
+    jobRole: jobName,
+
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+};

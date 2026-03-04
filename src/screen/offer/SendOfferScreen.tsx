@@ -25,7 +25,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getAuth } from '@react-native-firebase/auth';
 import styles from './sendOfferStyle';
 import { createEngagement } from '../../services/engagement';
-import { createOrGetChat, sendMessage } from '../../services/chat';
+// import { createOrGetChat, sendMessage } from '../../services/chat';
+import { sendMessage } from '../../services/chat';
 
 // ─── Types ────────────────────────────────────────────────
 type RootStackParamList = {
@@ -119,7 +120,8 @@ const SendOfferScreen = () => {
       const engagementId = await createEngagement(workerId, selectedPost.id);
 
       // 2. Create or get chat between employer and worker
-      const chatId = await createOrGetChat(workerId);
+      // const chatId = await createOrGetChat(workerId);
+      const chatId = engagementId;
 
       // 3. Send structured offer card as job_attachment message
       await sendMessage(chatId, '', 'job_attachment', {
@@ -138,6 +140,7 @@ const SendOfferScreen = () => {
           status: 'pending', // pending | accepted | declined | withdrawn
         },
       });
+      // const chatId = engagementId;
 
       Toast.show({ type: 'success', text1: 'Offer sent!' });
 

@@ -17,6 +17,7 @@ import { deductCredit, refundCredit } from './credit';
 import { getApp } from '@react-native-firebase/app';
 import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 import { CREDIT_COSTS } from './credit';
+import { createEngagementChat } from './chat';
 
 // Fetch active availability posts for a specific worker (employer calls this)
 export const fetchWorkerActivePosts = async (workerId: string) => {
@@ -115,6 +116,14 @@ export const createEngagement = async (
     createdAt: serverTimestamp(),
   });
 
+  await createEngagementChat(
+    engagementRef.id,
+    user.uid,
+    workerId,
+    availabilityPostId,
+    postSnap.data()?.title ?? 'Job',
+  );
+
   return engagementRef.id;
 };
 
@@ -156,7 +165,8 @@ export const updateEngagementStatus = async (
       });
 
       if (workerId) {
-        const chatId = [fromUserId, workerId].sort().join('_');
+        // const chatId = [fromUserId, workerId].sort().join('_');
+        const chatId = engagementId;
         const chatRef = doc(db, 'chats', chatId);
         tx.update(chatRef, {
           offerStatus: 'Accepted',

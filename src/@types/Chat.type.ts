@@ -66,6 +66,10 @@ export interface Chat {
   createdAt: FirebaseFirestoreTypes.Timestamp;
   updatedAt: FirebaseFirestoreTypes.Timestamp;
 
+  engagementId?: string;
+  jobId?: string;
+  jobName?: string; 
+
   /* ---------- OPTIONAL EXTENSIONS (UI LEVEL) ---------- */
 
   offerStatus?: 'Offer Pending' | 'Accepted' | 'Rejected';

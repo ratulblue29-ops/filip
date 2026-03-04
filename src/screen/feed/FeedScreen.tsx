@@ -48,12 +48,7 @@ const FeedContent = ({ navigation }: any) => {
     toUserId: string;
     toUserName: string;
     role: 'employer' | 'worker';
-  } | null>({
-    engagementId: '2pADWUJaf66HpRyScFBZ',
-    toUserId: 'rjGuO6eyqAOcyCXZTEmzyF96gZC3',
-    toUserName: 'Worker',
-    role: 'employer',
-  });
+  } | null>(null);
 
   /* ---------------- DEBOUNCE ---------------- */
   useEffect(() => {

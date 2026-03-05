@@ -161,7 +161,7 @@ export const updateEngagementStatus = async (
       // Mark job consumed — auto-removes from feed, blocks new engagements
       tx.update(jobRef, {
         'visibility.priority': 'consumed',
-        acceptedEmployeerId: engData.fromUserId,
+        acceptedEmployerId: engData.fromUserId,
         updatedAt: serverTimestamp(),
       });
 

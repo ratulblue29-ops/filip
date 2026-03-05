@@ -74,6 +74,7 @@ export interface Chat {
 
   offerStatus?: 'Offer Pending' | 'Accepted' | 'Rejected';
   jobRole?: string;
+  lockedAt?: FirebaseFirestoreTypes.Timestamp | null;
 }
 
 /* ================= CHAT WITH USER (ENRICHED) ================= */

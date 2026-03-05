@@ -324,3 +324,46 @@ export const createEngagementChat = async (
     updatedAt: serverTimestamp(),
   });
 };
+
+/* ================= CHAT LOCK STATUS (DAILY SHIFTS ONLY) ================= */
+// chatId === engagementId — allows direct engagement lookup without extra mapping
+export const getChatLockStatus = async (
+  chatId: string,
+): Promise<{ isLocked: boolean }> => {
+  const app = getApp();
+  const db = getFirestore(app);
+
+  // chatId is the engagementId — fetch engagement directly
+  const engSnap = await getDoc(firestoreDoc(db, 'engagements', chatId));
+  if (!engSnap.exists()) return { isLocked: false };
+
+  const engData = engSnap.data();
+  if (!engData?.availabilityPostId) return { isLocked: false };
+
+  // Fetch the linked availability post
+  const postSnap = await getDoc(firestoreDoc(db, 'jobs', engData.availabilityPostId));
+  if (!postSnap.exists()) return { isLocked: false };
+
+  const post = postSnap.data();
+
+  // Only daily shifts have a lock lifecycle
+  if (post?.type !== 'daily') return { isLocked: false };
+
+  const { date, endTime } = post;
+  if (!date || !endTime) return { isLocked: false };
+
+  // Build shift end datetime and compare to now
+  const shiftEnd = new Date(`${date}T${endTime}:00`);
+  const isLocked = new Date() > shiftEnd;
+
+  // Lazily write lockedAt to chat doc on first detection — lets ChatScreen show "Ended" badge
+  if (isLocked) {
+    const chatRef = firestoreDoc(db, 'chats', chatId);
+    const chatSnap = await getDoc(chatRef);
+    if (chatSnap.exists() && !chatSnap.data()?.lockedAt) {
+      await updateDoc(chatRef, { lockedAt: serverTimestamp() });
+    }
+  }
+
+  return { isLocked };
+};

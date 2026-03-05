@@ -198,4 +198,23 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666',
   },
+  lockedBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    borderRadius: 12,
+    backgroundColor: '#1D1D1D',
+    borderWidth: 1,
+    borderColor: 'rgba(247, 254, 231, 0.15)',
+    gap: 8,
+  },
+  lockedBannerText: {
+    color: '#9CA3AF',
+    fontSize: 13,
+    fontFamily: 'InterDisplayMedium',
+    fontWeight: '500',
+  },
 });

@@ -68,6 +68,8 @@ const ChatScreen: React.FC = () => {
         return { bg: '#22C55E', text: '#fff' };
       case 'Rejected':
         return { bg: '#EF4444', text: '#fff' };
+      case 'Ended':
+        return { bg: '#374151', text: '#9CA3AF' };
       default:
         return { bg: '#EAB308', text: '#000' };
     }
@@ -84,9 +86,7 @@ const ChatScreen: React.FC = () => {
         ]}
       >
         <ActivityIndicator size="large" color="#FFD900" />
-        <Text style={{ color: '#fff', marginTop: 10 }}>
-          Loading chats...
-        </Text>
+        <Text style={{ color: '#fff', marginTop: 10 }}>Loading chats...</Text>
       </SafeAreaView>
     );
   }
@@ -123,25 +123,23 @@ const ChatScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 40 }}>
-            <Text style={{ color: '#fff', fontSize: 16 }}>
-              No chats yet
-            </Text>
+            <Text style={{ color: '#fff', fontSize: 16 }}>No chats yet</Text>
           </View>
         }
         renderItem={({ item }) => {
-          const unreadCount =
-            item.unreadCount?.[currentUserId] || 0;
+          const unreadCount = item.unreadCount?.[currentUserId] || 0;
 
-          const status =
-            item.offerStatus || 'Offer Pending';
+          const status = item.offerStatus || 'Offer Pending';
 
-          const colors = getStatusColors(status);
+          const isEnded = !!item.lockedAt;
+
+          const colors = getStatusColors(isEnded ? 'Ended' : status);
 
           const messageData: MessageData = {
             id: item.id,
             name: item.otherUser?.name || 'Unknown',
             role: item.jobRole || '',
-            status,
+            status: isEnded ? 'Ended' : status,
             statusColor: colors.bg,
             statusTextColor: colors.text,
             message: item.lastMessage || '',

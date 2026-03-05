@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, MoreVertical, Send } from 'lucide-react-native';
+import { ChevronLeft, MoreVertical, Send, Lock } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getAuth } from '@react-native-firebase/auth';
 import { doc, getDoc, onSnapshot } from '@react-native-firebase/firestore';
@@ -23,10 +23,12 @@ import {
   sendMessage,
   markAsRead,
   getOtherUserInfoFromChat,
+  checkChatAccess,
+  getChatLockStatus,
 } from '../../services/chat';
 import { ChatMessage } from '../../@types/Chat.type';
 import { getFirestore } from '@react-native-firebase/firestore';
-import { checkChatAccess } from '../../services/chat';
+import { useQuery } from '@tanstack/react-query';
 
 const db = getFirestore();
 
@@ -47,6 +49,17 @@ const ChatDetailScreen = () => {
   >({});
 
   const flatListRef = useRef<FlatList>(null);
+
+  /* ================= SHIFT LOCK STATUS ================= */
+  // Polls every 60s — lightweight since result is cached after first lock detection
+  const { data: lockData } = useQuery({
+    queryKey: ['chatLockStatus', chatId],
+    queryFn: () => getChatLockStatus(chatId),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+  });
+
+  const isShiftLocked = lockData?.isLocked ?? false;
 
   /* ================= LOAD OTHER USER ================= */
   useEffect(() => {
@@ -245,7 +258,7 @@ const ChatDetailScreen = () => {
       />
 
       {/* ================= INPUT ================= */}
-      <KeyboardAvoidingView
+      {/* <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       >
@@ -265,6 +278,46 @@ const ChatDetailScreen = () => {
           </View>
         ) : (
           // Disabled state — waiting for worker to accept
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.textInput, { opacity: 0.4 }]}
+              placeholder="Waiting for acceptance..."
+              placeholderTextColor="#666"
+              editable={false}
+            />
+            <View style={[styles.sendButton, { opacity: 0.4 }]}>
+              <Send width={14} height={14} color="#fff" />
+            </View>
+          </View>
+        )}
+      </KeyboardAvoidingView> */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+      >
+        {isShiftLocked ? (
+          // Daily shift has ended — chat is permanently read-only
+          <View style={styles.lockedBanner}>
+            <Text style={styles.lockedBannerText}>
+              This shift has ended. Chat is now closed.
+            </Text>
+          </View>
+        ) : chatUnlocked ? (
+          // Active chat — full messaging enabled
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Type a message..."
+              placeholderTextColor="#666"
+              value={message}
+              onChangeText={setMessage}
+            />
+            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+              <Send width={14} height={14} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          // Pending acceptance — input disabled
           <View style={styles.inputContainer}>
             <TextInput
               style={[styles.textInput, { opacity: 0.4 }]}

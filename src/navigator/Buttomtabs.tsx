@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FeedScreen from '../screen/feed/FeedScreen';
 import CustomTabBar from '../components/CustomTabBar';
-import FindJobsStack from './FindJobsStack';
+import FindWorkersStack from './FindJobsStack';
 import FulltimeScreen from '../screen/fulltime/FulltimeScreen';
 import MainProfile from '../screen/profile/MainProfile';
 
@@ -16,7 +16,7 @@ export default function BottomTabs() {
       }}
     >
       <Tab.Screen name="Feed" component={FeedScreen} />
-      <Tab.Screen name="FindJobs" component={FindJobsStack} />
+      <Tab.Screen name="FindWorkers" component={FindWorkersStack} />
       <Tab.Screen name="fulltime" component={FulltimeScreen} />
       <Tab.Screen name="Profile" component={MainProfile} />
     </Tab.Navigator>

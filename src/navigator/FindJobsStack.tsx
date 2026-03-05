@@ -4,15 +4,15 @@ import AvailabilityScreen from '../screen/availabilty/AvailabiltyScreen';
 import SeasonAvailabiltyScreen from '../screen/seasonAvailabilty/SeasonAvailabiltyScreen';
 import DailyAvailabilityScreen from '../screen/dailyAvailability/DailyAvailabilityScreen';
 
-export type FindJobsStackParamList = {
+export type FindWorkersStackParamList = {
   FindJobsHome: undefined;
   Seasonal: undefined;
   Daily: undefined;
 };
 
-const Stack = createNativeStackNavigator<FindJobsStackParamList>();
+const Stack = createNativeStackNavigator<FindWorkersStackParamList>();
 
-const FindJobsStack = () => {
+const FindWorkersStack = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="FindJobsHome" component={AvailabilityScreen} />
@@ -22,4 +22,4 @@ const FindJobsStack = () => {
   );
 };
 
-export default FindJobsStack;
+export default FindWorkersStack;

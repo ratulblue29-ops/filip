@@ -8,7 +8,7 @@ import ProfileIcon from '../components/svg/ProfileIcon';
 
 const ICONS: any = {
   Feed: HomeIcon,
-  FindJobs: ExploreIcon,
+  FindWorkers: ExploreIcon,
   fulltime: ChatIcon,
   Profile: ProfileIcon,
 };
@@ -34,11 +34,11 @@ export default function CustomTabBar({ state, navigation }: any) {
                 <Text style={styles.label}>
                   {focused && (
                     <Text style={styles.label}>
-                      {route.name === 'FindJobs'
-                        ? 'Find Jobs'
+                      {route.name === 'FindWorkers'
+                        ? 'Find Workers'
                         : route.name === 'fulltime'
-                          ? 'Full-Time'
-                          : route.name}
+                        ? 'Full-Time'
+                        : route.name}
                     </Text>
                   )}
                 </Text>

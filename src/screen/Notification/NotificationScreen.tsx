@@ -38,7 +38,7 @@ import styles from './style';
 import WalletIcon from '../../components/svg/WalletIcon';
 import { fetchMyNotifications } from '../../services/notification';
 import { NotificationItem } from '../../@types/notificationIte.type';
-import { createOrGetChat } from '../../services/chat';
+// import { createOrGetChat } from '../../services/chat';
 import { updateEngagementStatus } from '../../services/engagement';
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -296,9 +296,27 @@ const NotificationScreen = () => {
       }
 
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // if (notif.type === 'ENGAGEMENT_SENT' && notif.fromUserId) {
+      //   // Worker receives this — navigate to chat with employer
+      //   const chatId = await createOrGetChat(notif.fromUserId);
+      //   navigation.navigate('ChatDetailScreen', {
+      //     chatId,
+      //     otherUserId: notif.fromUserId,
+      //   });
+      // }
+
+      // if (notif.type === 'ENGAGEMENT_ACCEPTED' && notif.fromUserId) {
+      //   // Employer receives this — fromUserId is the worker
+      //   const chatId = await createOrGetChat(notif.fromUserId);
+      //   navigation.navigate('ChatDetailScreen', {
+      //     chatId,
+      //     otherUserId: notif.fromUserId,
+      //   });
+      // }
       if (notif.type === 'ENGAGEMENT_SENT' && notif.fromUserId) {
-        // Worker receives this — navigate to chat with employer
-        const chatId = await createOrGetChat(notif.fromUserId);
+        // chatId IS the engagementId — no need to create a new chat
+        const chatId = notif.data?.engagementId;
+        if (!chatId) return;
         navigation.navigate('ChatDetailScreen', {
           chatId,
           otherUserId: notif.fromUserId,
@@ -306,8 +324,8 @@ const NotificationScreen = () => {
       }
 
       if (notif.type === 'ENGAGEMENT_ACCEPTED' && notif.fromUserId) {
-        // Employer receives this — fromUserId is the worker
-        const chatId = await createOrGetChat(notif.fromUserId);
+        const chatId = notif.data?.engagementId;
+        if (!chatId) return;
         navigation.navigate('ChatDetailScreen', {
           chatId,
           otherUserId: notif.fromUserId,
@@ -363,11 +381,11 @@ const NotificationScreen = () => {
       // We query all messages across both possible chat participants to find the matching one
       try {
         const db = getFirestore();
-        const currentUid = notif.data?.workerId; // current user is the worker for ENGAGEMENT_SENT
-        const employerUid = notif.fromUserId;
+        // const currentUid = notif.data?.workerId; // current user is the worker for ENGAGEMENT_SENT
+        // const employerUid = notif.fromUserId;
 
         // Chat ID is deterministic: sorted uids joined by _
-        const chatId = [currentUid, employerUid].sort().join('_');
+        const chatId = engagementId;
         const messagesRef = collection(db, 'chats', chatId, 'messages');
 
         const msgQuery = query(

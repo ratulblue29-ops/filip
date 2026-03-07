@@ -76,7 +76,7 @@ const FullTimeAvailabilityCreation = () => {
         location: city ? [city] : [],
         rate: {
           amount: Number(salary.replace(/\D/g, '')) || 0,
-          unit: 'year',
+          unit: 'month',
         },
         daysPerWeek: Number(daysPerWeek) || 0,
         contact: {
@@ -169,7 +169,7 @@ const FullTimeAvailabilityCreation = () => {
           <View style={styles.flex}>
             <Text style={styles.label}>Salary</Text>
             <TextInput
-              placeholder="€65K / Yr"
+              placeholder="€3,500 / Mo"
               placeholderTextColor="#9CA3AF"
               style={styles.input}
               value={salary}

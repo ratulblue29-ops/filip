@@ -252,4 +252,33 @@ export const styles = StyleSheet.create({
     fontFamily: 'InterDisplayMedium',
     fontWeight: 500,
   },
+  tabRow: {
+  flexDirection: 'row',
+  gap: 10,
+  marginTop: 16,
+  marginBottom: 4,
+},
+chip: {
+  paddingHorizontal: 16,
+  paddingVertical: 8,
+  borderRadius: 20,
+  borderWidth: 1,
+  borderColor: '#2A2A2A',
+  backgroundColor: '#121212',
+},
+activeChip: {
+  backgroundColor: '#FFD900',
+  borderColor: '#FFD900',
+},
+chipText: {
+  color: '#FFF',
+  fontSize: 14,
+  fontFamily: 'InterDisplayMedium',
+},
+activeChipText: {
+  color: '#000',
+  fontSize: 14,
+  fontFamily: 'InterDisplayMedium',
+  fontWeight: '600',
+},
 });

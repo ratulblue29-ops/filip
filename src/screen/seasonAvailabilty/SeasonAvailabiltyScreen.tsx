@@ -38,9 +38,9 @@ const SeasonAvailabilityScreen = () => {
     setSortBy(null);
   };
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
+  // const handleBack = () => {
+  //   navigation.goBack();
+  // };
 
   const {
     data: workers,
@@ -140,13 +140,17 @@ const SeasonAvailabilityScreen = () => {
       <StatusBar barStyle="light-content" />
 
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
           <ArrowLeft width={22} height={22} color="white" />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Seasonal Talent</Text>
 
+        <NotificationDot hasUnread={hasUnread} />
+      </View> */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Find Workers</Text>
         <NotificationDot hasUnread={hasUnread} />
       </View>
 
@@ -160,6 +164,19 @@ const SeasonAvailabilityScreen = () => {
           value={search}
           onChangeText={setSearch}
         />
+      </View>
+
+      {/* Type Tabs */}
+      <View style={styles.tabRow}>
+        <TouchableOpacity style={[styles.chip, styles.activeChip]}>
+          <Text style={styles.activeChipText}>Seasonal</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.chip}
+          onPress={() => navigation.navigate('Daily')}
+        >
+          <Text style={styles.chipText}>Daily</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Filters */}

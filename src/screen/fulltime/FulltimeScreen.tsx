@@ -45,7 +45,8 @@ const FulltimeScreen = () => {
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ['fulltime-jobs'],
-      queryFn: ({ pageParam }) => fetchRecommendedJobsPaginated(pageParam, 10),
+      queryFn: ({ pageParam }) =>
+        fetchRecommendedJobsPaginated(pageParam, 10, 'fulltime'),
       initialPageParam: null,
       getNextPageParam: lastPage => {
         return lastPage?.hasMore ? lastPage?.lastDoc : undefined;
@@ -139,7 +140,7 @@ const FulltimeScreen = () => {
     ({ item }) => (
       <JobCard
         job={{ ...item, isApplied: appliedJobIds.has(item.id) }}
-        onBookmark={() => { }}
+        onBookmark={() => {}}
       />
     ),
     [appliedJobIds],

@@ -27,7 +27,8 @@ const Gig = ({ refreshing, onRefresh }: GigProps) => {
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ['recommendedJobs'],
-      queryFn: ({ pageParam }) => fetchRecommendedJobsPaginated(pageParam, 10),
+      queryFn: ({ pageParam }) =>
+        fetchRecommendedJobsPaginated(pageParam, 10, 'all'),
       initialPageParam: null,
       getNextPageParam: lastPage => {
         return lastPage?.hasMore ? lastPage?.lastDoc : undefined;

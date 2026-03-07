@@ -300,40 +300,94 @@ export const createJob = async ({
   }
 };
 
+// export const fetchRecommendedJobsPaginated = async (
+//   lastDoc: any = null,
+//   pageSize: number = 10,
+//   jobType: 'fulltime' | 'seasonal' | 'daily' | 'all' = 'fulltime',
+// ) => {
+//   const db = getFirestore();
+//   const jobsCol = collection(db, 'jobs');
+
+//   let q = query(
+//     jobsCol,
+//     ...(jobType !== 'all' ? [where('type', '==', jobType)] : []),
+//     where('visibility.priority', '==', 'active'),
+//     orderBy('createdAt', 'desc'),
+//     limit(pageSize)
+//   );
+
+//   if (lastDoc) {
+//     q = query(
+//       jobsCol,
+//       ...(jobType !== 'all' ? [where('type', '==', jobType)] : []),
+//       where('visibility.priority', '==', 'active'),
+//       orderBy('createdAt', 'desc'),
+//       startAfter(lastDoc),
+//       limit(pageSize)
+//     );
+//   }
+
+//   const snapshot = await getDocs(q);
+
+//   const jobsWithUserInfo = await Promise.all(
+//     snapshot.docs.map(async (jobDoc: { data: () => any; id: any }) => {
+//       const jobData = jobDoc.data();
+
+//       const userRef = doc(db, 'users', jobData.userId);
+//       const userSnap = await getDoc(userRef);
+//       const userData = userSnap.exists() ? userSnap.data() : null;
+
+//       return {
+//         id: jobDoc.id,
+//         ...jobData,
+//         user: userData
+//           ? {
+//               id: userSnap.id,
+//               name: userData.profile.name,
+//               photo: userData.profile.photo,
+//               verified: userData?.profile.verified,
+//               email: userData.email,
+//               membership: userData.membership,
+//             }
+//           : null,
+//       };
+//     }),
+//   );
+
+//   return {
+//     jobs: jobsWithUserInfo,
+//     lastDoc:
+//       snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
+//     hasMore: snapshot.docs.length === pageSize,
+//   };
+// };
 export const fetchRecommendedJobsPaginated = async (
   lastDoc: any = null,
   pageSize: number = 10,
+  jobType: 'fulltime' | 'seasonal' | 'daily' | 'all' = 'fulltime',
 ) => {
   const db = getFirestore();
   const jobsCol = collection(db, 'jobs');
 
-  let q = query(
-    jobsCol,
-    where('visibility.priority', '==', 'active'),
-    orderBy('createdAt', 'desc'),
-    limit(pageSize)
-  );
-
-  if (lastDoc) {
-    q = query(
-      jobsCol,
-      where('visibility.priority', '==', 'active'),
-      orderBy('createdAt', 'desc'),
-      startAfter(lastDoc),
-      limit(pageSize)
-    );
+  // Build query based on jobType — spread workaround for react-native-firebase type mismatch
+  let q;
+  if (jobType === 'all') {
+    q = lastDoc
+      ? query(jobsCol, where('visibility.priority', '==', 'active'), orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(pageSize))
+      : query(jobsCol, where('visibility.priority', '==', 'active'), orderBy('createdAt', 'desc'), limit(pageSize));
+  } else {
+    q = lastDoc
+      ? query(jobsCol, where('type', '==', jobType), where('visibility.priority', '==', 'active'), orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(pageSize))
+      : query(jobsCol, where('type', '==', jobType), where('visibility.priority', '==', 'active'), orderBy('createdAt', 'desc'), limit(pageSize));
   }
 
   const snapshot = await getDocs(q);
-
   const jobsWithUserInfo = await Promise.all(
     snapshot.docs.map(async (jobDoc: { data: () => any; id: any }) => {
       const jobData = jobDoc.data();
-
       const userRef = doc(db, 'users', jobData.userId);
       const userSnap = await getDoc(userRef);
       const userData = userSnap.exists() ? userSnap.data() : null;
-
       return {
         id: jobDoc.id,
         ...jobData,
@@ -350,11 +404,9 @@ export const fetchRecommendedJobsPaginated = async (
       };
     }),
   );
-
   return {
     jobs: jobsWithUserInfo,
-    lastDoc:
-      snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
+    lastDoc: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
     hasMore: snapshot.docs.length === pageSize,
   };
 };

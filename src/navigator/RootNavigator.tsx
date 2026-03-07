@@ -32,6 +32,14 @@ import MainProfile from '../screen/profile/MainProfile';
 import ViewProfileScreen from '../screen/profile/ViewProfileScreen';
 import DailyAvailabilityCreation from '../screen/DailyAvailabilityCreation/DailyAvailabilityCreation';
 
+type SelectedPost = {
+  id: string;
+  title: string;
+  location: string[];
+  rate: { amount: number; unit: string };
+  type: string;
+};
+
 export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
@@ -52,7 +60,7 @@ export type RootStackParamList = {
   HelpSupport: undefined;
   TermsConditions: undefined;
   // sendoffer: undefined;
-  SendOffer: { workerId: string; selectedPost: any };
+  SendOffer: { workerId: string; selectedPost: SelectedPost };
   referral: undefined;
   profile: undefined;
   viewProfile: undefined;

@@ -16,7 +16,7 @@ import { onSnapshot, Unsubscribe } from '@react-native-firebase/firestore';
 // Credit costs per action type
 export const CREDIT_COSTS = {
   ENGAGEMENT_SEASONAL: 5,
-  ENGAGEMENT_DAILY: 5,
+  ENGAGEMENT_DAILY: 2,
   ENGAGEMENT_FULLTIME: 5,
 } as const;
 

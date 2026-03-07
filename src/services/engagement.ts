@@ -95,6 +95,7 @@ export const createEngagement = async (
     workerId,                    // worker
     availabilityPostId,          // REQUIRED — strict 1:1
     creditCost,                  // stored for exact refund on decline/withdraw
+    availabilityType: postType,
     status: 'pending',           // pending | accepted | declined | withdrawn
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),

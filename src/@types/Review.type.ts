@@ -15,6 +15,7 @@ export type ReviewItem = {
   rating: number;
   text: string;
   isRevealed: boolean;
+  status: 'pending' | 'approved' | 'rejected';
   createdAt: any;
   fromUserName?: string;
   fromUserPhoto?: string | null;

@@ -59,54 +59,168 @@ export const getReviewEligibleEngagement = async (
 };
 
 // Submit a review — marks engagement flag + writes review doc
+// export const submitReview = async (
+//   engagementId: string,
+//   toUserId: string,
+//   rating: number,
+//   text: string,
+//   role: 'employer' | 'worker', // current user's role in this engagement
+// ): Promise<void> => {
+//   const user = getAuth().currentUser;
+//   if (!user) throw new Error('Login required');
+
+//   const db = getFirestore();
+
+//   // Write review
+//   await addDoc(collection(db, 'reviews'), {
+//     engagementId,
+//     fromUserId: user.uid,
+//     toUserId,
+//     rating,
+//     text,
+//     isRevealed: false, // revealed after both submit or window expires
+//     status: rating <= 2 ? 'pending' : 'approved',
+//     createdAt: serverTimestamp(),
+//   });
+
+//   // Mark engagement as reviewed by this role
+//   const engRef = doc(db, 'engagements', engagementId);
+//   const flagField = role === 'employer' ? 'reviewedByEmployer' : 'reviewedByWorker';
+//   await updateDoc(engRef, { [flagField]: true });
+
+//   // Check if both sides reviewed — if yes, reveal both
+//   const engSnap = await getDoc(engRef);
+//   const engData = engSnap.data();
+//   const bothReviewed =
+//     (role === 'employer' && engData?.reviewedByWorker) ||
+//     (role === 'worker' && engData?.reviewedByEmployer);
+
+//   // if (bothReviewed) {
+//   //   // Reveal all reviews for this engagement
+//   //   const reviewsSnap = await getDocs(
+//   //     query(collection(db, 'reviews'), where('engagementId', '==', engagementId)),
+//   //   );
+//   //   // const batch = reviewsSnap.docs.map((d: any) =>
+//   //   //   updateDoc(doc(db, 'reviews', d.id), { isRevealed: true }),
+//   //   // );
+//   //   const batch = reviewsSnap.docs
+//   //     .filter((d: any) => d.data().status === 'approved') // never auto-reveal pending reviews
+//   //     .map((d: any) => updateDoc(doc(db, 'reviews', d.id), { isRevealed: true })
+//   //   );
+//   //   await Promise.all(batch);
+//   // }
+//   if (bothReviewed) {
+//     // Split into two queries Firestore can evaluate at rule level
+//     const [asFromSnap, asToSnap] = await Promise.all([
+//       getDocs(query(
+//         collection(db, 'reviews'),
+//         where('engagementId', '==', engagementId),
+//         where('fromUserId', '==', user.uid),
+//       )),
+//       getDocs(query(
+//         collection(db, 'reviews'),
+//         where('engagementId', '==', engagementId),
+//         where('toUserId', '==', user.uid),
+//       )),
+//     ]);
+
+//     const allDocs = [...asFromSnap.docs, ...asToSnap.docs];
+
+//     const batch = allDocs
+//       .filter((d: any) => d.data().status === 'approved')
+//       .map((d: any) => updateDoc(doc(db, 'reviews', d.id), { isRevealed: true }));
+
+//     await Promise.all(batch);
+//   }
+
+//   // Update user aggregate rating
+//   if (rating > 2) {
+//     await recalculateUserRating(toUserId);
+//   }
+// };
 export const submitReview = async (
   engagementId: string,
   toUserId: string,
   rating: number,
   text: string,
-  role: 'employer' | 'worker', // current user's role in this engagement
+  role: 'employer' | 'worker',
 ): Promise<void> => {
   const user = getAuth().currentUser;
   if (!user) throw new Error('Login required');
-
   const db = getFirestore();
 
-  // Write review
-  await addDoc(collection(db, 'reviews'), {
-    engagementId,
-    fromUserId: user.uid,
-    toUserId,
-    rating,
-    text,
-    isRevealed: false, // revealed after both submit or window expires
-    createdAt: serverTimestamp(),
-  });
+  try {
+    console.log('[REVIEW] Step 1: addDoc');
+    await addDoc(collection(db, 'reviews'), {
+      engagementId,
+      fromUserId: user.uid,
+      toUserId,
+      rating,
+      text,
+      isRevealed: false,
+      status: rating <= 2 ? 'pending' : 'approved',
+      createdAt: serverTimestamp(),
+    });
+    console.log('[REVIEW] Step 1: OK');
+  } catch (e) { throw new Error(`Step 1 addDoc failed: ${e}`); }
 
-  // Mark engagement as reviewed by this role
+  try {
+    console.log('[REVIEW] Step 2: updateDoc engagement');
+    const engRef = doc(db, 'engagements', engagementId);
+    const flagField = role === 'employer' ? 'reviewedByEmployer' : 'reviewedByWorker';
+    await updateDoc(engRef, { [flagField]: true });
+    console.log('[REVIEW] Step 2: OK');
+  } catch (e) { throw new Error(`Step 2 updateDoc engagement failed: ${e}`); }
+
   const engRef = doc(db, 'engagements', engagementId);
-  const flagField = role === 'employer' ? 'reviewedByEmployer' : 'reviewedByWorker';
-  await updateDoc(engRef, { [flagField]: true });
 
-  // Check if both sides reviewed — if yes, reveal both
-  const engSnap = await getDoc(engRef);
-  const engData = engSnap.data();
-  const bothReviewed =
-    (role === 'employer' && engData?.reviewedByWorker) ||
-    (role === 'worker' && engData?.reviewedByEmployer);
+  try {
+    console.log('[REVIEW] Step 3: getDoc engagement');
+    const engSnap = await getDoc(engRef);
+    const engData = engSnap.data();
+    console.log('[REVIEW] Step 3: OK', engData);
 
-  if (bothReviewed) {
-    // Reveal all reviews for this engagement
-    const reviewsSnap = await getDocs(
-      query(collection(db, 'reviews'), where('engagementId', '==', engagementId)),
-    );
-    const batch = reviewsSnap.docs.map((d: any) =>
-      updateDoc(doc(db, 'reviews', d.id), { isRevealed: true }),
-    );
-    await Promise.all(batch);
-  }
+    const bothReviewed =
+      (role === 'employer' && engData?.reviewedByWorker) ||
+      (role === 'worker' && engData?.reviewedByEmployer);
 
-  // Update user aggregate rating
-  await recalculateUserRating(toUserId);
+    console.log('[REVIEW] bothReviewed:', bothReviewed);
+
+    if (bothReviewed) {
+      try {
+        console.log('[REVIEW] Step 4: reveal queries');
+        const [asFromSnap, asToSnap] = await Promise.all([
+          getDocs(query(
+            collection(db, 'reviews'),
+            where('engagementId', '==', engagementId),
+            where('fromUserId', '==', user.uid),
+          )),
+          getDocs(query(
+            collection(db, 'reviews'),
+            where('engagementId', '==', engagementId),
+            where('toUserId', '==', user.uid),
+          )),
+        ]);
+        console.log('[REVIEW] Step 4: OK, docs:', asFromSnap.docs.length, asToSnap.docs.length);
+
+        const allDocs = [...asFromSnap.docs, ...asToSnap.docs];
+        const batch = allDocs
+          .filter((d: any) => d.data().status === 'approved')
+          .map((d: any) => updateDoc(doc(db, 'reviews', d.id), { isRevealed: true }));
+
+        await Promise.all(batch);
+        console.log('[REVIEW] Step 4 batch update: OK');
+      } catch (e) { throw new Error(`Step 4 reveal failed: ${e}`); }
+    }
+  } catch (e) { throw new Error(`Step 3 getDoc failed: ${e}`); }
+
+  try {
+    console.log('[REVIEW] Step 5: recalculate rating, rating=', rating);
+    if (rating > 2) {
+      await recalculateUserRating(toUserId);
+    }
+    console.log('[REVIEW] Step 5: OK');
+  } catch (e) { throw new Error(`Step 5 recalculate failed: ${e}`); }
 };
 
 // Recalculate and update user's average rating + reviewsCount
@@ -117,18 +231,29 @@ const recalculateUserRating = async (userId: string): Promise<void> => {
     query(
       collection(db, 'reviews'),
       where('toUserId', '==', userId),
-      // where('isRevealed', '==', true),
+      where('isRevealed', '==', true),
     ),
   );
 
   if (snap.empty) return;
 
-  const total = snap.docs.reduce((sum: number, d: any) => sum + (d.data().rating ?? 0), 0);
-  const avg = parseFloat((total / snap.docs.length).toFixed(1));
+  // const total = snap.docs.reduce((sum: number, d: any) => sum + (d.data().rating ?? 0), 0);
+  // const avg = parseFloat((total / snap.docs.length).toFixed(1));
+
+  // await updateDoc(doc(db, 'users', userId), {
+  //   'profile.rating': avg,
+  //   'profile.reviewsCount': snap.docs.length,
+  // });
+  // Only approved reviews count toward aggregate rating
+  const approvedDocs = snap.docs.filter((d: any) => d.data().status === 'approved');
+  if (approvedDocs.length === 0) return;
+
+  const total = approvedDocs.reduce((sum: number, d: any) => sum + (d.data().rating ?? 0), 0);
+  const avg = parseFloat((total / approvedDocs.length).toFixed(1));
 
   await updateDoc(doc(db, 'users', userId), {
     'profile.rating': avg,
-    'profile.reviewsCount': snap.docs.length,
+    'profile.reviewsCount': approvedDocs.length,
   });
 };
 
@@ -140,7 +265,7 @@ export const fetchUserReviews = async (userId: string) => {
     query(
       collection(db, 'reviews'),
       where('toUserId', '==', userId),
-      // where('isRevealed', '==', true),
+      where('isRevealed', '==', true),
       orderBy('createdAt', 'desc'),
     ),
   );

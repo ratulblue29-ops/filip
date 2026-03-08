@@ -224,37 +224,58 @@ export const submitReview = async (
 };
 
 // Recalculate and update user's average rating + reviewsCount
+// const recalculateUserRating = async (userId: string): Promise<void> => {
+//   const db = getFirestore();
+
+//   const snap = await getDocs(
+//     query(
+//       collection(db, 'reviews'),
+//       where('toUserId', '==', userId),
+//       // where('isRevealed', '==', true),
+//       where('status', '==', 'approved'),
+//     ),
+//   );
+
+//   if (snap.empty) return;
+
+//   const total = snap.docs.reduce((sum: number, d: any) => sum + (d.data().rating ?? 0), 0);
+//   const avg = parseFloat((total / snap.docs.length).toFixed(1));
+//   await updateDoc(doc(db, 'users', userId), {
+//     'profile.rating': avg,
+//     'profile.reviewsCount': snap.docs.length,
+//   });
+// };
 const recalculateUserRating = async (userId: string): Promise<void> => {
   const db = getFirestore();
+
+  console.log('[RECALC] querying for userId:', userId);
 
   const snap = await getDocs(
     query(
       collection(db, 'reviews'),
       where('toUserId', '==', userId),
-      where('isRevealed', '==', true),
+      where('status', '==', 'approved'),
     ),
   );
 
-  if (snap.empty) return;
+  console.log('[RECALC] snap size:', snap.size);
 
-  // const total = snap.docs.reduce((sum: number, d: any) => sum + (d.data().rating ?? 0), 0);
-  // const avg = parseFloat((total / snap.docs.length).toFixed(1));
+  if (snap.empty) {
+    console.log('[RECALC] no approved reviews found, returning');
+    return;
+  }
 
-  // await updateDoc(doc(db, 'users', userId), {
-  //   'profile.rating': avg,
-  //   'profile.reviewsCount': snap.docs.length,
-  // });
-  // Only approved reviews count toward aggregate rating
-  const approvedDocs = snap.docs.filter((d: any) => d.data().status === 'approved');
-  if (approvedDocs.length === 0) return;
+  const total = snap.docs.reduce((sum: number, d: any) => sum + (d.data().rating ?? 0), 0);
+  const avg = parseFloat((total / snap.docs.length).toFixed(1));
 
-  const total = approvedDocs.reduce((sum: number, d: any) => sum + (d.data().rating ?? 0), 0);
-  const avg = parseFloat((total / approvedDocs.length).toFixed(1));
+  console.log('[RECALC] avg:', avg, 'count:', snap.docs.length);
 
   await updateDoc(doc(db, 'users', userId), {
     'profile.rating': avg,
-    'profile.reviewsCount': approvedDocs.length,
+    'profile.reviewsCount': snap.docs.length,
   });
+
+  console.log('[RECALC] updateDoc OK');
 };
 
 // Fetch revealed reviews for a user (for ViewProfileScreen)
@@ -265,7 +286,8 @@ export const fetchUserReviews = async (userId: string) => {
     query(
       collection(db, 'reviews'),
       where('toUserId', '==', userId),
-      where('isRevealed', '==', true),
+      // where('isRevealed', '==', true),
+      where('status', '==', 'approved'),
       orderBy('createdAt', 'desc'),
     ),
   );

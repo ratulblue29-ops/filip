@@ -51,7 +51,7 @@ const SeasonalAvailabilityCreationScreen = () => {
 
   // — Workplace & position
   // const [workplaceType, setWorkplaceType] = useState<WorkplaceType>('On-site');
-  const [targetPosition, setTargetPosition] = useState('');
+  // const [targetPosition, setTargetPosition] = useState('');
 
   // — Locations
   const [locations, setLocations] = useState<string[]>([]);
@@ -134,7 +134,7 @@ const SeasonalAvailabilityCreationScreen = () => {
         positions: { total: 5, filled: 0 },
         // New required fields per client spec
         // workplaceType,
-        targetPosition,
+        // targetPosition,
         currency: 'EUR',
       });
     },
@@ -167,14 +167,14 @@ const SeasonalAvailabilityCreationScreen = () => {
       newErrors.title = 'Title is required';
     }
 
+    // if (!targetPosition.trim()) {
+    //   newErrors.targetPosition = 'Target position is required';
+    // }
+
     if (!startDate || !endDate) {
       newErrors.dates = 'Select both start and end dates';
     } else if (new Date(startDate) > new Date(endDate)) {
       newErrors.dates = 'End date must be after start date';
-    }
-
-    if (!targetPosition.trim()) {
-      newErrors.targetPosition = 'Target position is required';
     }
 
     if (categories.length === 0) {
@@ -241,14 +241,8 @@ const SeasonalAvailabilityCreationScreen = () => {
           <Text style={styles.fieldError}>{errors.title}</Text>
         ) : null}
 
-        {/* ── Banner Upload (optional) ── */}
-        <UploadBanner
-          bannerImage={bannerImage}
-          setBannerImage={setBannerImage}
-        />
-
         {/* ── Target Position ── */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Target Position</Text>
           <TextInput
             style={styles.textArea}
@@ -263,7 +257,13 @@ const SeasonalAvailabilityCreationScreen = () => {
           {errors.targetPosition ? (
             <Text style={styles.fieldError}>{errors.targetPosition}</Text>
           ) : null}
-        </View>
+        </View> */}
+
+        {/* ── Banner Upload (optional) ── */}
+        <UploadBanner
+          bannerImage={bannerImage}
+          setBannerImage={setBannerImage}
+        />
 
         {/* ── Workplace Type ── */}
         {/* <View style={styles.section}>

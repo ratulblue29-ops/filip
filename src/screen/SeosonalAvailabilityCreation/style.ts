@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontFamily: 'InterDisplayMedium',
     marginBottom: 16,
-    marginTop: 24,
+    // marginTop: 24,
   },
   subsectionTitle: {
     fontSize: 14,

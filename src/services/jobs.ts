@@ -261,7 +261,7 @@ export const createJob = async ({
         jobPost.schedule = schedule;
         // Store new client-spec fields on seasonal posts
         // jobPost.workplaceType = workplaceType;
-        jobPost.targetPosition = targetPosition;
+        // jobPost.targetPosition = targetPosition;
         // EUR is the only supported currency — stored explicitly for query/display
         jobPost.currency = currency;
       }
@@ -524,7 +524,7 @@ export const fetchSeasonalJobs = async () => {
 
         // New fields surfaced for feed/card display
         workplaceType: jobData.workplaceType ?? 'On-site',
-        targetPosition: jobData.targetPosition ?? '',
+        // targetPosition: jobData.targetPosition ?? '',
         currency: jobData.currency ?? 'EUR',
 
         tags: jobData.requiredSkills ?? [],

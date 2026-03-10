@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StatusBar,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Mail, Phone, MessageSquare } from 'lucide-react-native';
@@ -57,24 +58,32 @@ const JobApplicationsScreen = () => {
         </View>
       )}
 
-      {/* Phone — employer taps to call externally */}
+      {/* Phone — tapping opens the dialler with the number pre-filled */}
       {!!item.phone && (
-        <View style={styles.detailRow}>
+        <TouchableOpacity
+          style={styles.detailRow}
+          onPress={() => Linking.openURL(`tel:${item.phone}`)}
+          activeOpacity={0.7}
+        >
           <Phone size={16} color="#FFD900" />
           <Text style={[styles.detailText, { color: '#FFD900' }]}>
             {item.phone}
           </Text>
-        </View>
+        </TouchableOpacity>
       )}
 
-      {/* Email — employer taps to email externally */}
+      {/* Email — tapping opens the mail app with the address pre-filled */}
       {!!item.email && (
-        <View style={styles.detailRow}>
+        <TouchableOpacity
+          style={styles.detailRow}
+          onPress={() => Linking.openURL(`mailto:${item.email}`)}
+          activeOpacity={0.7}
+        >
           <Mail size={16} color="#FFD900" />
           <Text style={[styles.detailText, { color: '#FFD900' }]}>
             {item.email}
           </Text>
-        </View>
+        </TouchableOpacity>
       )}
     </View>
   );

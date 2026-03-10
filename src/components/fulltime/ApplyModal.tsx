@@ -76,7 +76,11 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
             {/* Message */}
             <Text style={styles.label}>Short Message / Introduction</Text>
             <View style={styles.inputWithIcon}>
-              <MessageSquare size={18} color="#9CA3AF" />
+              <MessageSquare
+                size={18}
+                color="#9CA3AF"
+                style={{ marginTop: 10, marginLeft: 5 }}
+              />
               <TextInput
                 style={styles.textArea}
                 value={message}
@@ -91,7 +95,11 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
             {/* Phone */}
             <Text style={styles.label}>Phone Number</Text>
             <View style={styles.inputWithIcon}>
-              <Phone size={18} color="#9CA3AF" />
+              <Phone
+                size={18}
+                color="#9CA3AF"
+                style={{ marginTop: 10, marginLeft: 5 }}
+              />
               <TextInput
                 style={styles.input}
                 value={phone}
@@ -105,7 +113,11 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
             {/* Email */}
             <Text style={styles.label}>Email Address</Text>
             <View style={styles.inputWithIcon}>
-              <Mail size={18} color="#9CA3AF" />
+              <Mail
+                size={18}
+                color="#9CA3AF"
+                style={{ marginTop: 10, marginLeft: 5 }}
+              />
               <TextInput
                 style={styles.input}
                 value={email}
@@ -162,7 +174,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontFamily: 'InterDisplay-SemiBold',
-    fontWeight: '600',
     flex: 1,
     marginRight: 12,
   },
@@ -170,7 +181,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontFamily: 'InterDisplay-Medium',
-    fontWeight: '500',
     marginBottom: 8,
     marginTop: 16,
   },
@@ -190,14 +200,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontFamily: 'InterDisplay-Regular',
-    fontWeight: '400',
   },
   textArea: {
     flex: 1,
     color: '#fff',
     fontSize: 14,
     fontFamily: 'InterDisplay-Regular',
-    fontWeight: '400',
     minHeight: 80,
     textAlignVertical: 'top',
   },
@@ -211,7 +219,6 @@ const styles = StyleSheet.create({
   submitText: {
     color: '#1F2937',
     fontSize: 16,
-    fontWeight: '600',
     fontFamily: 'InterDisplay-SemiBold',
   },
 });

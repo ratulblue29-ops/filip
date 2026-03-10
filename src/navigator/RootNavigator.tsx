@@ -31,6 +31,7 @@ import FullTimeAvailabilityCreation from '../screen/availabilty/FullTimeAvailabi
 import MainProfile from '../screen/profile/MainProfile';
 import ViewProfileScreen from '../screen/profile/ViewProfileScreen';
 import DailyAvailabilityCreation from '../screen/DailyAvailabilityCreation/DailyAvailabilityCreation';
+import JobApplicationsScreen from '../screen/fulltime/JobApplicationsScreen';
 
 type SelectedPost = {
   id: string;
@@ -70,6 +71,7 @@ export type RootStackParamList = {
   GetProfile: undefined;
   role: undefined;
   DailyAvailabilityCreation: undefined;
+  JobApplications: { jobId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -174,6 +176,10 @@ const RootNavigator: React.FC = () => {
       />
       <Stack.Screen name="GetProfile" component={withPrivate(MainProfile)} />
       <Stack.Screen name="role" component={withPrivate(RoleScreen)} />
+      <Stack.Screen
+        name="JobApplications"
+        component={withPrivate(JobApplicationsScreen)}
+      />
     </Stack.Navigator>
   );
 };

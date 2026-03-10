@@ -20,7 +20,10 @@ import { OfferItem } from '../@types/jobApplication.type';
 const getDb = () => getFirestore(getApp());
 const getCurrentUser = () => getAuth(getApp()).currentUser;
 
-export const applyToJob = async (job: { id: string; userId: string }) => {
+export const applyToJob = async (
+  job: { id: string; userId: string },
+  application: { message: string; phone: string; email: string },
+) => {
   const user = getCurrentUser();
   if (!user) throw new Error('Please login to apply');
 
@@ -53,6 +56,10 @@ export const applyToJob = async (job: { id: string; userId: string }) => {
       jobId: job.id,
       applicantId: user.uid,
       jobOwnerId: job.userId,
+      // Contact details submitted by worker — employer uses these to reach out externally
+      message: application.message,
+      phone: application.phone,
+      email: application.email,
       status: 'pending',
       createdAt: serverTimestamp(),
     });
@@ -95,7 +102,7 @@ export const fetchMyOffers = async (): Promise<OfferItem[]> => {
     const app = appDoc.data();
 
     const jobDoc = await getDoc(doc(db, 'jobs', app.jobId));
-    if (!jobDoc.exists) continue;
+    if (!jobDoc.exists()) continue;
 
     offers.push({
       id: appDoc.id,
@@ -123,7 +130,7 @@ export const updateOfferStatus = async (
 
   await runTransaction(db, async transaction => {
     const appDoc = await transaction.get(applicationRef);
-    if (!appDoc.exists) return;
+    if (!appDoc.exists()) return;
 
     const appData = appDoc.data();
     if (!appData) return;
@@ -152,5 +159,55 @@ export const updateOfferStatus = async (
       isRead: false,
       createdAt: serverTimestamp(),
     });
+  });
+};
+
+// Fetch all applications received by the current user (employer view)
+export const fetchReceivedApplications = async () => {
+  const user = getCurrentUser();
+  if (!user) throw new Error('User not logged in');
+
+  const db = getDb();
+
+  const snap = await getDocs(
+    query(
+      collection(db, 'jobApplications'),
+      where('jobOwnerId', '==', user.uid),
+    ),
+  );
+
+  const applications = [];
+
+  for (const appDoc of snap.docs) {
+    const app = appDoc.data();
+
+    // Fetch job title
+    const jobDoc = await getDoc(doc(db, 'jobs', app.jobId));
+    const jobTitle = jobDoc.exists() ? (jobDoc.data() as any)?.title ?? '' : '';
+
+    // Fetch applicant profile — employer needs name + photo to identify who applied
+    const userDoc = await getDoc(doc(db, 'users', app.applicantId));
+    const userData = userDoc.exists() ? (userDoc.data() as any) : null;
+
+    applications.push({
+      id: appDoc.id,
+      jobId: app.jobId,
+      jobTitle,
+      applicantId: app.applicantId,
+      applicantName: userData?.profile?.name ?? 'Unknown',
+      applicantPhoto: userData?.profile?.photo ?? null,
+      message: app.message ?? '',
+      phone: app.phone ?? '',
+      email: app.email ?? '',
+      status: app.status,
+      createdAt: app.createdAt,
+    });
+  }
+
+  // Newest first
+  return applications.sort((a, b) => {
+    const aS = a.createdAt?.seconds ?? 0;
+    const bS = b.createdAt?.seconds ?? 0;
+    return bS - aS;
   });
 };

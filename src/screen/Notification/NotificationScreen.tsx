@@ -332,6 +332,13 @@ const NotificationScreen = () => {
         });
       }
 
+      // JOB_APPLY — employer taps notification → sees applicant contact details
+      if (notif.type === 'JOB_APPLY' && notif.data?.jobId) {
+        navigation.navigate('JobApplications', {
+          jobId: notif.data.jobId,
+        });
+      }
+
       // if (notif.type === 'ENGAGEMENT_DECLINED') {
       //   // No chat navigation needed
       //   console.log(

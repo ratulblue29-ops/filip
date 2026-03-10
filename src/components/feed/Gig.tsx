@@ -43,7 +43,11 @@ const Gig = ({ refreshing, onRefresh }: GigProps) => {
 
   //  FLATTEN JOBS
   const recommendedData = useMemo(() => {
-    return data?.pages?.flatMap(page => page.jobs) ?? [];
+    const all = data?.pages?.flatMap(page => page.jobs) ?? [];
+    // Feed shows ONLY daily and seasonal — fulltime lives in its own tab
+    return all.filter(
+      (job: any) => job.type === 'daily' || job.type === 'seasonal',
+    );
   }, [data]);
 
   if (isPending || wishlistLoading) {

@@ -27,7 +27,9 @@ const JobApplicationsScreen = () => {
   });
 
   // Show only applications for this specific job
-  const filtered = applications.filter((a: any) => a.jobId === jobId);
+  const filtered = jobId
+    ? applications.filter((a: any) => a.jobId === jobId)
+    : applications;
 
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.card}>

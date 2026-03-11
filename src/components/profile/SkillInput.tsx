@@ -13,10 +13,12 @@ const SkillInput = ({
   skillInput,
   setSkillInput,
   addSkill,
+  currentSkills = [],
 }: {
   skillInput: string;
   setSkillInput: (text: string) => void;
   addSkill: () => void;
+  currentSkills?: string[];
 }) => {
   const navigation = useNavigation<any>();
   return (
@@ -40,7 +42,9 @@ const SkillInput = ({
         />
         <TouchableOpacity
           style={styles.plusIcon}
-          onPress={() => navigation.navigate('role')}
+          onPress={() =>
+            navigation.navigate('role', { currentSkills, fromEdit: true })
+          }
         >
           <Plus size={20} color="#FFFFFF" />
         </TouchableOpacity>

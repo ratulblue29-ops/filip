@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -20,8 +20,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCurrentUser, updateUserProfile } from '../../services/user';
 import { uploadProfilePhoto } from '../../services/uploadPhoto';
 // import defaultProfile from '../../../assets/images/defaultProfile.png';
+// import { useNavigation } from '@react-navigation/native';
+import { useRoute, useFocusEffect } from '@react-navigation/native';
+import {
+  getPendingSkills,
+  clearPendingSkills,
+} from '../../store/pendingSkillsStore';
+
 const MainProfile: React.FC = () => {
   const queryClient = useQueryClient();
+  const hasInitialized = useRef(false);
+  const route = useRoute<any>();
   const [skillInput, setSkillInput] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
   const [openToWork, setOpenToWork] = useState(true);
@@ -39,8 +48,25 @@ const MainProfile: React.FC = () => {
     queryFn: fetchCurrentUser,
   });
 
+  // useEffect(() => {
+  //   if (!user) return;
+
+  //   setCity(user.profile?.city || '');
+  //   setAbout(user.profile?.aboutMe || '');
+  //   setSkills(user.profile?.skills || []);
+  //   setFullName(user.profile?.name || '');
+  //   setHourlyRate(
+  //     user.profile?.hourlyRate ? String(user.profile.hourlyRate) : '',
+  //   );
+
+  //   setPhoto(user.profile?.photo || null);
+  //   setBannerImage(user.profile?.bannerImage || null);
+  //   setOpenToWork(user.profile?.openToWork ?? user.profile?.opentowork ?? true);
+  // }, [user]);
+
   useEffect(() => {
-    if (!user) return;
+    if (!user || hasInitialized.current) return;
+    hasInitialized.current = true;
 
     setCity(user.profile?.city || '');
     setAbout(user.profile?.aboutMe || '');
@@ -49,11 +75,27 @@ const MainProfile: React.FC = () => {
     setHourlyRate(
       user.profile?.hourlyRate ? String(user.profile.hourlyRate) : '',
     );
-
     setPhoto(user.profile?.photo || null);
     setBannerImage(user.profile?.bannerImage || null);
     setOpenToWork(user.profile?.openToWork ?? user.profile?.opentowork ?? true);
   }, [user]);
+
+  // useEffect(() => {
+  //   if (route.params?.updatedSkills) {
+  //     setSkills(route.params.updatedSkills);
+  //   }
+  // }, [route.params?.updatedSkills]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const skills = getPendingSkills();
+      if (skills) {
+        setSkills(skills);
+        setIsEditing(true);
+        clearPendingSkills(); // consume and clear so it doesn't re-apply
+      }
+    }, []), // empty deps — safe because store is external
+  );
 
   /* Pick Image */
   const pickImage = () => {
@@ -77,6 +119,7 @@ const MainProfile: React.FC = () => {
   const { mutate: saveProfile, isPending } = useMutation({
     mutationFn: updateUserProfile,
     onSuccess: () => {
+      hasInitialized.current = false; // ADD this line — allow re-init with fresh data
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       Toast.show({
         type: 'success',
@@ -269,7 +312,7 @@ const MainProfile: React.FC = () => {
                 </View>
               </View>
             </TouchableOpacity>
-            <Text style={styles.uploadText}>Upload Photo</Text>
+            <Text style={styles.uploadText}>Upload Photo(PNG/JPG)</Text>
             <Text style={styles.subText}>Make a great first impression</Text>
           </View>
 
@@ -325,6 +368,7 @@ const MainProfile: React.FC = () => {
             skillInput={skillInput}
             setSkillInput={setSkillInput}
             addSkill={addSkill}
+            currentSkills={skills}
           />
 
           <View style={styles.skillWrap}>

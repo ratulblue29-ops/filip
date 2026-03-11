@@ -21,8 +21,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styles from '../Language/style';
 import { updateUserRoles } from '../../services/user';
 import Toast from 'react-native-toast-message';
-import { useQuery } from '@tanstack/react-query';
-import { fetchCurrentUser } from '../../services/user';
+// import { useQuery } from '@tanstack/react-query';
+// import { fetchCurrentUser } from '../../services/user';
+import { useRoute } from '@react-navigation/native';
+import { setPendingSkills } from '../../store/pendingSkillsStore';
 
 type Role = {
   code: string;
@@ -33,18 +35,22 @@ type Role = {
 const RoleScreen = () => {
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const route = useRoute<any>();
+  const fromEdit = route.params?.fromEdit ?? false;
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
+    route.params?.currentSkills ?? [],
+  );
   const [searchQuery] = useState('');
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: fetchCurrentUser,
-  });
+  // const { data: currentUser } = useQuery({
+  //   queryKey: ['currentUser'],
+  //   queryFn: fetchCurrentUser,
+  // });
 
-  React.useEffect(() => {
-    if (currentUser?.profile?.skills && currentUser.profile.skills.length > 0) {
-      setSelectedLanguages(currentUser.profile.skills);
-    }
-  }, [currentUser]);
+  // React.useEffect(() => {
+  //   if (currentUser?.profile?.skills && currentUser.profile.skills.length > 0) {
+  //     setSelectedLanguages(currentUser.profile.skills);
+  //   }
+  // }, [currentUser]);
   const roles: Role[] = [
     { code: 'WAITER', name: 'Waiter', icon: Utensils },
     { code: 'BARTENDER', name: 'Bartender', icon: Martini },
@@ -83,6 +89,19 @@ const RoleScreen = () => {
       });
     },
   });
+  // const handleSaveChanges = () => {
+  //   if (selectedLanguages.length === 0) {
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: 'Error',
+  //       text2: 'Please select at least one role',
+  //     });
+  //     return;
+  //   }
+  //   saveRoles(selectedLanguages);
+  // };
+
+  // CHANGE handleSaveChanges to this:
   const handleSaveChanges = () => {
     if (selectedLanguages.length === 0) {
       Toast.show({
@@ -92,6 +111,22 @@ const RoleScreen = () => {
       });
       return;
     }
+
+    // If coming from Edit Profile, just return skills — do NOT save to Firebase
+    // if (fromEdit) {
+    //   navigation.navigate('BottomTabs', {
+    //     screen: 'Profile',
+    //     params: { updatedSkills: selectedLanguages },
+    //   });
+    //   return;
+    // }
+    if (fromEdit) {
+      setPendingSkills(selectedLanguages); // store skills before going back
+      navigation.goBack(); // goBack() does NOT remount MainProfile
+      return;
+    }
+
+    // Standalone usage — save to Firebase as before
     saveRoles(selectedLanguages);
   };
 

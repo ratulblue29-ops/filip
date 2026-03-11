@@ -16,6 +16,13 @@ import {
 } from '@react-native-firebase/firestore';
 import { OfferItem } from '../@types/jobApplication.type';
 
+type FullTimeApplyPayload = {
+  message: string;
+  phone: string;
+  email: string;
+  cvUrl: string | null;
+};
+
 // Singleton accessors — avoids repeated getApp() calls across functions
 const getDb = () => getFirestore(getApp());
 const getCurrentUser = () => getAuth(getApp()).currentUser;
@@ -74,6 +81,59 @@ export const applyToJob = async (
         jobId: job.id,
         applicationId: applicationRef.id,
       },
+      isRead: false,
+      createdAt: serverTimestamp(),
+    });
+  });
+
+  return true;
+};
+
+// Full-time job application — stores contact details + optional CV URL.
+// No credits deducted. No in-app chat created. Employer contacts applicant directly.
+export const applyToFullTimeJob = async (
+  job: { id: string; userId: string },
+  payload: FullTimeApplyPayload,
+) => {
+  const user = getCurrentUser();
+  if (!user) throw new Error('Please login to apply');
+  if (job.userId === user.uid) throw new Error('You cannot apply to your own job');
+
+  const db = getDb();
+
+  const existingSnap = await getDocs(
+    query(
+      collection(db, 'jobApplications'),
+      where('jobId', '==', job.id),
+      where('applicantId', '==', user.uid),
+      limit(1),
+    ),
+  );
+  if (!existingSnap.empty) throw new Error('You already applied for this job');
+
+  const applicationRef = doc(collection(db, 'jobApplications'));
+  const notifRef = doc(collection(db, 'notifications'));
+
+  await runTransaction(db, async transaction => {
+    transaction.set(applicationRef, {
+      jobId: job.id,
+      applicantId: user.uid,
+      jobOwnerId: job.userId,
+      status: 'pending',
+      message: payload.message,
+      phone: payload.phone,
+      email: payload.email,
+      cvUrl: payload.cvUrl ?? null,
+      createdAt: serverTimestamp(),
+    });
+
+    transaction.set(notifRef, {
+      toUserId: job.userId,
+      fromUserId: user.uid,
+      type: 'JOB_APPLY',
+      title: 'New Job Application',
+      body: 'Someone applied for your full-time job',
+      data: { jobId: job.id, applicationId: applicationRef.id },
       isRead: false,
       createdAt: serverTimestamp(),
     });
@@ -199,6 +259,7 @@ export const fetchReceivedApplications = async () => {
       message: app.message ?? '',
       phone: app.phone ?? '',
       email: app.email ?? '',
+      cvUrl: app.cvUrl ?? null,
       status: app.status,
       createdAt: app.createdAt,
     });

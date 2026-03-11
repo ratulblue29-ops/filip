@@ -312,8 +312,8 @@ const MainProfile: React.FC = () => {
                 </View>
               </View>
             </TouchableOpacity>
-            <Text style={styles.uploadText}>Upload Photo(PNG/JPG)</Text>
-            <Text style={styles.subText}>Make a great first impression</Text>
+            <Text style={styles.uploadText}>Upload Photo</Text>
+            <Text style={styles.subText}>Format: PNG/JPG</Text>
           </View>
 
           {/* Full Name */}

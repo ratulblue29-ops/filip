@@ -24,10 +24,12 @@ import { getApp } from '@react-native-firebase/app';
 import { getAuth, signOut } from '@react-native-firebase/auth';
 import { getFirestore, doc, getDoc } from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import ResumeDocsModal from '../modals/ResumeDocsModal';
 
 const MainDrawer = () => {
   const navigation = useNavigation<any>();
   const [showBanner, setShowBanner] = useState(true);
+  const [showResumeModal, setShowResumeModal] = useState(false);
   const [userData, setUserData] = useState<any>(null);
 
   const app = getApp();
@@ -197,7 +199,11 @@ const MainDrawer = () => {
             <ChevronRight width={20} height={20} color="#9CA3AF" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            activeOpacity={0.7}
+            onPress={() => setShowResumeModal(true)}
+          >
             <View style={styles.menuLeft}>
               <View style={styles.iconCircle}>
                 <FileText width={20} height={18} color="#FFF" />
@@ -205,7 +211,7 @@ const MainDrawer = () => {
 
               <View>
                 <Text style={styles.menuText}>Resume & Docs</Text>
-                <Text style={styles.menuSubtext}>Last Updated 2 Days Ago</Text>
+                {/* <Text style={styles.menuSubtext}>Last Updated 2 Days Ago</Text> */}
               </View>
             </View>
 
@@ -274,6 +280,10 @@ const MainDrawer = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <ResumeDocsModal
+        visible={showResumeModal}
+        onClose={() => setShowResumeModal(false)}
+      />
     </View>
   );
 };

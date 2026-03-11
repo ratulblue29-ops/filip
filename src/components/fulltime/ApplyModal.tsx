@@ -8,10 +8,20 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { X, MessageSquare, Phone, Mail } from 'lucide-react-native';
+import {
+  X,
+  MessageSquare,
+  Phone,
+  Mail,
+  FileText,
+  Upload,
+  CheckCircle,
+} from 'lucide-react-native';
+import { pick, types } from '@react-native-documents/picker';
 import Toast from 'react-native-toast-message';
-import { useQueryClient } from '@tanstack/react-query';
-import { applyToJob } from '../../services/applyToJob';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { applyToFullTimeJob } from '../../services/applyToJob';
+import { fetchUserCvUrl, uploadCv } from '../../services/cv';
 import { StyleSheet } from 'react-native';
 
 type Props = {
@@ -25,7 +35,49 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  // CV state — null means no CV selected yet for this session
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
+  const [cvFileName, setCvFileName] = useState<string | null>(null);
+  const [cvUploading, setCvUploading] = useState(false);
+  // Fetch user's stored CV from Firestore — same cache key as ResumeDocsModal
+  const { data: savedCvUrl } = useQuery({
+    queryKey: ['user-cv-url'],
+    queryFn: fetchUserCvUrl,
+    enabled: visible,
+  });
   const queryClient = useQueryClient();
+
+  // Pick a new PDF from device and upload it, replacing existing CV
+  const handlePickNewCv = async () => {
+    try {
+      const result = await pick({ type: [types.pdf] });
+      if (!result.length) return; // user cancelled
+
+      const file = result[0];
+      if (file.size && file.size > 10 * 1024 * 1024) {
+        Toast.show({ type: 'error', text1: 'File too large (max 10 MB)' });
+        return;
+      }
+
+      setCvUploading(true);
+      const url = await uploadCv(file.uri);
+      await queryClient.invalidateQueries({ queryKey: ['user-cv-url'] });
+      setCvUrl(url);
+      setCvFileName(file.name ?? 'cv.pdf');
+      Toast.show({ type: 'success', text1: 'CV uploaded!' });
+    } catch (err: any) {
+      Toast.show({ type: 'error', text1: err.message ?? 'Upload failed' });
+    } finally {
+      setCvUploading(false);
+    }
+  };
+
+  // Use the CV already saved in user profile
+  const handleUseExisting = () => {
+    if (!savedCvUrl) return;
+    setCvUrl(savedCvUrl);
+    setCvFileName('Saved CV');
+  };
 
   const handleSubmit = async () => {
     if (!message.trim()) {
@@ -43,8 +95,13 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
 
     setLoading(true);
     try {
-      await applyToJob(job, { message, phone, email });
-      // Refresh applied state in FulltimeScreen
+      // cvUrl may be null — CV is optional, employer can still contact via phone/email
+      await applyToFullTimeJob(job, {
+        message,
+        phone,
+        email,
+        cvUrl: cvUrl ?? null,
+      });
       await queryClient.invalidateQueries({ queryKey: ['my-offers'] });
       Toast.show({ type: 'success', text1: 'Application submitted!' });
       onClose();
@@ -127,6 +184,63 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
+            </View>
+
+            {/* CV / Resume */}
+            <Text style={styles.label}>CV / Resume (optional)</Text>
+
+            {/* Show selected CV filename if one is attached this session */}
+            {cvUrl && (
+              <View style={styles.cvAttached}>
+                <CheckCircle size={16} color="#22C55E" />
+                <Text style={styles.cvAttachedText} numberOfLines={1}>
+                  {cvFileName ?? 'CV attached'}
+                </Text>
+              </View>
+            )}
+
+            <View style={styles.cvRow}>
+              {/* Use existing — only shown if a saved CV exists in profile */}
+              {savedCvUrl && (
+                <TouchableOpacity
+                  style={[
+                    styles.cvBtn,
+                    cvUrl === savedCvUrl && styles.cvBtnActive,
+                  ]}
+                  onPress={handleUseExisting}
+                  activeOpacity={0.8}
+                >
+                  <FileText
+                    size={16}
+                    color={cvUrl === savedCvUrl ? '#FFD900' : '#fff'}
+                  />
+                  <Text
+                    style={[
+                      styles.cvBtnText,
+                      cvUrl === savedCvUrl && { color: '#FFD900' },
+                    ]}
+                  >
+                    Use Existing
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Upload new — always visible */}
+              <TouchableOpacity
+                style={styles.cvBtn}
+                onPress={handlePickNewCv}
+                disabled={cvUploading}
+                activeOpacity={0.8}
+              >
+                {cvUploading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <>
+                    <Upload size={16} color="#fff" />
+                    <Text style={styles.cvBtnText}>Upload New</Text>
+                  </>
+                )}
+              </TouchableOpacity>
             </View>
 
             {/* Submit */}
@@ -220,6 +334,43 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     fontSize: 16,
     fontFamily: 'InterDisplay-SemiBold',
+  },
+  cvAttached: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 10,
+  },
+  cvAttachedText: {
+    color: '#22C55E',
+    fontSize: 13,
+    fontFamily: 'InterDisplay-Regular',
+    flex: 1,
+  },
+  cvRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  cvBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: '#1D1D1D',
+    borderRadius: 8,
+    paddingVertical: 12,
+    borderWidth: 0.5,
+    borderColor: 'rgba(249, 250, 251, 0.10)',
+  },
+  cvBtnActive: {
+    borderColor: '#FFD900',
+    borderWidth: 1,
+  },
+  cvBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'InterDisplay-Medium',
   },
 });
 

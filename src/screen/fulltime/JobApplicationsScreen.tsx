@@ -10,7 +10,14 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Mail, Phone, MessageSquare } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  MessageSquare,
+  ExternalLink,
+  FileText,
+} from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { StyleSheet } from 'react-native';
@@ -83,6 +90,23 @@ const JobApplicationsScreen = () => {
           <Text style={[styles.detailText, { color: '#FFD900' }]}>
             {item.email}
           </Text>
+        </TouchableOpacity>
+      )}
+
+      {/* CV — tapping opens the PDF in the device browser */}
+      {!!item.cvUrl && (
+        <TouchableOpacity
+          style={styles.cvBtn}
+          onPress={() => Linking.openURL(item.cvUrl)}
+          activeOpacity={0.7}
+        >
+          <FileText size={16} color="#1F2937" />
+          <Text style={styles.cvBtnText}>View CV</Text>
+          <ExternalLink
+            size={14}
+            color="#1F2937"
+            style={{ marginLeft: 'auto' }}
+          />
         </TouchableOpacity>
       )}
     </View>
@@ -195,6 +219,21 @@ const styles = StyleSheet.create({
     marginTop: 60,
     fontSize: 14,
     fontFamily: 'InterDisplay-Regular',
+  },
+  cvBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#FFD900',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  cvBtnText: {
+    color: '#1F2937',
+    fontSize: 14,
+    fontFamily: 'InterDisplay-SemiBold',
+    flex: 1,
   },
 });
 

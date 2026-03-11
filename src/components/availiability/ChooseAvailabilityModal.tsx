@@ -21,6 +21,7 @@ type AvailabilityPost = {
   type: string;
   rate: { amount: number; unit: string };
   location: string[];
+  schedule?: { start: string; end: string };
 };
 
 type ChooseAvailabilityModalProps = {

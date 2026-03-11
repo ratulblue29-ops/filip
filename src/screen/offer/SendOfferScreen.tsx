@@ -38,6 +38,7 @@ type SelectedPost = {
   location: string[];
   rate: { amount: number; unit: string };
   type: string;
+  schedule?: { start: string; end: string };
 };
 
 // ─── Helpers ──────────────────────────────────────────────
@@ -81,14 +82,46 @@ const SendOfferScreen = () => {
   const [workDateText, setWorkDateText] = useState(formatDate(new Date()));
 
   // Seasonal: start date
-  const [startDate, setStartDate] = useState(new Date());
+  // const [startDate, setStartDate] = useState(new Date());
+  // const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  // const [startDateText, setStartDateText] = useState(formatDate(new Date()));
+
+  const [startDate, setStartDate] = useState<Date>(() =>
+    selectedPost.schedule?.start
+      ? new Date(selectedPost.schedule.start)
+      : new Date(),
+  );
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [startDateText, setStartDateText] = useState(formatDate(new Date()));
+  const [startDateText, setStartDateText] = useState<string>(() =>
+    formatDate(
+      selectedPost.schedule?.start
+        ? new Date(selectedPost.schedule.start)
+        : new Date(),
+    ),
+  );
 
   // Seasonal: end date
-  const [endDate, setEndDate] = useState(new Date());
+  // const defaultEndDate = new Date();
+  // defaultEndDate.setMonth(defaultEndDate.getMonth() + 1);
+
+  // const [endDate, setEndDate] = useState(defaultEndDate);
+  // const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  // const [endDateText, setEndDateText] = useState(formatDate(defaultEndDate));
+
+  const [endDate, setEndDate] = useState<Date>(() => {
+    if (selectedPost.schedule?.end) return new Date(selectedPost.schedule.end);
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    return d;
+  });
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [endDateText, setEndDateText] = useState(formatDate(new Date()));
+  const [endDateText, setEndDateText] = useState<string>(() => {
+    if (selectedPost.schedule?.end)
+      return formatDate(new Date(selectedPost.schedule.end));
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    return formatDate(d);
+  });
 
   // Daily: start time
   const [startTime, setStartTime] = useState(new Date());

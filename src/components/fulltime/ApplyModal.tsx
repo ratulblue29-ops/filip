@@ -20,8 +20,10 @@ import {
 import { pick, types } from '@react-native-documents/picker';
 import Toast from 'react-native-toast-message';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigation } from '@react-navigation/native';
 import { applyToFullTimeJob } from '../../services/applyToJob';
 import { fetchUserCvUrl, uploadCv } from '../../services/cv';
+import { fetchCurrentUser } from '../../services/user';
 import { StyleSheet } from 'react-native';
 
 type Props = {
@@ -45,7 +47,16 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
     queryFn: fetchUserCvUrl,
     enabled: visible,
   });
+  const { data: currentUser, isLoading: userLoading } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: fetchCurrentUser,
+    enabled: visible,
+  });
+  const membershipTier = currentUser?.membership?.tier ?? 'free';
+  const isPremium = membershipTier === 'premium';
   const queryClient = useQueryClient();
+
+  const navigation = useNavigation<any>();
 
   // Pick a new PDF from device and upload it, replacing existing CV
   const handlePickNewCv = async () => {
@@ -130,132 +141,170 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            {/* Message */}
-            <Text style={styles.label}>Short Message / Introduction</Text>
-            <View style={styles.inputWithIcon}>
-              <MessageSquare
-                size={18}
-                color="#9CA3AF"
-                style={{ marginTop: 10, marginLeft: 5 }}
+            {/* Premium gate — non-premium users see upgrade prompt, not the form */}
+            {userLoading ? (
+              <ActivityIndicator
+                color="#FFD900"
+                style={{ marginVertical: 40 }}
               />
-              <TextInput
-                style={styles.textArea}
-                value={message}
-                onChangeText={setMessage}
-                placeholder="Tell the employer about yourself..."
-                placeholderTextColor="#9CA3AF"
-                multiline
-                maxLength={300}
-              />
-            </View>
-
-            {/* Phone */}
-            <Text style={styles.label}>Phone Number</Text>
-            <View style={styles.inputWithIcon}>
-              <Phone
-                size={18}
-                color="#9CA3AF"
-                style={{ marginTop: 10, marginLeft: 5 }}
-              />
-              <TextInput
-                style={styles.input}
-                value={phone}
-                onChangeText={setPhone}
-                placeholder="+1 234 567 890"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="phone-pad"
-              />
-            </View>
-
-            {/* Email */}
-            <Text style={styles.label}>Email Address</Text>
-            <View style={styles.inputWithIcon}>
-              <Mail
-                size={18}
-                color="#9CA3AF"
-                style={{ marginTop: 10, marginLeft: 5 }}
-              />
-              <TextInput
-                style={styles.input}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="you@example.com"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-
-            {/* CV / Resume */}
-            <Text style={styles.label}>CV / Resume (optional)</Text>
-
-            {/* Show selected CV filename if one is attached this session */}
-            {cvUrl && (
-              <View style={styles.cvAttached}>
-                <CheckCircle size={16} color="#22C55E" />
-                <Text style={styles.cvAttachedText} numberOfLines={1}>
-                  {cvFileName ?? 'CV attached'}
+            ) : !isPremium ? (
+              <View style={styles.upgradeBox}>
+                <Text style={styles.upgradeTitle}>Premium Required</Text>
+                <Text style={styles.upgradeText}>
+                  Only Premium members can apply for full-time jobs. Upgrade
+                  your plan to unlock applications.
                 </Text>
-              </View>
-            )}
-
-            <View style={styles.cvRow}>
-              {/* Use existing — only shown if a saved CV exists in profile */}
-              {savedCvUrl && (
                 <TouchableOpacity
-                  style={[
-                    styles.cvBtn,
-                    cvUrl === savedCvUrl && styles.cvBtnActive,
-                  ]}
-                  onPress={handleUseExisting}
+                  style={styles.upgradePremiumBtn}
+                  onPress={() => {
+                    onClose();
+                    navigation.navigate('membership');
+                  }}
                   activeOpacity={0.8}
                 >
-                  <FileText
-                    size={16}
-                    color={cvUrl === savedCvUrl ? '#FFD900' : '#fff'}
-                  />
-                  <Text
-                    style={[
-                      styles.cvBtnText,
-                      cvUrl === savedCvUrl && { color: '#FFD900' },
-                    ]}
-                  >
-                    Use Existing
+                  <Text style={styles.upgradePremiumBtnText}>
+                    Upgrade to Premium
                   </Text>
                 </TouchableOpacity>
-              )}
 
-              {/* Upload new — always visible */}
-              <TouchableOpacity
-                style={styles.cvBtn}
-                onPress={handlePickNewCv}
-                disabled={cvUploading}
-                activeOpacity={0.8}
-              >
-                {cvUploading ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <>
-                    <Upload size={16} color="#fff" />
-                    <Text style={styles.cvBtnText}>Upload New</Text>
-                  </>
+                {/* <TouchableOpacity
+                  style={styles.upgradeBtn}
+                  onPress={onClose}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.upgradeBtnText}>Close</Text>
+                </TouchableOpacity> */}
+              </View>
+            ) : (
+              <>
+                {/* Message */}
+                <Text style={styles.label}>Short Message / Introduction</Text>
+                <View style={styles.inputWithIcon}>
+                  <MessageSquare
+                    size={18}
+                    color="#9CA3AF"
+                    style={{ marginTop: 10, marginLeft: 5 }}
+                  />
+                  <TextInput
+                    style={styles.textArea}
+                    value={message}
+                    onChangeText={setMessage}
+                    placeholder="Tell the employer about yourself..."
+                    placeholderTextColor="#9CA3AF"
+                    multiline
+                    maxLength={300}
+                  />
+                </View>
+
+                {/* Phone */}
+                <Text style={styles.label}>Phone Number</Text>
+                <View style={styles.inputWithIcon}>
+                  <Phone
+                    size={18}
+                    color="#9CA3AF"
+                    style={{ marginTop: 10, marginLeft: 5 }}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    value={phone}
+                    onChangeText={setPhone}
+                    placeholder="+1 234 567 890"
+                    placeholderTextColor="#9CA3AF"
+                    keyboardType="phone-pad"
+                  />
+                </View>
+
+                {/* Email */}
+                <Text style={styles.label}>Email Address</Text>
+                <View style={styles.inputWithIcon}>
+                  <Mail
+                    size={18}
+                    color="#9CA3AF"
+                    style={{ marginTop: 10, marginLeft: 5 }}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="you@example.com"
+                    placeholderTextColor="#9CA3AF"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+
+                {/* CV / Resume */}
+                <Text style={styles.label}>CV / Resume (optional)</Text>
+
+                {/* Show selected CV filename if one is attached this session */}
+                {cvUrl && (
+                  <View style={styles.cvAttached}>
+                    <CheckCircle size={16} color="#22C55E" />
+                    <Text style={styles.cvAttachedText} numberOfLines={1}>
+                      {cvFileName ?? 'CV attached'}
+                    </Text>
+                  </View>
                 )}
-              </TouchableOpacity>
-            </View>
 
-            {/* Submit */}
-            <TouchableOpacity
-              style={styles.submitBtn}
-              onPress={handleSubmit}
-              disabled={loading}
-              activeOpacity={0.8}
-            >
-              {loading ? (
-                <ActivityIndicator color="#1F2937" />
-              ) : (
-                <Text style={styles.submitText}>Submit Application</Text>
-              )}
-            </TouchableOpacity>
+                <View style={styles.cvRow}>
+                  {/* Use existing — only shown if a saved CV exists in profile */}
+                  {savedCvUrl && (
+                    <TouchableOpacity
+                      style={[
+                        styles.cvBtn,
+                        cvUrl === savedCvUrl && styles.cvBtnActive,
+                      ]}
+                      onPress={handleUseExisting}
+                      activeOpacity={0.8}
+                    >
+                      <FileText
+                        size={16}
+                        color={cvUrl === savedCvUrl ? '#FFD900' : '#fff'}
+                      />
+                      <Text
+                        style={[
+                          styles.cvBtnText,
+                          cvUrl === savedCvUrl && { color: '#FFD900' },
+                        ]}
+                      >
+                        Use Existing
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+
+                  {/* Upload new — always visible */}
+                  <TouchableOpacity
+                    style={styles.cvBtn}
+                    onPress={handlePickNewCv}
+                    disabled={cvUploading}
+                    activeOpacity={0.8}
+                  >
+                    {cvUploading ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <>
+                        <Upload size={16} color="#fff" />
+                        <Text style={styles.cvBtnText}>Upload New</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                </View>
+
+                {/* Submit */}
+                <TouchableOpacity
+                  style={styles.submitBtn}
+                  onPress={handleSubmit}
+                  disabled={loading}
+                  activeOpacity={0.8}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#1F2937" />
+                  ) : (
+                    <Text style={styles.submitText}>Submit Application</Text>
+                  )}
+                </TouchableOpacity>
+              </>
+            )}
           </ScrollView>
         </View>
       </View>
@@ -371,6 +420,50 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontFamily: 'InterDisplay-Medium',
+  },
+  upgradeBox: {
+    paddingVertical: 32,
+    alignItems: 'center',
+    gap: 12,
+  },
+  upgradeTitle: {
+    color: '#FFD900',
+    fontSize: 18,
+    fontFamily: 'InterDisplay-SemiBold',
+  },
+  upgradeText: {
+    color: '#9CA3AF',
+    fontSize: 14,
+    fontFamily: 'InterDisplay-Regular',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  upgradeBtn: {
+    marginTop: 8,
+    backgroundColor: '#1D1D1D',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderWidth: 0.5,
+    borderColor: 'rgba(249,250,251,0.1)',
+  },
+  upgradeBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'InterDisplay-Medium',
+  },
+  upgradePremiumBtn: {
+    backgroundColor: '#FFD900',
+    borderRadius: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    marginTop: 8,
+  },
+  upgradePremiumBtnText: {
+    color: '#1F2937',
+    fontSize: 15,
+    fontFamily: 'InterDisplay-SemiBold',
+    textAlign: 'center',
   },
 });
 

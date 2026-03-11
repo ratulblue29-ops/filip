@@ -100,6 +100,11 @@ export const applyToFullTimeJob = async (
   if (job.userId === user.uid) throw new Error('You cannot apply to your own job');
 
   const db = getDb();
+  const userSnap = await getDoc(doc(db, 'users', user.uid));
+  const membershipTier = userSnap.data()?.membership?.tier ?? 'free';
+  if (membershipTier !== 'premium') {
+    throw new Error('Only Premium members can apply for full-time jobs. Please upgrade.');
+  }
 
   const existingSnap = await getDocs(
     query(

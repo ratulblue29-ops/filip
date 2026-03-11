@@ -33,6 +33,7 @@ type Props = {
 };
 
 const ApplyModal = ({ visible, onClose, job }: Props) => {
+  const navigation = useNavigation<any>();
   const [message, setMessage] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -56,7 +57,7 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
   const isPremium = membershipTier === 'premium';
   const queryClient = useQueryClient();
 
-  const navigation = useNavigation<any>();
+  // const navigation = useNavigation<any>();
 
   // Pick a new PDF from device and upload it, replacing existing CV
   const handlePickNewCv = async () => {

@@ -24,24 +24,24 @@ const PostTypeModal: React.FC<PostTypeModalProps> = ({
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Post Availability</Text>
+          <Text style={styles.modalTitle}>Post Job & Availability</Text>
 
           <TouchableOpacity
             style={styles.modalOption}
             onPress={onSelectFullTime}
           >
-            <Text style={styles.modalOptionText}>Full Time</Text>
+            <Text style={styles.modalOptionText}>Full Time Job</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.modalOption}
             onPress={onSelectSeasonal}
           >
-            <Text style={styles.modalOptionText}>Seasonal</Text>
+            <Text style={styles.modalOptionText}>Seasonal Availability</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.modalOption} onPress={onSelectDaily}>
-            <Text style={styles.modalOptionText}>Daily Shift</Text>
+            <Text style={styles.modalOptionText}>Daily Shift Availability</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.modalCancel} onPress={onClose}>

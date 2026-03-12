@@ -18,7 +18,7 @@ import {
 import { navigationRef } from './src/utils/navigationRef';
 import { handleNotificationNavigation } from './src/utils/notificationNavigation';
 import { registerFCMToken } from './src/services/FCMnotification';
-import notifee, { AndroidImportance } from '@notifee/react-native';
+import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 
 // Ignore deprecated Firebase namespaced API warnings
 LogBox.ignoreLogs([
@@ -72,6 +72,15 @@ const App = () => {
     });
 
     return unsubscribe;
+  }, []);
+
+  // Notifee foreground notification tap → navigate to notification screen
+  useEffect(() => {
+    return notifee.onForegroundEvent(({ type }) => {
+      if (type === EventType.PRESS) {
+        navigationRef.current?.navigate('notification');
+      }
+    });
   }, []);
 
   // Background tap handler + quit state tap handler

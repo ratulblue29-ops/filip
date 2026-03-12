@@ -49,12 +49,12 @@ export const registerFCMToken = async () => {
     if (!token) return null;
 
     await setDoc(
-        doc(db, "users", user.uid),
+        doc(db, 'users', user.uid),
         {
-            fcmTokens: arrayUnion(token),
+            fcmTokens: [token],
             updatedAt: serverTimestamp(),
         },
-        { merge: true }
+        { merge: true },
     );
 
     return token;

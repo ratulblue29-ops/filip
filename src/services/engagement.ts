@@ -18,6 +18,7 @@ import { getApp } from '@react-native-firebase/app';
 import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 import { CREDIT_COSTS } from './credit';
 import { createEngagementChat } from './chat';
+import { sendPush } from './pushNotification';
 
 // Fetch active availability posts for a specific worker (employer calls this)
 export const fetchWorkerActivePosts = async (workerId: string) => {
@@ -124,6 +125,12 @@ export const createEngagement = async (
     availabilityPostId,
     postSnap.data()?.title ?? 'Job',
   );
+  sendPush({
+    toUserId: workerId,         // use whatever param name exists in that function
+    title: 'New Engagement Request',
+    body: 'Someone wants to engage with you',
+    type: 'ENGAGEMENT_CREATED',
+  });
 
   return engagementRef.id;
 };
@@ -191,6 +198,12 @@ export const updateEngagementStatus = async (
       });
     });
 
+    sendPush({
+      toUserId: fromUserId,
+      title: 'Engagement Accepted',
+      body: 'A worker has accepted your engagement request',
+      type: 'ENGAGEMENT_ACCEPTED',
+    });
     return;
   }
 
@@ -227,6 +240,12 @@ export const updateEngagementStatus = async (
     const functions = getFunctions(getApp(), 'us-central1');
     const declineEngagement = httpsCallable(functions, 'declineEngagement');
     await declineEngagement({ engagementId });
+    sendPush({
+      toUserId: fromUserId,
+      title: 'Engagement Declined',
+      body: 'A worker has declined your engagement request',
+      type: 'ENGAGEMENT_DECLINED',
+    });
     return;
   }
 
@@ -236,6 +255,13 @@ export const updateEngagementStatus = async (
     // Employer refunds themselves — client-side write to own doc is allowed by Firestore rules
     await refundCredit(engagementId, 'employer_withdrew', fromUserId, creditCostToRefund);
   }
+
+    sendPush({
+    toUserId: fromUserId,
+    title: 'Engagement Withdrawn',
+    body: 'An employer has withdrawn their engagement request',
+    type: 'ENGAGEMENT_WITHDRAWN',
+  });
 };
 
 // Fetch engagements received by current user (worker view)

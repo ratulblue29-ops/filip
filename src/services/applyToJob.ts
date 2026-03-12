@@ -15,6 +15,7 @@ import {
   serverTimestamp,
 } from '@react-native-firebase/firestore';
 import { OfferItem } from '../@types/jobApplication.type';
+import { sendPush } from './pushNotification';
 
 type FullTimeApplyPayload = {
   message: string;
@@ -86,6 +87,14 @@ export const applyToJob = async (
     });
   });
 
+  sendPush({
+    toUserId: job.userId,
+    title: 'New Job Application',
+    body: 'Someone applied for your job',
+    type: 'JOB_APPLY',
+    data: { jobId: job.id },
+  });
+
   return true;
 };
 
@@ -144,6 +153,14 @@ export const applyToFullTimeJob = async (
     });
   });
 
+  sendPush({
+    toUserId: job.userId,
+    title: 'New Job Application',
+    body: 'Someone applied for your job',
+    type: 'JOB_APPLY',
+    data: { jobId: job.id },
+  });
+
   return true;
 };
 
@@ -193,11 +210,13 @@ export const updateOfferStatus = async (
 
   const applicationRef = doc(db, 'jobApplications', applicationId);
 
+  let appData: any = null;
+
   await runTransaction(db, async transaction => {
     const appDoc = await transaction.get(applicationRef);
     if (!appDoc.exists()) return;
 
-    const appData = appDoc.data();
+    appData = appDoc.data();
     if (!appData) return;
 
     // Update status
@@ -224,6 +243,14 @@ export const updateOfferStatus = async (
       isRead: false,
       createdAt: serverTimestamp(),
     });
+  });
+  sendPush({
+    toUserId: appData?.jobOwnerId ?? '',
+    title: status === 'accepted' ? 'Offer Accepted' : 'Offer Rejected',
+    body: status === 'accepted'
+      ? 'Your applicant has accepted the offer'
+      : 'Your applicant has rejected the offer',
+    type: status === 'accepted' ? 'OFFER_ACCEPTED' : 'OFFER_REJECTED',
   });
 };
 

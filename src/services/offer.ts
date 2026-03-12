@@ -1,5 +1,6 @@
 import { getAuth } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { sendPush } from './pushNotification';
 
 // Send Offer
 export const sendOffer = async ({
@@ -56,6 +57,14 @@ export const sendOffer = async ({
       createdAt: firestore.FieldValue.serverTimestamp(),
     });
   });
+  sendPush({
+    toUserId: workerId,
+    title: 'New Job Offer',
+    body: 'You have received a new offer',
+    type: 'OFFER_SENT',
+    data: { jobId },
+  });
+
   return offerRef.id;
 };
 
@@ -68,11 +77,13 @@ export const acceptOffer = async (offerId: string) => {
   const offerRef = db.collection('offers').doc(offerId);
   const notifRef = db.collection('notifications').doc();
 
+  let offer: any = null;
+
   await db.runTransaction(async tx => {
     const snap = await tx.get(offerRef);
     if (!snap.exists) throw new Error('Offer not found');
 
-    const offer = snap.data();
+    offer = snap.data();
     if (!offer || offer.toUserId !== user.uid)
       throw new Error('Not authorized');
 
@@ -92,6 +103,15 @@ export const acceptOffer = async (offerId: string) => {
       createdAt: firestore.FieldValue.serverTimestamp(),
     });
   });
+
+  if (offer) {
+    sendPush({
+      toUserId: offer.fromUserId,
+      title: 'Offer Accepted',
+      body: 'Your applicant has accepted the offer',
+      type: 'OFFER_ACCEPTED',
+    });
+  }
 };
 
 // Decline Offer
@@ -103,11 +123,13 @@ export const declineOffer = async (offerId: string) => {
   const offerRef = db.collection('offers').doc(offerId);
   const notifRef = db.collection('notifications').doc();
 
+  let offer: any = null;
+
   await db.runTransaction(async tx => {
     const snap = await tx.get(offerRef);
     if (!snap.exists) throw new Error('Offer not found');
 
-    const offer = snap.data();
+    offer = snap.data();
     if (!offer || offer.toUserId !== user.uid)
       throw new Error('Not authorized');
 
@@ -127,6 +149,14 @@ export const declineOffer = async (offerId: string) => {
       createdAt: firestore.FieldValue.serverTimestamp(),
     });
   });
+  if (offer) {
+    sendPush({
+      toUserId: offer.fromUserId,
+      title: 'Offer Declined',
+      body: 'Your applicant has declined the offer',
+      type: 'OFFER_DECLINED',
+    });
+  }
 };
 
 // Fetch Received Offers

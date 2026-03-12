@@ -1,4 +1,5 @@
 const { onCall, onRequest } = require("firebase-functions/v2/https");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const Stripe = require("stripe");
 require("dotenv").config();
@@ -392,5 +393,64 @@ exports.declineEngagement = onCall(
     });
 
     return { success: true };
+  }
+);
+
+/**
+ * =====================================
+ * SEND PUSH NOTIFICATION (Callable)
+ * Called manually from app after writing notification doc.
+ * No Eventarc/IAM required — plain HTTPS callable.
+ * =====================================
+ */
+exports.sendPushNotification = onCall(
+  { region: "us-central1" },
+  async (request) => {
+    if (!request.auth) throw new Error("UNAUTHENTICATED");
+
+    const { toUserId, title, body, type, data } = request.data;
+    if (!toUserId || !title || !body) throw new Error("Missing required fields");
+
+    const userSnap = await admin
+      .firestore()
+      .collection("users")
+      .doc(toUserId)
+      .get();
+
+    const tokens = userSnap.data()?.fcmTokens ?? [];
+    if (tokens.length === 0) return { sent: false, reason: "no_tokens" };
+
+    const response = await admin.messaging().sendEachForMulticast({
+      tokens,
+      notification: { title, body },
+      // flat strings only in FCM data payload
+      data: {
+        type: type ?? "",
+        chatId: data?.chatId ?? "",
+        otherUserId: data?.otherUserId ?? "",
+      },
+      android: { priority: "high" },
+      apns: { payload: { aps: { sound: "default" } } },
+    });
+
+    // Prune stale tokens FCM rejected
+    const staleTokens = [];
+    response.responses.forEach((resp, idx) => {
+      if (
+        !resp.success &&
+        resp.error?.code ===
+          "messaging/registration-token-not-registered"
+      ) {
+        staleTokens.push(tokens[idx]);
+      }
+    });
+
+    if (staleTokens.length > 0) {
+      await admin.firestore().collection("users").doc(toUserId).update({
+        fcmTokens: admin.firestore.FieldValue.arrayRemove(...staleTokens),
+      });
+    }
+
+    return { sent: true, successCount: response.successCount };
   }
 );

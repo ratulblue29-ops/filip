@@ -55,6 +55,7 @@ const formatTime = (d: Date): string =>
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
+    timeZone: 'UTC',
   });
 
 // ─── Component ────────────────────────────────────────────
@@ -77,9 +78,22 @@ const SendOfferScreen = () => {
   // ── Form state ──
 
   // Daily: single work date
-  const [workDate, setWorkDate] = useState(new Date());
+  // const [workDate, setWorkDate] = useState(new Date());
+  // const [showDatePicker, setShowDatePicker] = useState(false);
+  // const [workDateText, setWorkDateText] = useState(formatDate(new Date()));
+  const [workDate, setWorkDate] = useState<Date>(() =>
+    selectedPost.schedule?.start
+      ? new Date(selectedPost.schedule.start)
+      : new Date(),
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [workDateText, setWorkDateText] = useState(formatDate(new Date()));
+  const [workDateText, setWorkDateText] = useState<string>(() =>
+    formatDate(
+      selectedPost.schedule?.start
+        ? new Date(selectedPost.schedule.start)
+        : new Date(),
+    ),
+  );
 
   // Seasonal: start date
   // const [startDate, setStartDate] = useState(new Date());
@@ -124,14 +138,40 @@ const SendOfferScreen = () => {
   });
 
   // Daily: start time
-  const [startTime, setStartTime] = useState(new Date());
+  // const [startTime, setStartTime] = useState(new Date());
+  // const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  // const [startTimeText, setStartTimeText] = useState(formatTime(new Date()));
+  const [startTime, setStartTime] = useState<Date>(() =>
+    selectedPost.schedule?.start
+      ? new Date(selectedPost.schedule.start)
+      : new Date(),
+  );
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-  const [startTimeText, setStartTimeText] = useState(formatTime(new Date()));
+  const [startTimeText, setStartTimeText] = useState<string>(() =>
+    formatTime(
+      selectedPost.schedule?.start
+        ? new Date(selectedPost.schedule.start)
+        : new Date(),
+    ),
+  );
 
   // Daily: end time
-  const [endTime, setEndTime] = useState(new Date());
+  // const [endTime, setEndTime] = useState(new Date());
+  // const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+  // const [endTimeText, setEndTimeText] = useState(formatTime(new Date()));
+  const [endTime, setEndTime] = useState<Date>(() =>
+    selectedPost.schedule?.end
+      ? new Date(selectedPost.schedule.end)
+      : new Date(),
+  );
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
-  const [endTimeText, setEndTimeText] = useState(formatTime(new Date()));
+  const [endTimeText, setEndTimeText] = useState<string>(() =>
+    formatTime(
+      selectedPost.schedule?.end
+        ? new Date(selectedPost.schedule.end)
+        : new Date(),
+    ),
+  );
 
   // Seasonal: hours per day
   const [hoursPerDay, setHoursPerDay] = useState('');
@@ -277,7 +317,7 @@ const SendOfferScreen = () => {
                 />
               )}
 
-              <Text style={styles.label}>Work Hours</Text>
+              {/* <Text style={styles.label}>Work Hours</Text>
               <View style={styles.rowBetween}>
                 <TouchableOpacity
                   style={[styles.inputWithIcon, { flex: 1 }]}
@@ -307,6 +347,75 @@ const SendOfferScreen = () => {
                   />
                 </TouchableOpacity>
               </View>
+              {showStartTimePicker && (
+                <DateTimePicker
+                  value={startTime}
+                  mode="time"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(_, selected) => {
+                    setShowStartTimePicker(false);
+                    if (selected) {
+                      setStartTime(selected);
+                      setStartTimeText(formatTime(selected));
+                    }
+                  }}
+                />
+              )}
+              {showEndTimePicker && (
+                <DateTimePicker
+                  value={endTime}
+                  mode="time"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(_, selected) => {
+                    setShowEndTimePicker(false);
+                    if (selected) {
+                      setEndTime(selected);
+                      setEndTimeText(formatTime(selected));
+                    }
+                  }}
+                />
+              )} */}
+              {/* <Text style={styles.label}>Work Hours</Text> */}
+              <View style={styles.rowBetween}>
+                {/* Start Time */}
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.subLabel}>Start Time</Text>
+                  <TouchableOpacity
+                    style={styles.inputWithIcon}
+                    onPress={() => setShowStartTimePicker(true)}
+                    activeOpacity={0.8}
+                  >
+                    <Clock size={18} color="#9CA3AF" />
+                    <TextInput
+                      style={styles.flexInput}
+                      value={startTimeText}
+                      onChangeText={setStartTimeText}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={styles.arrowText}> </Text>
+
+                {/* End Time */}
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.subLabel}>End Time</Text>
+                  <TouchableOpacity
+                    style={styles.inputWithIcon}
+                    onPress={() => setShowEndTimePicker(true)}
+                    activeOpacity={0.8}
+                  >
+                    <Clock size={18} color="#9CA3AF" />
+                    <TextInput
+                      style={styles.flexInput}
+                      value={endTimeText}
+                      onChangeText={setEndTimeText}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
               {showStartTimePicker && (
                 <DateTimePicker
                   value={startTime}

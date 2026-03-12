@@ -166,6 +166,13 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingVertical: 14,
   },
+  subLabel: {
+    color: '#fff',
+    marginTop: 32,
+    marginBottom: 8,
+    fontSize: 14,
+    fontFamily: 'InterDisplay-Medium',
+  },
 });
 
 export default styles;

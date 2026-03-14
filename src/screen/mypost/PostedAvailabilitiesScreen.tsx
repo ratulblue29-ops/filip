@@ -26,11 +26,13 @@ import PostTypeModal from '../../components/availiability/PostTypeModal';
 import { Mypost } from '../../@types/Mypost.type';
 import NotificationDot from '../../components/feed/NotificationDot';
 import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
+import AvailabilityDetailModal from '../../components/mypost/AvailabilityDetailModal';
 
 const PostedAvailabilitiesScreen = () => {
   const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'past'>('all');
   const [showPostTypeModal, setShowPostTypeModal] = useState<boolean>(false);
+  const [selectedJob, setSelectedJob] = useState<Mypost | null>(null);
   // notification get for dot
   const { hasUnread } = useUnreadNotifications();
   // Queries
@@ -124,7 +126,11 @@ const PostedAvailabilitiesScreen = () => {
           </View>
         ) : (
           filteredAvailabilities.map((item: Mypost) => (
-            <TouchableOpacity key={item.id} style={styles.availabilityCard}>
+            <TouchableOpacity
+              key={item.id}
+              style={styles.availabilityCard}
+              onPress={() => setSelectedJob(item)}
+            >
               <View style={styles.cardHeader}>
                 <View style={styles.iconCircle}>
                   {item?.type === 'fulltime' ? (
@@ -188,6 +194,11 @@ const PostedAvailabilitiesScreen = () => {
           setShowPostTypeModal(false);
           navigation.navigate('DailyAvailabilityCreation');
         }}
+      />
+      <AvailabilityDetailModal
+        job={selectedJob}
+        visible={!!selectedJob}
+        onClose={() => setSelectedJob(null)}
       />
     </SafeAreaView>
   );

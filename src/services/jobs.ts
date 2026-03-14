@@ -10,6 +10,7 @@ import {
   orderBy,
   getDocs,
   getDoc,
+  updateDoc,
   startAfter,
   limit,
 } from '@react-native-firebase/firestore';
@@ -626,4 +627,25 @@ export const fetchDailyJobs = async () => {
   return active;
 
   // return results;
+};
+
+// ─── Fetch single job by Firestore doc ID ────────────────────────────────────
+export const fetchJobById = async (id: string): Promise<Record<string, any>> => {
+  const db = getFirestore();
+  const snap = await getDoc(doc(db, 'jobs', id));
+  if (!snap.exists()) throw new Error('Job not found');
+  return { id: snap.id, ...snap.data() };
+};
+
+// ─── Partial update for any job type ────────────────────────────────────────
+// Caller builds the payload — this layer only handles persistence + timestamp
+export const updateJob = async (
+  id: string,
+  payload: Record<string, any>,
+): Promise<void> => {
+  const db = getFirestore();
+  await updateDoc(doc(db, 'jobs', id), {
+    ...payload,
+    updatedAt: serverTimestamp(),
+  });
 };

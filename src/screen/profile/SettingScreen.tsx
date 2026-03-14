@@ -34,12 +34,12 @@ const SettingScreen = () => {
   });
 
   const menuItems = [
-    {
-      id: '1',
-      label: 'Personal Information',
-      icon: User,
-      onPress: () => {},
-    },
+    // {
+    //   id: '1',
+    //   label: 'Personal Information',
+    //   icon: User,
+    //   onPress: () => {},
+    // },
     {
       id: '2',
       label: 'Credit',

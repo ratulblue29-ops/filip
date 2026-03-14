@@ -14,6 +14,7 @@ export interface JobCardProps {
       photo?: string;
     };
     isApplied?: boolean;
+    isWishlisted?: boolean;
   };
   onBookmark: () => void;
 }

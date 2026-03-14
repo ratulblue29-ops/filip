@@ -76,7 +76,12 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
           </View>
         </View>
         <TouchableOpacity onPress={onBookmark}>
-          <Bookmark width={24} height={24} color="white" />
+          <Bookmark
+            width={24}
+            height={24}
+            color={job.isWishlisted ? '#FFD900' : 'white'}
+            fill={job.isWishlisted ? '#FFD900' : 'transparent'}
+          />
         </TouchableOpacity>
       </View>
 

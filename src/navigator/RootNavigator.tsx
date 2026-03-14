@@ -32,6 +32,7 @@ import MainProfile from '../screen/profile/MainProfile';
 import ViewProfileScreen from '../screen/profile/ViewProfileScreen';
 import DailyAvailabilityCreation from '../screen/DailyAvailabilityCreation/DailyAvailabilityCreation';
 import JobApplicationsScreen from '../screen/fulltime/JobApplicationsScreen';
+import SavedJobsScreen from '../screen/savedJobs/SavedJobsScreen';
 
 type SelectedPost = {
   id: string;
@@ -72,6 +73,7 @@ export type RootStackParamList = {
   role: undefined;
   DailyAvailabilityCreation: undefined;
   JobApplications: { jobId: string };
+  savedJobs: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -180,6 +182,7 @@ const RootNavigator: React.FC = () => {
         name="JobApplications"
         component={withPrivate(JobApplicationsScreen)}
       />
+      <Stack.Screen name="savedJobs" component={withPrivate(SavedJobsScreen)} />
     </Stack.Navigator>
   );
 };

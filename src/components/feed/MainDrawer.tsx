@@ -17,6 +17,7 @@ import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import styles from '../../screen/feed/style';
 import { useNavigation } from '@react-navigation/native';
+import { useQueryClient } from '@tanstack/react-query';
 import UsersAddIcon from '../svg/UsersAddIcon';
 import UpgradeIcon from '../svg/UpgradeIcon';
 
@@ -31,6 +32,7 @@ const MainDrawer = () => {
   const [showBanner, setShowBanner] = useState(true);
   const [showResumeModal, setShowResumeModal] = useState(false);
   const [userData, setUserData] = useState<any>(null);
+  const queryClient = useQueryClient();
 
   const app = getApp();
   const authInstance = getAuth(app);
@@ -93,7 +95,7 @@ const MainDrawer = () => {
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>142</Text>
-            <Text style={styles.statLabel}>Gigs Done</Text>
+            <Text style={styles.statLabel}>Jobs Done</Text>
           </View>
 
           <View style={styles.statCard}>
@@ -110,7 +112,7 @@ const MainDrawer = () => {
         <View style={styles.drawerSection}>
           <Text style={styles.sectionHeader}>Dashboard</Text>
 
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+          {/* <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
             <View style={styles.menuLeft}>
               <View style={styles.iconCircle}>
                 <BriefcaseBusiness width={22} height={20} color="#FFF" />
@@ -118,14 +120,18 @@ const MainDrawer = () => {
               <Text style={styles.menuText}>My Gigs</Text>
             </View>
             <ChevronRight width={20} height={20} color="#9CA3AF" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('savedJobs')}
+          >
             <View style={styles.menuLeft}>
               <View style={styles.iconCircle}>
                 <Bookmark width={20} height={18} color="#FFF" />
               </View>
-              <Text style={styles.menuText}>Saved Jobs</Text>
+              <Text style={styles.menuText}>Saved Posts</Text>
             </View>
             <ChevronRight width={20} height={20} color="#9CA3AF" />
           </TouchableOpacity>
@@ -272,6 +278,7 @@ const MainDrawer = () => {
                 // email login user — no Google session to clear, safe to ignore
               }
               await signOut(authInstance); // Firebase sign out
+              queryClient.clear();
               navigation.replace('Login');
             }}
           >

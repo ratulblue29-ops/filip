@@ -11,7 +11,17 @@ import {
 } from 'react-native';
 import { Search, SlidersHorizontal } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
+import {
+  fetchWishlistIds,
+  addToWishlist,
+  removeFromWishlist,
+} from '../../services/wishlist';
 import { styles } from './style';
 import FilterItem from '../../components/FilterItem';
 import { JobCard } from '../../components/fulltime/JobCard';
@@ -62,6 +72,24 @@ const FulltimeScreen = () => {
     () => new Set(myOffers.map((o: any) => o.job.id)),
     [myOffers],
   );
+
+  const queryClient = useQueryClient();
+
+  const { data: wishlistIds = [] } = useQuery({
+    queryKey: ['wishlistIds'],
+    queryFn: fetchWishlistIds,
+  });
+
+  const wishlistSet = useMemo(() => new Set(wishlistIds), [wishlistIds]);
+
+  const { mutate: toggleWishlist } = useMutation({
+    mutationFn: (jobId: string) =>
+      wishlistSet.has(jobId) ? removeFromWishlist(jobId) : addToWishlist(jobId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wishlistIds'] });
+      queryClient.invalidateQueries({ queryKey: ['wishlistJobs'] });
+    },
+  });
 
   /* ---------------- FIX ESLINT WARNING ---------------- */
   const jobs = useMemo(() => {
@@ -139,11 +167,15 @@ const FulltimeScreen = () => {
   const renderJobItem: ListRenderItem<any> = useCallback(
     ({ item }) => (
       <JobCard
-        job={{ ...item, isApplied: appliedJobIds.has(item.id) }}
-        onBookmark={() => {}}
+        job={{
+          ...item,
+          isApplied: appliedJobIds.has(item.id),
+          isWishlisted: wishlistSet.has(item.id),
+        }}
+        onBookmark={() => toggleWishlist(item.id)}
       />
     ),
-    [appliedJobIds],
+    [appliedJobIds, wishlistSet, toggleWishlist],
   );
 
   // notification get for dot

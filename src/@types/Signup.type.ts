@@ -4,4 +4,5 @@ export interface SignUpData {
     password: string;
     city: string;
     acceptedTerms: boolean;
+    referralCode?: string;
 }

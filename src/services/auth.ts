@@ -14,6 +14,7 @@ import {
 } from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { SignUpData } from '../@types/Signup.type';
+import { registerReferral } from './referral';
 
 const auth = getAuth();
 const db = getFirestore();
@@ -91,11 +92,19 @@ export const signUpUser = async (data: SignUpData) => {
     updatedAt: serverTimestamp(),
   });
 
+  if (data.referralCode) {
+    await registerReferral(data.referralCode, {
+      uid: user.uid,
+      name: fullName,
+      photo: null,
+    });
+  }
+
   return user;
 };
 
 // google signup
-export const signInWithGoogle = async () => {
+export const signInWithGoogle = async (referralCode?: string) => {
   try {
     await GoogleSignin.hasPlayServices({
       showPlayServicesUpdateDialog: true,
@@ -158,6 +167,14 @@ export const signInWithGoogle = async () => {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+
+      if (referralCode) {
+        await registerReferral(referralCode, {
+          uid: user.uid,
+          name: finalName,
+          photo: finalPhoto,
+        });
+      }
     }
 
     // merge latest auth data on every login

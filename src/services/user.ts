@@ -62,6 +62,16 @@ export const updateUserProfile = async (payload: UpdateProfilePayload) => {
     data['profile.photo'] = payload.photo;
   }
 
+  // Auto-verify: all 4 required fields present — name, city, skills, photo
+  const hasName = !!payload.name?.trim();
+  const hasCity = !!payload.city?.trim();
+  const hasSkills = Array.isArray(payload.skills) && payload.skills.length > 0;
+  const hasPhoto = !!payload.photo && payload.photo.startsWith('https://');
+
+  if (hasName && hasCity && hasSkills && hasPhoto) {
+    data['profile.verified'] = true;
+  }
+
   await updateDoc(userRef, data);
 };
 

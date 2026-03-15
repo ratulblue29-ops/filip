@@ -30,6 +30,7 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [referralCode, setReferralCode] = useState('');
 
   const mutation = useMutation({
     mutationFn: signUpUser,
@@ -57,6 +58,7 @@ const SignUpScreen = () => {
       password,
       city,
       acceptedTerms,
+      referralCode: referralCode.trim() || undefined,
     });
   };
 
@@ -106,6 +108,17 @@ const SignUpScreen = () => {
             <MapPin size={24} color="#374151" />
           </View>
         </View>
+
+        {/* Referral Code (optional) */}
+        <Text style={styles.label}>Referral Code (Optional)</Text>
+        <TextInput
+          placeholder="Enter referral code"
+          placeholderTextColor="#9CA3AF"
+          style={styles.input}
+          autoCapitalize="characters"
+          value={referralCode}
+          onChangeText={setReferralCode}
+        />
 
         {/* Password */}
         <Text style={styles.label}>Password</Text>

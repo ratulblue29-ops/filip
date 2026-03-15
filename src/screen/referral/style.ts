@@ -1,265 +1,298 @@
+// src/screen/referral/style.ts
+
 import { StyleSheet } from 'react-native';
+
+const GOLD = '#FFD900';
+const GOLD_LIGHT = '#FBBF24';
+const BG = '#0F0F0F';
+const CARD_BG = '#1A1A1A';
+const CARD_ACTIVE_BG = '#2A2200';
+const WHITE = '#FFFFFF';
+const MUTED = '#A0A0A0';
+const WARM_WHITE = '#FFFBEB';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111',
+    backgroundColor: BG,
   },
+
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingHorizontal: '5%',
+    paddingBottom: '10%',
   },
+
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: '5%',
+  },
+
+  // ── Header ──────────────────────────────────────────────────
   headerTitle: {
-    color: 'white',
-    fontSize: 16,
+    color: WHITE,
+    fontSize: 20,
+    fontFamily: 'InterDisplay-SemiBold',
     textAlign: 'center',
-    marginTop: 10,
-    fontWeight: 500,
-    fontFamily: 'InterDisplayMedium',
+    marginTop: '6%',
+    marginBottom: '4%',
   },
+
   giftIconContainer: {
     alignItems: 'center',
-    marginVertical: 30,
+    marginBottom: '4%',
   },
+
   iconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 40,
-    backgroundColor: '#181711',
-    justifyContent: 'center',
+    backgroundColor: GOLD,
+    borderRadius: 50,
+    padding: '4%',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#374151',
+    justifyContent: 'center',
   },
+
+  // ── Hero ─────────────────────────────────────────────────────
   heroSection: {
     alignItems: 'center',
-    marginBottom: 25,
+    marginBottom: '6%',
   },
+
   title: {
-    color: 'white',
-    fontSize: 24,
-    fontFamily: 'InterDisplayBold',
-    fontWeight: 700,
-    lineHeight: 30,
-    marginBottom: 4,
+    color: WHITE,
+    fontSize: 26,
+    fontFamily: 'InterDisplay-Bold',
+    marginBottom: '2%',
   },
+
   subtitle: {
-    color: '#fff',
+    color: MUTED,
+    fontSize: 13,
+    fontFamily: 'InterDisplay-Regular',
     textAlign: 'center',
-    lineHeight: 16,
-    paddingHorizontal: 20,
-    marginBottom: 16,
-    fontWeight: 400,
-    fontFamily: 'InterDisplayMedium',
-    maxWidth: 280,
+    lineHeight: 20,
+    marginBottom: '4%',
   },
+
   infoBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#262216',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 24,
-    borderWidth: 0.5,
-    borderColor: '#4B5563',
+    backgroundColor: '#2A2000',
+    borderRadius: 20,
+    paddingVertical: '2%',
+    paddingHorizontal: '4%',
+    gap: 6,
   },
+
   infoText: {
-    color: '#FBBF24',
+    color: GOLD_LIGHT,
     fontSize: 12,
-    marginLeft: 6,
-    fontWeight: 400,
-    fontFamily: 'InterDisplayMedium',
+    fontFamily: 'InterDisplay-Medium',
   },
+
+  // ── Stats ────────────────────────────────────────────────────
   statsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 30,
+    gap: 12,
+    marginBottom: '6%',
   },
+
   statCard: {
-    flex: 0.48,
-    backgroundColor: '#000',
-    borderRadius: 16,
-    padding: 20,
+    flex: 1,
+    backgroundColor: CARD_BG,
+    borderRadius: 12,
+    paddingVertical: '5%',
     alignItems: 'center',
-    borderWidth: 0.5,
-    borderColor: '#FDE68A',
   },
+
   statCardActive: {
-    borderColor: '#FDE68A',
+    backgroundColor: CARD_ACTIVE_BG,
+    borderWidth: 1,
+    borderColor: '#3A3000',
   },
+
   statNumber: {
-    color: 'white',
-    fontSize: 32,
-    fontFamily: 'InterDisplayBold',
-    fontWeight: 700,
+    color: WHITE,
+    fontSize: 28,
+    fontFamily: 'InterDisplay-Bold',
   },
+
   statLabel: {
-    color: 'white',
-    fontSize: 14,
+    color: MUTED,
+    fontSize: 13,
+    fontFamily: 'InterDisplay-Regular',
     marginTop: 4,
-    fontWeight: 500,
-    fontFamily: 'InterDisplayMedium',
   },
+
+  // ── Code ─────────────────────────────────────────────────────
   sectionLabel: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 500,
-    fontFamily: 'InterDisplayMedium',
-    marginBottom: 20,
+    color: WHITE,
+    fontSize: 15,
+    fontFamily: 'InterDisplay-SemiBold',
+    marginBottom: '3%',
   },
+
   codeContainer: {
-    backgroundColor: '#1D1D1D',
-    borderRadius: 12,
-    padding: 16,
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 0.5,
-    borderColor: 'rgba(249, 250, 251, 0.10)',
+    backgroundColor: CARD_BG,
+    borderRadius: 12,
+    paddingVertical: '4%',
+    paddingHorizontal: '5%',
+    marginBottom: '4%',
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
   },
+
   codeText: {
-    color: '#9CA3AF',
-    fontSize: 20,
-    fontWeight: 500,
-    fontFamily: 'InterDisplayMedium',
+    color: GOLD,
+    fontSize: 18,
+    fontFamily: 'InterDisplay-Bold',
+    letterSpacing: 1.5,
   },
+
+  // ── Share Button ─────────────────────────────────────────────
   shareButton: {
-    backgroundColor: '#FFD900',
-    borderRadius: 12,
-    paddingVertical: 12,
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 25,
+    justifyContent: 'center',
+    backgroundColor: GOLD,
+    borderRadius: 12,
+    paddingVertical: '4%',
+    gap: 8,
+    marginBottom: '8%',
   },
+
   shareButtonText: {
-    color: '#1F2937',
-    fontSize: 16,
-    fontWeight: 500,
-    fontFamily: 'InterDisplayMedium',
-    marginLeft: 12,
+    color: '#000000',
+    fontSize: 15,
+    fontFamily: 'InterDisplay-SemiBold',
   },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#FFF',
-    marginHorizontal: 20,
-  },
-  dividerText: {
-    color: 'white',
-    marginHorizontal: 15,
-    fontSize: 14,
-    fontWeight: 500,
-    fontFamily: 'InterDisplayMedium',
-  },
-  emailInputWrapper: {
-    marginBottom: 32,
-  },
-  emailInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#141414',
-    borderRadius: 12,
-    paddingLeft: 15,
-    paddingRight: 6,
-    height: 56,
-    borderWidth: 0.5,
-    borderColor: '#FBBF24',
-  },
-  textInput: {
-    flex: 1,
-    color: 'white',
-    fontSize: 14,
-  },
-  sendButton: {
-    backgroundColor: 'white',
-    paddingHorizontal: 24,
-    height: 44,
-    borderRadius: 10,
-    justifyContent: 'center',
-  },
-  sendButtonText: {
-    fontWeight: 500,
-    fontFamily: 'InterDisplayMedium',
-    fontSize: 16,
-    color: '#1F2937',
-  },
+
+  // ── List ─────────────────────────────────────────────────────
   listHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    justifyContent: 'space-between',
+    marginBottom: '3%',
   },
+
   recentBadge: {
-    backgroundColor: 'white',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 15,
+    backgroundColor: '#2A2A2A',
+    borderRadius: 20,
+    paddingVertical: '1.5%',
+    paddingHorizontal: '4%',
   },
+
   recentBadgeText: {
-    color: '#1F2937',
+    color: MUTED,
     fontSize: 12,
-    fontFamily: 'InterDisplayRegular',
-    fontWeight: 400,
+    fontFamily: 'InterDisplay-Medium',
   },
+
   referralItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    backgroundColor: CARD_BG,
+    borderRadius: 12,
+    paddingVertical: '3%',
+    paddingHorizontal: '4%',
+    marginBottom: '3%',
   },
+
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 30,
+    width: '12%',
+    aspectRatio: 1,
+    borderRadius: 50,
+    marginRight: '3%',
   },
+
+  avatarFallback: {
+    backgroundColor: '#2A2A2A',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  avatarInitial: {
+    color: GOLD,
+    fontSize: 16,
+    fontFamily: 'InterDisplay-Bold',
+  },
+
   referralInfo: {
     flex: 1,
-    marginLeft: 15,
+    marginRight: '2%',
   },
+
   referralName: {
-    color: 'white',
-    fontSize: 16,
-    marginBottom: 8,
-    lineHeight: 22,
-    fontWeight: 500,
-    fontFamily: 'InterDisplayMedium',
+    color: WHITE,
+    fontSize: 14,
+    fontFamily: 'InterDisplay-SemiBold',
   },
+
   referralSubtext: {
-    color: '#fff',
+    color: MUTED,
     fontSize: 12,
-    fontFamily: 'InterDisplayRegular',
-    fontWeight: 400,
+    fontFamily: 'InterDisplay-Regular',
+    marginTop: 2,
   },
+
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
     borderRadius: 20,
-    borderWidth: 1,
+    paddingVertical: '1.5%',
+    paddingHorizontal: '3%',
+    gap: 4,
   },
+
   statusVerified: {
-    borderColor: '#4B5563',
-    backgroundColor: '#262216',
-    borderWidth: 0.5,
+    backgroundColor: '#2A2000',
   },
+
   statusPending: {
-    borderColor: '#4B5563',
-    borderWidth: 0.5,
-    backgroundColor: '#374151',
+    backgroundColor: '#222222',
   },
+
   statusText: {
-    fontSize: 11,
-    marginLeft: 5,
-    color: '#FFFBEB',
-    fontWeight: 500,
-    fontFamily: 'InterDisplayMedium',
+    fontSize: 12,
+    fontFamily: 'InterDisplay-Medium',
+  },
+
+  // ── Empty / Error ────────────────────────────────────────────
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: '10%',
+  },
+
+  emptyText: {
+    color: MUTED,
+    fontSize: 14,
+    fontFamily: 'InterDisplay-Regular',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+
+  errorText: {
+    color: MUTED,
+    fontSize: 14,
+    fontFamily: 'InterDisplay-Regular',
+    marginBottom: '4%',
+    textAlign: 'center',
+  },
+
+  retryButton: {
+    backgroundColor: GOLD,
+    borderRadius: 12,
+    paddingVertical: '3%',
+    paddingHorizontal: '8%',
+  },
+
+  retryText: {
+    color: '#000000',
+    fontSize: 14,
+    fontFamily: 'InterDisplay-SemiBold',
   },
 });
 

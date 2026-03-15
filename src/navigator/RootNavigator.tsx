@@ -33,6 +33,7 @@ import ViewProfileScreen from '../screen/profile/ViewProfileScreen';
 import DailyAvailabilityCreation from '../screen/DailyAvailabilityCreation/DailyAvailabilityCreation';
 import JobApplicationsScreen from '../screen/fulltime/JobApplicationsScreen';
 import SavedJobsScreen from '../screen/savedJobs/SavedJobsScreen';
+import ForgotPasswordScreen from '../screen/forgotPassword/ForgotPasswordScreen';
 
 type SelectedPost = {
   id: string;
@@ -46,6 +47,7 @@ export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
   signup: undefined;
+  ForgotPassword: undefined;
   BottomTabs: undefined;
   membership: undefined;
   purchase: undefined;
@@ -116,6 +118,7 @@ const RootNavigator: React.FC = () => {
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="signup" component={SignUpScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
 
       <Stack.Screen name="BottomTabs" component={withPrivate(BottomTabs)} />
       <Stack.Screen

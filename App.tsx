@@ -42,6 +42,7 @@ const App = () => {
     GoogleSignin.configure({
       webClientId:
         '842815751322-fgg618jn2o3uldffnhaabi6k2se3kedm.apps.googleusercontent.com',
+      iosClientId: '842815751322-js7cpvgv36j81mkvh47rjln48hdo3gre.apps.googleusercontent.com',
       offlineAccess: true,
     });
   }, []);

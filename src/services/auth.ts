@@ -15,6 +15,7 @@ import {
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { SignUpData } from '../@types/Signup.type';
 import { registerReferral } from './referral';
+import { Platform } from 'react-native';
 
 // const auth = getAuth();
 // const db = getFirestore();
@@ -110,9 +111,12 @@ export const signInWithGoogle = async (referralCode?: string) => {
   const auth = getAuth();
   const db = getFirestore();
   try {
-    await GoogleSignin.hasPlayServices({
-      showPlayServicesUpdateDialog: true,
-    });
+    // hasPlayServices is Android-only — throws on iOS without this guard
+    if (Platform.OS === 'android') {
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+    }
 
     await GoogleSignin.signIn();
 

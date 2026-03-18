@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#111',
     paddingHorizontal: 20,
+    paddingTop: 30,
   },
 
   header: {
@@ -291,7 +292,7 @@ viewAvatar: {
   borderWidth: 3,
   borderColor: '#111',
   marginTop: '-10%',
-  marginLeft: 16,
+  marginLeft: 10,
 },
 viewName: {
   color: '#fff',

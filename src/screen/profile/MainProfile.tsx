@@ -192,14 +192,14 @@ const MainProfile: React.FC = () => {
 
           <View style={styles.container}>
             {/* Banner */}
-            <View style={styles.profileBanner}>
+            {/* <View style={styles.profileBanner}>
               {bannerImage ? (
                 <Image
                   source={{ uri: bannerImage }}
                   style={{ width: '100%', height: '100%' }}
                 />
               ) : null}
-            </View>
+            </View> */}
 
             {/* Avatar */}
             <Image

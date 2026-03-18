@@ -30,12 +30,11 @@ import { ChatMessage } from '../../@types/Chat.type';
 import { getFirestore } from '@react-native-firebase/firestore';
 import { useQuery } from '@tanstack/react-query';
 
-const db = getFirestore();
-
 const ChatDetailScreen = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { chatId } = route.params;
+  const db = getFirestore();
 
   const currentUserId = getAuth().currentUser?.uid || '';
 

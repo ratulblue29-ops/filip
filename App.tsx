@@ -8,7 +8,7 @@ import { LogBox } from 'react-native';
 
 import { StripeProvider } from '@stripe/stripe-react-native';
 
-import { getApp } from '@react-native-firebase/app';
+// import { getApp } from '@react-native-firebase/app';
 import {
   getMessaging,
   onMessage,
@@ -51,8 +51,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const app = getApp();
-    const messaging = getMessaging(app);
+    // const app = getApp();
+    // const messaging = getMessaging(app);
+    const messaging = getMessaging();
 
     const unsubscribe = onMessage(messaging, async remoteMessage => {
       console.log('Foreground Notification:', remoteMessage);
@@ -85,8 +86,9 @@ const App = () => {
 
   // Background tap handler + quit state tap handler
   useEffect(() => {
-    const app = getApp();
-    const messaging = getMessaging(app);
+    // const app = getApp();
+    // const messaging = getMessaging(app);
+    const messaging = getMessaging();
 
     // App was in background when notification was tapped
     const unsubscribeBackground = onNotificationOpenedApp(

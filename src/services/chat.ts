@@ -22,8 +22,7 @@ import {
 
 import { Chat, ChatMessage, JobAttachment } from '../@types/Chat.type';
 
-const app = getApp();
-const db = getFirestore(app);
+const getDb = () => getFirestore();
 
 /* ================= CHAT ID ================= */
 
@@ -36,15 +35,13 @@ export const checkChatAccess = async (
   otherUserId: string,
   membershipTier: string,
 ): Promise<boolean> => {
-  // Premium users always have access
   if (membershipTier === 'premium') return true;
 
-  const auth = getAuth(app);
+  const auth = getAuth();
   const currentUser = auth.currentUser;
   if (!currentUser) return false;
 
-  // Check for accepted engagement between currentUser (employer) and otherUser (worker)
-  const db = getFirestore(app);
+  const db = getDb();
   const [asEmployer, asWorker] = await Promise.all([
     getDocs(query(
       collection(db, 'engagements'),
@@ -68,7 +65,8 @@ export const createOrGetChat = async (
   otherUserId: string,
   jobContext?: JobAttachment,
 ): Promise<string> => {
-  const auth = getAuth(app);
+  const auth = getAuth();
+  const db = getDb();
   const currentUser = auth.currentUser;
 
   if (!currentUser) throw new Error('Not authenticated');
@@ -121,7 +119,8 @@ export const sendMessage = async (
   type: 'text' | 'job_attachment' | 'system' = 'text',
   metadata?: unknown,
 ): Promise<void> => {
-  const auth = getAuth(app);
+  const auth = getAuth();
+  const db = getDb();
   const currentUser = auth.currentUser;
   if (!currentUser) throw new Error('Not authenticated');
 
@@ -167,6 +166,7 @@ export const subscribeToMessages = (
   chatId: string,
   onMessagesUpdate: (messages: ChatMessage[]) => void,
 ): Unsubscribe => {
+  const db = getDb();
   const messagesRef = collection(db, 'chats', chatId, 'messages');
   const q = query(messagesRef, orderBy('createdAt', 'asc'));
 
@@ -194,7 +194,8 @@ export const subscribeToMessages = (
 export const subscribeToChats = (
   onChatsUpdate: (chats: Chat[]) => void,
 ): Unsubscribe => {
-  const auth = getAuth(app);
+  const auth = getAuth();
+  const db = getDb();
   const currentUser = auth.currentUser;
   if (!currentUser) throw new Error('Not authenticated');
 
@@ -228,7 +229,8 @@ export const subscribeToChats = (
 /* ================= MARK AS READ ================= */
 
 export const markAsRead = async (chatId: string): Promise<void> => {
-  const auth = getAuth(app);
+  const auth = getAuth();
+  const db = getDb();
   const currentUser = auth.currentUser;
   if (!currentUser) throw new Error('Not authenticated');
 
@@ -258,7 +260,8 @@ export const markAsRead = async (chatId: string): Promise<void> => {
 /* ================= GET OTHER USER INFO ================= */
 
 export const getOtherUserInfoFromChat = async (chatData: any) => {
-  const auth = getAuth(app);
+  const auth = getAuth();
+  const db = getDb();
   const currentUser = auth.currentUser;
   if (!currentUser) throw new Error('Not authenticated');
 
@@ -287,11 +290,12 @@ export const getOtherUserInfoFromChat = async (chatData: any) => {
 // jobName stored for display in ChatScreen list title
 export const createEngagementChat = async (
   engagementId: string,
-  fromUserId: string,    // employer
+  fromUserId: string,
   workerId: string,
   jobId: string,
   jobName: string,
 ): Promise<void> => {
+  const db = getDb();
   const chatRef = firestoreDoc(db, 'chats', engagementId);
   const chatSnap = await getDoc(chatRef);
 
@@ -330,8 +334,7 @@ export const createEngagementChat = async (
 export const getChatLockStatus = async (
   chatId: string,
 ): Promise<{ isLocked: boolean }> => {
-  const app = getApp();
-  const db = getFirestore(app);
+  const db = getDb();
 
   // chatId is the engagementId — fetch engagement directly
   const engSnap = await getDoc(firestoreDoc(db, 'engagements', chatId));

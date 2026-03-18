@@ -61,11 +61,14 @@ import {
 } from '@react-native-firebase/firestore';
 import { getAuth } from '@react-native-firebase/auth';
 
-const db = getFirestore();
-const auth = getAuth();
+// const db = getFirestore();
+// const auth = getAuth();
 
 export const addToWishlist = async (jobId: string) => {
-    const user = auth.currentUser;
+    const db = getFirestore();
+    const user = getAuth().currentUser;
+
+    // const user = auth.currentUser;
     if (!user) throw new Error('User not logged in');
 
     const wishlistDoc = doc(db, 'users', user.uid, 'wishlist', jobId);
@@ -78,7 +81,8 @@ export const addToWishlist = async (jobId: string) => {
 };
 
 export const removeFromWishlist = async (jobId: string) => {
-    const user = auth.currentUser;
+    const db = getFirestore();
+    const user = getAuth().currentUser;
     if (!user) throw new Error('User not logged in');
 
     const wishlistDoc = doc(db, 'users', user.uid, 'wishlist', jobId);
@@ -88,7 +92,8 @@ export const removeFromWishlist = async (jobId: string) => {
 };
 
 export const fetchWishlistIds = async (): Promise<string[]> => {
-    const user = auth.currentUser;
+    const db = getFirestore();
+    const user = getAuth().currentUser;
     if (!user) return [];
 
     const wishlistCol = collection(db, 'users', user.uid, 'wishlist');
@@ -98,7 +103,8 @@ export const fetchWishlistIds = async (): Promise<string[]> => {
 };
 
 export const fetchWishlistJobs = async (): Promise<any[]> => {
-    const user = auth.currentUser;
+    const db = getFirestore();
+    const user = getAuth().currentUser;
     if (!user) return [];
 
     const wishlistCol = collection(db, 'users', user.uid, 'wishlist');

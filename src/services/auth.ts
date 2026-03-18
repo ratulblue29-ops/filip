@@ -16,8 +16,8 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { SignUpData } from '../@types/Signup.type';
 import { registerReferral } from './referral';
 
-const auth = getAuth();
-const db = getFirestore();
+// const auth = getAuth();
+// const db = getFirestore();
 
 // helper for monthKey e.g. 2026-02
 const getMonthKey = () => {
@@ -29,6 +29,8 @@ const getMonthKey = () => {
 
 // email signup
 export const signUpUser = async (data: SignUpData) => {
+  const auth = getAuth();
+  const db = getFirestore();
   const { fullName, email, password, city, acceptedTerms } = data;
 
   if (!fullName || !email || !password || !city) {
@@ -105,6 +107,8 @@ export const signUpUser = async (data: SignUpData) => {
 
 // google signup
 export const signInWithGoogle = async (referralCode?: string) => {
+  const auth = getAuth();
+  const db = getFirestore();
   try {
     await GoogleSignin.hasPlayServices({
       showPlayServicesUpdateDialog: true,

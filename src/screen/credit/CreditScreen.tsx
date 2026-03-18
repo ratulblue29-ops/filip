@@ -244,10 +244,10 @@ const CreditsScreen = () => {
               <View style={styles.premiumPackInfo}>
                 <Text style={styles.premiumPackTitle}>Pro Pack</Text>
                 <Text style={styles.premiumPackCredits}>12 Credits</Text>
-              </View>
 
-              <View style={styles.saveBadge}>
-                <Text style={styles.saveBadgeText}>Save 20%</Text>
+                <View style={styles.saveBadge}>
+                  <Text style={styles.saveBadgeText}>Save 20%</Text>
+                </View>
               </View>
             </View>
 

@@ -260,6 +260,7 @@ const styles = StyleSheet.create({
   },
   premiumPackInfo: {
     flex: 1,
+    paddingTop: 10,
   },
   premiumPackTitle: {
     fontSize: 20,
@@ -274,12 +275,15 @@ const styles = StyleSheet.create({
     fontFamily: 'InterDisplayRegular',
   },
   saveBadge: {
-    marginTop: 40,
-    marginRight: 15,
+    top: 5,
+    marginRight: 10,
+    marginLeft: 55,
     backgroundColor: '#005a0f',
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 3,
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   saveBadgeText: {
     fontSize: 11,

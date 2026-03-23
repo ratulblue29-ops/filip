@@ -43,6 +43,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#1A1A1A',
     borderRadius: 8,
     paddingHorizontal: 12,
+    paddingVertical: 12,
   },
 
   filterScroll: {
@@ -129,7 +130,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusYellow: {
-    backgroundColor: '#FFD900',
+    backgroundColor: 'rgba(0,0,0,0.6)',
   },
   statusDark: {
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -253,32 +254,32 @@ export const styles = StyleSheet.create({
     fontWeight: 500,
   },
   tabRow: {
-  flexDirection: 'row',
-  gap: 10,
-  marginTop: 16,
-  marginBottom: 4,
-},
-chip: {
-  paddingHorizontal: 16,
-  paddingVertical: 8,
-  borderRadius: 20,
-  borderWidth: 1,
-  borderColor: '#2A2A2A',
-  backgroundColor: '#121212',
-},
-activeChip: {
-  backgroundColor: '#FFD900',
-  borderColor: '#FFD900',
-},
-chipText: {
-  color: '#FFF',
-  fontSize: 14,
-  fontFamily: 'InterDisplayMedium',
-},
-activeChipText: {
-  color: '#000',
-  fontSize: 14,
-  fontFamily: 'InterDisplayMedium',
-  fontWeight: '600',
-},
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 16,
+    marginBottom: 4,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+    backgroundColor: '#121212',
+  },
+  activeChip: {
+    backgroundColor: '#FFD900',
+    borderColor: '#FFD900',
+  },
+  chipText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontFamily: 'InterDisplayMedium',
+  },
+  activeChipText: {
+    color: '#000',
+    fontSize: 14,
+    fontFamily: 'InterDisplayMedium',
+    fontWeight: '600',
+  },
 });

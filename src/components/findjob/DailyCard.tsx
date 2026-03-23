@@ -38,6 +38,11 @@ const DailyCard = ({ item }: Props) => {
       ? item.location.join(', ')
       : item.user.city || 'N/A';
 
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const isToday = item.date === today;
+  const isSoon = item.date > today;
+
   return (
     <View style={styles.card}>
       {/* ── User row ── */}
@@ -53,10 +58,30 @@ const DailyCard = ({ item }: Props) => {
             <Text style={styles.locationText}>{locationText}</Text>
           </View>
         </View>
-        <View style={styles.rateChip}>
-          <Text style={styles.rateText}>
-            {item.currency} {item.rate.amount}/{item.rate.unit}
-          </Text>
+        <View>
+          <View style={{
+            alignSelf: 'flex-start',
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            paddingHorizontal: 10,
+            paddingVertical: 4,
+            borderRadius: 12,
+            marginBottom: 10,
+          }}>
+            <View style={{
+              width: 6, height: 6, borderRadius: 3, marginRight: 6,
+              backgroundColor: isToday ? '#4ADE80' : isSoon ? '#F59E0B' : '#6B7280',
+            }} />
+            <Text style={{ color: '#FFF', fontSize: 12, fontFamily: 'InterDisplayMedium' }}>
+              {isToday ? 'Available Today' : isSoon ? 'Starts Soon' : 'Ended'}
+            </Text>
+          </View>
+          <View style={styles.rateChip}>
+            <Text style={styles.rateText}>
+              {item.currency} {item.rate.amount}/{item.rate.unit}
+            </Text>
+          </View>
         </View>
       </View>
 

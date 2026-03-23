@@ -54,6 +54,12 @@ const CandidateCard = ({ candidate }: CandidateCardProps) => {
     });
   };
 
+  const now = new Date();
+  const start = candidate.dateRange?.start ? new Date(candidate.dateRange.start) : null;
+  const end = candidate.dateRange?.end ? new Date(candidate.dateRange.end) : null;
+  const isAvailableNow = start && end && now >= start && now <= end;
+  const isStartsSoon = start && start > now;
+
   return (
     <View style={styles.card}>
       <Image
@@ -64,19 +70,17 @@ const CandidateCard = ({ candidate }: CandidateCardProps) => {
       <View
         style={[
           styles.statusBadge,
-          candidate.status === 'Available'
-            ? styles.statusYellow
-            : styles.statusDark,
+          isAvailableNow ? styles.statusYellow : styles.statusDark
         ]}
       >
         <View
           style={[
             styles.dot,
-            { backgroundColor: candidate?.isAvailable ? '#4ADE80' : '#F59E0B' },
+            { backgroundColor: isAvailableNow ? '#4ADE80' : '#F59E0B' }
           ]}
         />
         <Text style={styles.statusText}>
-          {candidate?.isAvailable ? 'Available' : 'Starts Soon'}
+          {isAvailableNow ? 'Available Now' : isStartsSoon ? 'Starts Soon' : 'Ended'}
         </Text>
       </View>
 

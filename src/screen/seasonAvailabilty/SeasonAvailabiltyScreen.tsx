@@ -64,7 +64,7 @@ const SeasonAvailabilityScreen = () => {
 
   const locationOptions = useMemo(() => {
     if (!workers) return [];
-    const all = workers.map((w: any) => w.user?.city).filter(Boolean);
+    const all = workers.flatMap((w: any) => w.location ?? []).filter(Boolean);
     return [...new Set(all)] as string[];
   }, [workers]);
 
@@ -98,14 +98,25 @@ const SeasonAvailabilityScreen = () => {
     if (locationFilter) {
       result = result.filter(
         (w: any) =>
-          w.user?.city?.toLowerCase() === locationFilter.toLowerCase(),
+          w.location?.some(
+            (loc: string) => loc.toLowerCase() === locationFilter.toLowerCase(),
+          ),
       );
     }
 
     if (availabilityFilter === 'Available Now') {
-      result = result.filter((w: any) => w.isAvailable === true);
+      const now = new Date();
+      result = result.filter((w: any) => {
+        const start = w.dateRange?.start ? new Date(w.dateRange.start) : null;
+        const end = w.dateRange?.end ? new Date(w.dateRange.end) : null;
+        return start && end && now >= start && now <= end;
+      });
     } else if (availabilityFilter === 'Starts Soon') {
-      result = result.filter((w: any) => w.isAvailable === false);
+      const now = new Date();
+      result = result.filter((w: any) => {
+        const start = w.dateRange?.start ? new Date(w.dateRange.start) : null;
+        return start && start > now;
+      });
     }
 
     if (sortBy === 'Newest First') {

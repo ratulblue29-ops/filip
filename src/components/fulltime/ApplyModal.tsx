@@ -7,6 +7,7 @@ import {
   Modal,
   ScrollView,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import {
   X,
@@ -240,6 +241,25 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
             )}
 
             <View style={styles.cvRow}>
+              {cvUrl && (
+                <TouchableOpacity
+                  style={[
+                    styles.cvBtn,
+                    cvUrl === savedCvUrl && styles.cvBtnActive,
+                  ]}
+                  onPress={() => Linking.openURL(cvUrl)}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.cvBtnText,
+                      cvUrl === savedCvUrl && { color: '#FFD900' },
+                    ]}
+                  >
+                    Preview CV</Text>
+                </TouchableOpacity>
+              )}
+
               {/* Use existing — only shown if a saved CV exists in profile */}
               {savedCvUrl && (
                 <TouchableOpacity
@@ -391,14 +411,14 @@ const styles = StyleSheet.create({
   },
   cvRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 5,
   },
   cvBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: 2,
     backgroundColor: '#1D1D1D',
     borderRadius: 8,
     paddingVertical: 12,
@@ -457,6 +477,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'InterDisplay-SemiBold',
     textAlign: 'center',
+  },
+  viewCvLink: {
+    color: '#FFD900',
+    fontSize: 13,
+    fontFamily: 'InterDisplay-Regular',
+    textDecorationLine: 'underline',
   },
 });
 

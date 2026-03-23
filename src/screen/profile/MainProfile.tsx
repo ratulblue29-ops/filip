@@ -7,9 +7,10 @@ import {
   ScrollView,
   Image,
   Switch,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CameraIcon, MapPin, X } from 'lucide-react-native';
+import { CameraIcon, MapPin, X, ExternalLink, FileText, CheckCircle, Upload } from 'lucide-react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import styles from './mainProfileStyle';
@@ -30,6 +31,8 @@ import {
   getPendingSkills,
   clearPendingSkills,
 } from '../../store/pendingSkillsStore';
+import { fetchUserCvUrl } from '../../services/cv';
+import ResumeDocsModal from '../../components/modals/ResumeDocsModal';
 
 const MainProfile: React.FC = () => {
   const queryClient = useQueryClient();
@@ -59,6 +62,14 @@ const MainProfile: React.FC = () => {
     queryFn: () => fetchUserReviews(currentUid),
     enabled: !!currentUid,
   });
+
+  const { data: cvUrl } = useQuery({
+    queryKey: ['user-cv-url'],
+    queryFn: fetchUserCvUrl,
+    enabled: !!currentUid,
+  });
+
+  const [showResumeModal, setShowResumeModal] = useState(false);
 
   // useEffect(() => {
   //   if (!user) return;
@@ -269,6 +280,48 @@ const MainProfile: React.FC = () => {
               </Text>
             </View>
 
+            {/* CV Section */}
+            <View style={styles.viewSection}>
+              <Text style={styles.viewSectionLabel}>CV / Resume</Text>
+
+              {/* Status box — mirrors ResumeDocsModal statusBox */}
+              <View style={styles.cvStatusBox}>
+                <FileText size={20} color={cvUrl ? '#FFD900' : '#6B7280'} />
+                <Text style={styles.viewSectionValue}>
+                  {cvUrl ? 'CV on file — ready to use' : 'No CV uploaded yet'}
+                </Text>
+                {cvUrl && (
+                  <CheckCircle size={18} color="#22C55E" style={{ marginLeft: 'auto' }} />
+                )}
+              </View>
+
+              <View style={styles.CVactionBtn}>
+                {/* View CV — only when CV exists */}
+                {cvUrl && (
+                  <TouchableOpacity
+                    style={styles.cvViewBtn}
+                    onPress={() => Linking.openURL(cvUrl)}
+                    activeOpacity={0.8}
+                  >
+                    <ExternalLink size={18} color="#fff" />
+                    <Text style={styles.cvViewBtnText}>View CV</Text>
+                  </TouchableOpacity>
+                )}
+
+                {/* Upload / Replace */}
+                <TouchableOpacity
+                  style={styles.cvUploadBtn}
+                  onPress={() => setShowResumeModal(true)}
+                  activeOpacity={0.8}
+                >
+                  <Upload size={18} color="#1F2937" />
+                  <Text style={styles.cvUploadBtnText}>
+                    {cvUrl ? 'Replace CV' : 'Upload CV'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
             {/* Reviews */}
             <Text style={styles.label}>My Reviews</Text>
             {reviews.length === 0 ? (
@@ -298,6 +351,7 @@ const MainProfile: React.FC = () => {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        <ResumeDocsModal visible={showResumeModal} onClose={() => setShowResumeModal(false)} />
       </SafeAreaView>
     );
   }

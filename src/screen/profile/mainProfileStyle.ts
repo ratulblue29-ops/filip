@@ -398,6 +398,58 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontFamily: 'InterDisplay-Regular',
   },
+  cvStatusBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#111',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    borderWidth: 0.5,
+    borderColor: 'rgba(249, 250, 251, 0.10)',
+    marginTop: 6,
+    marginBottom: 12,
+  },
+  cvViewBtn: {
+    backgroundColor: '#111',
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    borderColor: 'rgba(249,250,251,0.10)',
+    flex: 1,
+  },
+  cvViewBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'InterDisplay-SemiBold',
+  },
+  cvUploadBtn: {
+    backgroundColor: '#FFD900',
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    borderColor: '#FFD900',
+    flex: 1,
+  },
+  cvUploadBtnText: {
+    color: '#1F2937',
+    fontSize: 16,
+    fontFamily: 'InterDisplay-SemiBold',
+  },
+  CVactionBtn: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+  }
 });
 
 export default styles;

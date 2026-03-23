@@ -6,8 +6,9 @@ import {
   Modal,
   ActivityIndicator,
   StyleSheet,
+  Linking,
 } from 'react-native';
-import { X, FileText, Upload, CheckCircle } from 'lucide-react-native';
+import { X, FileText, Upload, CheckCircle, ExternalLink } from 'lucide-react-native';
 import { pick, types } from '@react-native-documents/picker';
 import Toast from 'react-native-toast-message';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -86,8 +87,8 @@ const ResumeDocsModal = ({ visible, onClose }: Props) => {
               {isLoading
                 ? 'Checking...'
                 : cvUrl
-                ? 'CV on file — ready to use'
-                : 'No CV uploaded yet'}
+                  ? 'CV on file — ready to use'
+                  : 'No CV uploaded yet'}
             </Text>
             {cvUrl && !isLoading && (
               <CheckCircle
@@ -97,6 +98,17 @@ const ResumeDocsModal = ({ visible, onClose }: Props) => {
               />
             )}
           </View>
+
+          {cvUrl && !isLoading && (
+            <TouchableOpacity
+              style={styles.viewBtn}
+              onPress={() => Linking.openURL(cvUrl)}
+              activeOpacity={0.8}
+            >
+              <ExternalLink size={18} color="#fff" />
+              <Text style={styles.viewBtnText}>View CV</Text>
+            </TouchableOpacity>
+          )}
 
           {/* Upload button */}
           <TouchableOpacity
@@ -182,6 +194,23 @@ const styles = StyleSheet.create({
   },
   uploadBtnText: {
     color: '#1F2937',
+    fontSize: 16,
+    fontFamily: 'InterDisplay-SemiBold',
+  },
+  viewBtn: {
+    backgroundColor: '#1D1D1D',
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 12,
+    borderWidth: 0.5,
+    borderColor: 'rgba(249,250,251,0.10)',
+  },
+  viewBtnText: {
+    color: '#fff',
     fontSize: 16,
     fontFamily: 'InterDisplay-SemiBold',
   },

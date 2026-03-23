@@ -45,9 +45,15 @@ const Gig = ({ refreshing, onRefresh }: GigProps) => {
   const recommendedData = useMemo(() => {
     const all = data?.pages?.flatMap(page => page.jobs) ?? [];
     // Feed shows ONLY daily and seasonal — fulltime lives in its own tab
-    return all.filter(
-      (job: any) => job.type === 'daily' || job.type === 'seasonal',
-    );
+    // return all.filter(
+    //   (job: any) => job.type === 'daily' || job.type === 'seasonal',
+    // );
+    const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+    return all.filter((job: any) => {
+      if (job.type === 'seasonal') return true;
+      if (job.type === 'daily') return job.date >= today; // filter expired daily posts
+      return false;
+    });
   }, [data]);
 
   if (isPending || wishlistLoading) {

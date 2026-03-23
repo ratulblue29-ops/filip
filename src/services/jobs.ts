@@ -163,7 +163,7 @@ export const createJob = async ({
 
       const membershipExpiry =
         userData?.membership?.expiresAt &&
-        typeof userData.membership.expiresAt.toDate === 'function'
+          typeof userData.membership.expiresAt.toDate === 'function'
           ? userData.membership.expiresAt.toDate()
           : null;
 
@@ -394,13 +394,13 @@ export const fetchRecommendedJobsPaginated = async (
         ...jobData,
         user: userData
           ? {
-              id: userSnap.id,
-              name: userData.profile.name,
-              photo: userData.profile.photo,
-              verified: userData?.profile.verified,
-              email: userData.email,
-              membership: userData.membership,
-            }
+            id: userSnap.id,
+            name: userData.profile.name,
+            photo: userData.profile.photo,
+            verified: userData?.profile.verified,
+            email: userData.email,
+            membership: userData.membership,
+          }
           : null,
       };
     }),
@@ -565,11 +565,11 @@ export const searchJobs = async (searchText: string) => {
           ...job,
           user: userData
             ? {
-                id: userSnap.id,
-                name: userData.profile?.name,
-                photo: userData.profile?.photo,
-                verified: userData.profile?.verified,
-              }
+              id: userSnap.id,
+              name: userData.profile?.name,
+              photo: userData.profile?.photo,
+              verified: userData.profile?.verified,
+            }
             : null,
         };
       }),
@@ -584,8 +584,8 @@ export const fetchDailyJobs = async () => {
   const q = query(
     collection(db, 'jobs'),
     where('type', '==', 'daily'),
-    // where('visibility.priority', '==', 'active'),
-    // orderBy('createdAt', 'desc'),
+    where('visibility.priority', '==', 'active'),
+    orderBy('createdAt', 'desc'),
   );
 
   const snap = await getDocs(q);

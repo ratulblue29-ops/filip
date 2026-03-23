@@ -20,10 +20,10 @@ import {
 import { pick, types } from '@react-native-documents/picker';
 import Toast from 'react-native-toast-message';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigation } from '@react-navigation/native';
+// import { useNavigation } from '@react-navigation/native';
 import { applyToFullTimeJob } from '../../services/applyToJob';
 import { fetchUserCvUrl, uploadCv } from '../../services/cv';
-import { fetchCurrentUser } from '../../services/user';
+// import { fetchCurrentUser } from '../../services/user';
 import { StyleSheet } from 'react-native';
 
 type Props = {
@@ -33,7 +33,7 @@ type Props = {
 };
 
 const ApplyModal = ({ visible, onClose, job }: Props) => {
-  const navigation = useNavigation<any>();
+  // const navigation = useNavigation<any>();
   const [message, setMessage] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -48,13 +48,13 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
     queryFn: fetchUserCvUrl,
     enabled: visible,
   });
-  const { data: currentUser, isLoading: userLoading } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: fetchCurrentUser,
-    enabled: visible,
-  });
-  const membershipTier = currentUser?.membership?.tier ?? 'free';
-  const isPremium = membershipTier === 'premium';
+  // const { data: currentUser, isLoading: userLoading } = useQuery({
+  //   queryKey: ['currentUser'],
+  //   queryFn: fetchCurrentUser,
+  //   enabled: visible,
+  // });
+  // const membershipTier = currentUser?.membership?.tier ?? 'free';
+  // const isPremium = membershipTier === 'premium';
   const queryClient = useQueryClient();
 
   // const navigation = useNavigation<any>();
@@ -143,7 +143,7 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
 
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* Premium gate — non-premium users see upgrade prompt, not the form */}
-            {userLoading ? (
+            {/* {userLoading ? (
               <ActivityIndicator
                 color="#FFD900"
                 style={{ marginVertical: 40 }}
@@ -167,145 +167,137 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
                     Upgrade to Premium
                   </Text>
                 </TouchableOpacity>
-
-                {/* <TouchableOpacity
-                  style={styles.upgradeBtn}
-                  onPress={onClose}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.upgradeBtnText}>Close</Text>
-                </TouchableOpacity> */}
               </View>
             ) : (
-              <>
-                {/* Message */}
-                <Text style={styles.label}>Short Message / Introduction</Text>
-                <View style={styles.inputWithIcon}>
-                  <MessageSquare
-                    size={18}
-                    color="#9CA3AF"
-                    style={{ marginTop: 10, marginLeft: 5 }}
-                  />
-                  <TextInput
-                    style={styles.textArea}
-                    value={message}
-                    onChangeText={setMessage}
-                    placeholder="Tell the employer about yourself..."
-                    placeholderTextColor="#9CA3AF"
-                    multiline
-                    maxLength={300}
-                  />
-                </View>
+              <> */}
+            {/* Message */}
+            <Text style={styles.label}>Short Message / Introduction</Text>
+            <View style={styles.inputWithIcon}>
+              <MessageSquare
+                size={18}
+                color="#9CA3AF"
+                style={{ marginTop: 10, marginLeft: 5 }}
+              />
+              <TextInput
+                style={styles.textArea}
+                value={message}
+                onChangeText={setMessage}
+                placeholder="Tell the employer about yourself..."
+                placeholderTextColor="#9CA3AF"
+                multiline
+                maxLength={300}
+              />
+            </View>
 
-                {/* Phone */}
-                <Text style={styles.label}>Phone Number</Text>
-                <View style={styles.inputWithIcon}>
-                  <Phone
-                    size={18}
-                    color="#9CA3AF"
-                    style={{ marginTop: 10, marginLeft: 5 }}
-                  />
-                  <TextInput
-                    style={styles.input}
-                    value={phone}
-                    onChangeText={setPhone}
-                    placeholder="+1 234 567 890"
-                    placeholderTextColor="#9CA3AF"
-                    keyboardType="phone-pad"
-                  />
-                </View>
+            {/* Phone */}
+            <Text style={styles.label}>Phone Number</Text>
+            <View style={styles.inputWithIcon}>
+              <Phone
+                size={18}
+                color="#9CA3AF"
+                style={{ marginTop: 10, marginLeft: 5 }}
+              />
+              <TextInput
+                style={styles.input}
+                value={phone}
+                onChangeText={setPhone}
+                placeholder="+1 234 567 890"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="phone-pad"
+              />
+            </View>
 
-                {/* Email */}
-                <Text style={styles.label}>Email Address</Text>
-                <View style={styles.inputWithIcon}>
-                  <Mail
-                    size={18}
-                    color="#9CA3AF"
-                    style={{ marginTop: 10, marginLeft: 5 }}
-                  />
-                  <TextInput
-                    style={styles.input}
-                    value={email}
-                    onChangeText={setEmail}
-                    placeholder="you@example.com"
-                    placeholderTextColor="#9CA3AF"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                  />
-                </View>
+            {/* Email */}
+            <Text style={styles.label}>Email Address</Text>
+            <View style={styles.inputWithIcon}>
+              <Mail
+                size={18}
+                color="#9CA3AF"
+                style={{ marginTop: 10, marginLeft: 5 }}
+              />
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="you@example.com"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
 
-                {/* CV / Resume */}
-                <Text style={styles.label}>CV / Resume (optional)</Text>
+            {/* CV / Resume */}
+            <Text style={styles.label}>CV / Resume (optional)</Text>
 
-                {/* Show selected CV filename if one is attached this session */}
-                {cvUrl && (
-                  <View style={styles.cvAttached}>
-                    <CheckCircle size={16} color="#22C55E" />
-                    <Text style={styles.cvAttachedText} numberOfLines={1}>
-                      {cvFileName ?? 'CV attached'}
-                    </Text>
-                  </View>
-                )}
+            {/* Show selected CV filename if one is attached this session */}
+            {cvUrl && (
+              <View style={styles.cvAttached}>
+                <CheckCircle size={16} color="#22C55E" />
+                <Text style={styles.cvAttachedText} numberOfLines={1}>
+                  {cvFileName ?? 'CV attached'}
+                </Text>
+              </View>
+            )}
 
-                <View style={styles.cvRow}>
-                  {/* Use existing — only shown if a saved CV exists in profile */}
-                  {savedCvUrl && (
-                    <TouchableOpacity
-                      style={[
-                        styles.cvBtn,
-                        cvUrl === savedCvUrl && styles.cvBtnActive,
-                      ]}
-                      onPress={handleUseExisting}
-                      activeOpacity={0.8}
-                    >
-                      <FileText
-                        size={16}
-                        color={cvUrl === savedCvUrl ? '#FFD900' : '#fff'}
-                      />
-                      <Text
-                        style={[
-                          styles.cvBtnText,
-                          cvUrl === savedCvUrl && { color: '#FFD900' },
-                        ]}
-                      >
-                        Use Existing
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-
-                  {/* Upload new — always visible */}
-                  <TouchableOpacity
-                    style={styles.cvBtn}
-                    onPress={handlePickNewCv}
-                    disabled={cvUploading}
-                    activeOpacity={0.8}
-                  >
-                    {cvUploading ? (
-                      <ActivityIndicator size="small" color="#fff" />
-                    ) : (
-                      <>
-                        <Upload size={16} color="#fff" />
-                        <Text style={styles.cvBtnText}>Upload New</Text>
-                      </>
-                    )}
-                  </TouchableOpacity>
-                </View>
-
-                {/* Submit */}
+            <View style={styles.cvRow}>
+              {/* Use existing — only shown if a saved CV exists in profile */}
+              {savedCvUrl && (
                 <TouchableOpacity
-                  style={styles.submitBtn}
-                  onPress={handleSubmit}
-                  disabled={loading}
+                  style={[
+                    styles.cvBtn,
+                    cvUrl === savedCvUrl && styles.cvBtnActive,
+                  ]}
+                  onPress={handleUseExisting}
                   activeOpacity={0.8}
                 >
-                  {loading ? (
-                    <ActivityIndicator color="#1F2937" />
-                  ) : (
-                    <Text style={styles.submitText}>Submit Application</Text>
-                  )}
+                  <FileText
+                    size={16}
+                    color={cvUrl === savedCvUrl ? '#FFD900' : '#fff'}
+                  />
+                  <Text
+                    style={[
+                      styles.cvBtnText,
+                      cvUrl === savedCvUrl && { color: '#FFD900' },
+                    ]}
+                  >
+                    Use Existing
+                  </Text>
                 </TouchableOpacity>
-              </>
-            )}
+              )}
+
+              {/* Upload new — always visible */}
+              <TouchableOpacity
+                style={styles.cvBtn}
+                onPress={handlePickNewCv}
+                disabled={cvUploading}
+                activeOpacity={0.8}
+              >
+                {cvUploading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <>
+                    <Upload size={16} color="#fff" />
+                    <Text style={styles.cvBtnText}>Upload New</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {/* Submit */}
+            <TouchableOpacity
+              style={styles.submitBtn}
+              onPress={handleSubmit}
+              disabled={loading}
+              activeOpacity={0.8}
+            >
+              {loading ? (
+                <ActivityIndicator color="#1F2937" />
+              ) : (
+                <Text style={styles.submitText}>Submit Application</Text>
+              )}
+            </TouchableOpacity>
+            {/* </>
+            )} */}
           </ScrollView>
         </View>
       </View>

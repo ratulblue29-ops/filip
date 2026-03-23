@@ -67,7 +67,7 @@ export type RootStackParamList = {
   SendOffer: { workerId: string; selectedPost: SelectedPost };
   referral: undefined;
   profile: undefined;
-  viewProfile: undefined;
+  viewProfile: { userId: string };
   postAvailabilites: undefined;
   SeosonalAvailabilityCreation: undefined;
   FullTimeAvailabilityCreation: undefined;

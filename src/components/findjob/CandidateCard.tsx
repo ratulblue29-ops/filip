@@ -84,7 +84,10 @@ const CandidateCard = ({ candidate }: CandidateCardProps) => {
         </Text>
       </View>
 
-      <View style={styles.profileRow}>
+      <TouchableOpacity
+        style={styles.profileRow}
+        onPress={() => navigation.navigate('viewProfile', { userId: candidate.user.id })}
+      >
         <Image
           source={{
             uri:
@@ -100,7 +103,7 @@ const CandidateCard = ({ candidate }: CandidateCardProps) => {
             <Text style={styles.locationText}>{candidate?.user?.city}</Text>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.cardContent}>
         <View style={styles.tagContainer}>

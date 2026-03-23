@@ -47,42 +47,47 @@ const DailyCard = ({ item }: Props) => {
     <View style={styles.card}>
       {/* ── User row ── */}
       <View style={styles.userRow}>
-        <Image
-          source={{ uri: item.user.photo || DEFAULT_AVATAR }}
-          style={styles.avatar}
-        />
-        <View style={styles.userInfo}>
-          <Text style={styles.userName}>{item.user.name}</Text>
-          <View style={styles.locationRow}>
-            <MapPin size={12} color="#9CA3AF" />
-            <Text style={styles.locationText}>{locationText}</Text>
+        <TouchableOpacity
+          style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+          onPress={() => navigation.navigate('viewProfile', { userId: item.user.id })}
+        >
+          <Image
+            source={{ uri: item.user.photo || DEFAULT_AVATAR }}
+            style={styles.avatar}
+          />
+          <View style={styles.userInfo}>
+            <Text style={styles.userName}>{item.user.name}</Text>
+            <View style={styles.locationRow}>
+              <MapPin size={12} color="#9CA3AF" />
+              <Text style={styles.locationText}>{locationText}</Text>
+            </View>
           </View>
-        </View>
-        <View>
-          <View style={{
-            alignSelf: 'flex-start',
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0,0,0,0.6)',
-            paddingHorizontal: 10,
-            paddingVertical: 4,
-            borderRadius: 12,
-            marginBottom: 10,
-          }}>
+          <View>
             <View style={{
-              width: 6, height: 6, borderRadius: 3, marginRight: 6,
-              backgroundColor: isToday ? '#4ADE80' : isSoon ? '#F59E0B' : '#6B7280',
-            }} />
-            <Text style={{ color: '#FFF', fontSize: 12, fontFamily: 'InterDisplayMedium' }}>
-              {isToday ? 'Available Today' : isSoon ? 'Starts Soon' : 'Ended'}
-            </Text>
+              alignSelf: 'flex-start',
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0,0,0,0.6)',
+              paddingHorizontal: 10,
+              paddingVertical: 4,
+              borderRadius: 12,
+              marginBottom: 10,
+            }}>
+              <View style={{
+                width: 6, height: 6, borderRadius: 3, marginRight: 6,
+                backgroundColor: isToday ? '#4ADE80' : isSoon ? '#F59E0B' : '#6B7280',
+              }} />
+              <Text style={{ color: '#FFF', fontSize: 12, fontFamily: 'InterDisplayMedium' }}>
+                {isToday ? 'Available Today' : isSoon ? 'Starts Soon' : 'Ended'}
+              </Text>
+            </View>
+            <View style={styles.rateChip}>
+              <Text style={styles.rateText}>
+                {item.currency} {item.rate.amount}/{item.rate.unit}
+              </Text>
+            </View>
           </View>
-          <View style={styles.rateChip}>
-            <Text style={styles.rateText}>
-              {item.currency} {item.rate.amount}/{item.rate.unit}
-            </Text>
-          </View>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* ── Info row ── */}

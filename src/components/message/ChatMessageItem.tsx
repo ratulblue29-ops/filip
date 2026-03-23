@@ -83,18 +83,18 @@ const OfferCard = ({
   const badgeColor = isAccepted
     ? '#4ADE80'
     : isDeclined
-    ? '#F87171'
-    : isWithdrawn
-    ? '#9CA3AF'
-    : '#FFD900';
+      ? '#F87171'
+      : isWithdrawn
+        ? '#9CA3AF'
+        : '#FFD900';
 
   const badgeLabel = isAccepted
     ? 'Accepted'
     : isDeclined
-    ? 'Declined'
-    : isWithdrawn
-    ? 'Withdrawn'
-    : 'Pending';
+      ? 'Declined'
+      : isWithdrawn
+        ? 'Withdrawn'
+        : 'Pending';
 
   return (
     <View style={cardStyles.card}>
@@ -116,21 +116,51 @@ const OfferCard = ({
       </View>
 
       {/* Details */}
-      <View style={cardStyles.row}>
+      {/* <View style={cardStyles.row}>
         <CalendarDays size={14} color="#9CA3AF" />
         <Text style={cardStyles.detail}>{offerCard.workDate}</Text>
-      </View>
+      </View> */}
 
-      <View style={cardStyles.row}>
+      {/* <View style={cardStyles.row}>
         <Clock size={14} color="#9CA3AF" />
         <Text style={cardStyles.detail}>
           {offerCard.startTime} – {offerCard.endTime}
         </Text>
-      </View>
+      </View> */}
+
+      {/* Daily: single date + time range */}
+      {offerCard.workDate ? (
+        <>
+          <View style={cardStyles.row}>
+            <CalendarDays size={14} color="#9CA3AF" />
+            <Text style={cardStyles.detail}>{offerCard.workDate}</Text>
+          </View>
+          <View style={cardStyles.row}>
+            <Clock size={14} color="#9CA3AF" />
+            <Text style={cardStyles.detail}>
+              {offerCard.startTime ?? '—'} – {offerCard.endTime ?? '—'}
+            </Text>
+          </View>
+        </>
+      ) : (
+        /* Seasonal: date range + hours per day */
+        <>
+          <View style={cardStyles.row}>
+            <CalendarDays size={14} color="#9CA3AF" />
+            <Text style={cardStyles.detail}>
+              {offerCard.startDate ?? '—'} → {offerCard.endDate ?? '—'}
+            </Text>
+          </View>
+          <View style={cardStyles.row}>
+            <Clock size={14} color="#9CA3AF" />
+            <Text style={cardStyles.detail}>{offerCard.hoursPerDay ?? '—'}</Text>
+          </View>
+        </>
+      )}
 
       <View style={cardStyles.row}>
         <Banknote size={14} color="#9CA3AF" />
-        <Text style={cardStyles.detail}>{offerCard.wage}/hr</Text>
+        <Text style={cardStyles.detail}>{offerCard.wage}/{offerCard.rateType ?? '—'}</Text>
       </View>
 
       <View style={cardStyles.row}>

@@ -31,6 +31,14 @@
           }
         },
         {
+          "client_id": "842815751322-khednneajkoh3ofun3iq9laua7ipmfps.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.filip",
+            "certificate_hash": "4ad69ea3fd125a22706804371c2c4f406d737648"
+          }
+        },
+        {
           "client_id": "842815751322-kresu8jmn54hjnvt8nohr9pd67bvbd52.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -64,10 +72,10 @@
               "client_type": 3
             },
             {
-              "client_id": "842815751322-p6g85uidip9ivddfhph1f4tq0n75ttfe.apps.googleusercontent.com",
+              "client_id": "842815751322-js7cpvgv36j81mkvh47rjln48hdo3gre.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.filip"
+                "bundle_id": "org.reactjs.native.example.filip"
               }
             }
           ]

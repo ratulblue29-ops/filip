@@ -18,6 +18,10 @@ import SkillInput from '../../components/profile/SkillInput';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCurrentUser, updateUserProfile } from '../../services/user';
+import { fetchUserReviews } from '../../services/review';
+import ReviewCard from '../../components/profile/ReviewCard';
+import { timeAgo } from '../../helper/timeAgo';
+import { getAuth } from '@react-native-firebase/auth';
 import { uploadProfilePhoto } from '../../services/uploadPhoto';
 // import defaultProfile from '../../../assets/images/defaultProfile.png';
 // import { useNavigation } from '@react-navigation/native';
@@ -46,6 +50,14 @@ const MainProfile: React.FC = () => {
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: fetchCurrentUser,
+  });
+
+  const currentUid = getAuth().currentUser?.uid ?? '';
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['userReviews', currentUid],
+    queryFn: () => fetchUserReviews(currentUid),
+    enabled: !!currentUid,
   });
 
   // useEffect(() => {
@@ -256,6 +268,26 @@ const MainProfile: React.FC = () => {
                 {openToWork ? 'Open To Work' : 'Not Available'}
               </Text>
             </View>
+
+            {/* Reviews */}
+            <Text style={styles.label}>My Reviews</Text>
+            {reviews.length === 0 ? (
+              <Text style={{ color: '#555', marginTop: 12, fontFamily: 'InterDisplay-Regular' }}>
+                No reviews yet
+              </Text>
+            ) : (
+              reviews.map((review: any) => (
+                <ReviewCard
+                  key={review.id}
+                  name={review.fromUserName ?? 'Anonymous'}
+                  role={review.fromUserRole ?? ''}
+                  time={timeAgo(review.createdAt)}
+                  rating={String(review.rating)}
+                  text={review.text}
+                  photo={review.fromUserPhoto}
+                />
+              ))
+            )}
 
             {/* Edit Button */}
             <TouchableOpacity

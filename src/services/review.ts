@@ -157,7 +157,9 @@ export const submitReview = async (
       toUserId,
       rating,
       text,
-      isRevealed: false,
+      // isRevealed: false,
+      // status: rating <= 2 ? 'pending' : 'approved',
+      isRevealed: rating > 2,
       status: rating <= 2 ? 'pending' : 'approved',
       createdAt: serverTimestamp(),
     });
@@ -172,47 +174,47 @@ export const submitReview = async (
     console.log('[REVIEW] Step 2: OK');
   } catch (e) { throw new Error(`Step 2 updateDoc engagement failed: ${e}`); }
 
-  const engRef = doc(db, 'engagements', engagementId);
+  // const engRef = doc(db, 'engagements', engagementId);
 
-  try {
-    console.log('[REVIEW] Step 3: getDoc engagement');
-    const engSnap = await getDoc(engRef);
-    const engData = engSnap.data();
-    console.log('[REVIEW] Step 3: OK', engData);
+  // try {
+  //   console.log('[REVIEW] Step 3: getDoc engagement');
+  //   const engSnap = await getDoc(engRef);
+  //   const engData = engSnap.data();
+  //   console.log('[REVIEW] Step 3: OK', engData);
 
-    const bothReviewed =
-      (role === 'employer' && engData?.reviewedByWorker) ||
-      (role === 'worker' && engData?.reviewedByEmployer);
+  //   // const bothReviewed =
+  //   //   (role === 'employer' && engData?.reviewedByWorker) ||
+  //   //   (role === 'worker' && engData?.reviewedByEmployer);
 
-    console.log('[REVIEW] bothReviewed:', bothReviewed);
+  //   // console.log('[REVIEW] bothReviewed:', bothReviewed);
 
-    if (bothReviewed) {
-      try {
-        console.log('[REVIEW] Step 4: reveal queries');
-        const [asFromSnap, asToSnap] = await Promise.all([
-          getDocs(query(
-            collection(db, 'reviews'),
-            where('engagementId', '==', engagementId),
-            where('fromUserId', '==', user.uid),
-          )),
-          getDocs(query(
-            collection(db, 'reviews'),
-            where('engagementId', '==', engagementId),
-            where('toUserId', '==', user.uid),
-          )),
-        ]);
-        console.log('[REVIEW] Step 4: OK, docs:', asFromSnap.docs.length, asToSnap.docs.length);
+  //   // if (bothReviewed) {
+  //   //   try {
+  //   //     console.log('[REVIEW] Step 4: reveal queries');
+  //   //     const [asFromSnap, asToSnap] = await Promise.all([
+  //   //       getDocs(query(
+  //   //         collection(db, 'reviews'),
+  //   //         where('engagementId', '==', engagementId),
+  //   //         where('fromUserId', '==', user.uid),
+  //   //       )),
+  //   //       getDocs(query(
+  //   //         collection(db, 'reviews'),
+  //   //         where('engagementId', '==', engagementId),
+  //   //         where('toUserId', '==', user.uid),
+  //   //       )),
+  //   //     ]);
+  //   //     console.log('[REVIEW] Step 4: OK, docs:', asFromSnap.docs.length, asToSnap.docs.length);
 
-        const allDocs = [...asFromSnap.docs, ...asToSnap.docs];
-        const batch = allDocs
-          .filter((d: any) => d.data().status === 'approved')
-          .map((d: any) => updateDoc(doc(db, 'reviews', d.id), { isRevealed: true }));
+  //   //     const allDocs = [...asFromSnap.docs, ...asToSnap.docs];
+  //   //     const batch = allDocs
+  //   //       .filter((d: any) => d.data().status === 'approved')
+  //   //       .map((d: any) => updateDoc(doc(db, 'reviews', d.id), { isRevealed: true }));
 
-        await Promise.all(batch);
-        console.log('[REVIEW] Step 4 batch update: OK');
-      } catch (e) { throw new Error(`Step 4 reveal failed: ${e}`); }
-    }
-  } catch (e) { throw new Error(`Step 3 getDoc failed: ${e}`); }
+  //   //     await Promise.all(batch);
+  //   //     console.log('[REVIEW] Step 4 batch update: OK');
+  //   //   } catch (e) { throw new Error(`Step 4 reveal failed: ${e}`); }
+  //   // }
+  // } catch (e) { throw new Error(`Step 3 getDoc failed: ${e}`); }
 
   try {
     console.log('[REVIEW] Step 5: recalculate rating, rating=', rating);

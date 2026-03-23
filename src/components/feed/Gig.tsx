@@ -48,7 +48,9 @@ const Gig = ({ refreshing, onRefresh }: GigProps) => {
     // return all.filter(
     //   (job: any) => job.type === 'daily' || job.type === 'seasonal',
     // );
-    const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+    // const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     return all.filter((job: any) => {
       if (job.type === 'seasonal') return true;
       if (job.type === 'daily') return job.date >= today; // filter expired daily posts

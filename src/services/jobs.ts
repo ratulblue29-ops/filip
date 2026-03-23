@@ -584,8 +584,8 @@ export const fetchDailyJobs = async () => {
   const q = query(
     collection(db, 'jobs'),
     where('type', '==', 'daily'),
-    where('visibility.priority', '==', 'active'),
-    orderBy('createdAt', 'desc'),
+    // where('visibility.priority', '==', 'active'),
+    // orderBy('createdAt', 'desc'),
   );
 
   const snap = await getDocs(q);
@@ -611,6 +611,8 @@ export const fetchDailyJobs = async () => {
         location: jobData.location ?? [],
         rate: jobData.rate ?? { amount: 0, unit: 'hourly' },
         currency: jobData.currency ?? 'EUR',
+        createdAt: jobData.createdAt ?? null,
+        visibilityPriority: jobData.visibility?.priority ?? 'active',
         user: {
           id: jobData.userId,
           name: userData?.profile?.fullName || userData?.profile?.name || 'Unknown',
@@ -622,8 +624,21 @@ export const fetchDailyJobs = async () => {
     }),
   );
 
+  results.sort((a: any, b: any) => {
+    const aT = a.createdAt?.seconds ?? 0;
+    const bT = b.createdAt?.seconds ?? 0;
+    return bT - aT;
+  });
+
   // Filter expired posts in memory — avoids composite index requirement
-  const active = results.filter((job: { date: string }) => job.date >= new Date().toISOString().split('T')[0]);
+  // const active = results.filter((job: { date: string }) => job.date >= new Date().toISOString().split('T')[0]);
+  const now = new Date();
+  const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const active = results.filter((job: any) =>
+    job.date >= localToday &&
+    job.visibilityPriority !== 'consumed' &&
+    job.visibilityPriority !== 'withdrawn',
+  );
   return active;
 
   // return results;

@@ -92,7 +92,7 @@ const MainDrawer = () => {
           </View>
         </View>
 
-        <View style={styles.statsRow}>
+        {/* <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>142</Text>
             <Text style={styles.statLabel}>Jobs Done</Text>
@@ -107,7 +107,7 @@ const MainDrawer = () => {
             <Text style={styles.statValue}>26</Text>
             <Text style={styles.statLabel}>Repeats</Text>
           </View>
-        </View>
+        </View> */}
 
         <View style={styles.drawerSection}>
           <Text style={styles.sectionHeader}>Dashboard</Text>

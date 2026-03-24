@@ -65,55 +65,113 @@ export const fetchReferralData = async (): Promise<ReferralData> => {
   const snap = await getDocs(q);
 
   // Resolve each referral — parallel fetches then sequential credit awards
-  const referrals: ReferralItem[] = await Promise.all(
-    snap.docs.map(async (d: any) => {
-      const data = d.data();
+  // const referrals: ReferralItem[] = await Promise.all(
+  //   snap.docs.map(async (d: any) => {
+  //     const data = d.data();
 
-      const referredSnap = await getDoc(doc(db, 'users', data.referredId));
-      const isVerified = referredSnap.data()?.profile?.verified === true;
+  //     if (data.status === 'verified' && !data.creditAwarded) {
+  //       try {
+  //         await runTransaction(db, async tx => {
+  //           const referralRef = doc(db, 'referrals', d.id);
+  //           const referrerRef = doc(db, 'users', user.uid);
+  //           const [referralSnap, referrerSnap] = await Promise.all([
+  //             tx.get(referralRef),
+  //             tx.get(referrerRef),
+  //           ]);
+  //           if (referralSnap.data()?.creditAwarded) return;
+  //           const credits = referrerSnap.data()?.credits ?? { balance: 0, lifetimeEarned: 0 };
+  //           tx.update(referrerRef, {
+  //             'credits.balance': (credits.balance ?? 0) + 1,
+  //             'credits.lifetimeEarned': (credits.lifetimeEarned ?? 0) + 1,
+  //           });
+  //           tx.update(referralRef, { creditAwarded: true });
+  //         });
+  //       } catch (err) {
+  //         console.error('[fetchReferralData] credit award failed:', err);
+  //       }
+  //     }
 
-      // Lazy credit award — atomic transaction guards against double award
-      if (isVerified && !data.creditAwarded) {
-        try {
-          await runTransaction(db, async tx => {
-            const referralRef = doc(db, 'referrals', d.id);
-            const referrerRef = doc(db, 'users', user.uid);
+  //     // const referredSnap = await getDoc(doc(db, 'users', data.referredId));
+  //     // const isVerified = referredSnap.data()?.profile?.verified === true;
 
-            const [referralSnap, referrerSnap] = await Promise.all([
-              tx.get(referralRef),
-              tx.get(referrerRef),
-            ]);
+  //     // Lazy credit award — atomic transaction guards against double award
+  //     // if (isVerified && !data.creditAwarded) {
+  //     //   try {
+  //     //     await runTransaction(db, async tx => {
+  //     //       const referralRef = doc(db, 'referrals', d.id);
+  //     //       const referrerRef = doc(db, 'users', user.uid);
 
-            // Guard: already awarded in a concurrent session
-            if (referralSnap.data()?.creditAwarded) return;
+  //     //       const [referralSnap, referrerSnap] = await Promise.all([
+  //     //         tx.get(referralRef),
+  //     //         tx.get(referrerRef),
+  //     //       ]);
 
-            const credits = referrerSnap.data()?.credits ?? { balance: 0, lifetimeEarned: 0 };
+  //     //       // Guard: already awarded in a concurrent session
+  //     //       if (referralSnap.data()?.creditAwarded) return;
 
-            tx.update(referrerRef, {
-              'credits.balance': (credits.balance ?? 0) + 1,
-              'credits.lifetimeEarned': (credits.lifetimeEarned ?? 0) + 1,
-            });
-            tx.update(referralRef, {
-              creditAwarded: true,
-              status: 'verified',
-            });
+  //     //       const credits = referrerSnap.data()?.credits ?? { balance: 0, lifetimeEarned: 0 };
+
+  //     //       tx.update(referrerRef, {
+  //     //         'credits.balance': (credits.balance ?? 0) + 1,
+  //     //         'credits.lifetimeEarned': (credits.lifetimeEarned ?? 0) + 1,
+  //     //       });
+  //     //       tx.update(referralRef, {
+  //     //         creditAwarded: true,
+  //     //         status: 'verified',
+  //     //       });
+  //     //     });
+  //     //   } catch (err) {
+  //     //     // Non-fatal: credit award will retry on next fetch
+  //     //     console.error('[fetchReferralData] credit award failed:', err);
+  //     //   }
+  //     // }
+
+  //     return {
+  //       id: d.id,
+  //       referredId: data.referredId as string,
+  //       referredName: data.referredName ?? 'Unknown',
+  //       referredPhoto: data.referredPhoto ?? null,
+  //       // status: isVerified ? 'verified' : 'pending',
+  //       status: data.status as 'verified' | 'pending',
+  //       createdAt: data.createdAt,
+  //     } satisfies ReferralItem;
+  //   }),
+  // );
+  const referrals: ReferralItem[] = [];
+  for (const d of snap.docs) {
+    const data = d.data();
+
+    if (data.status === 'verified' && !data.creditAwarded) {
+      try {
+        await runTransaction(db, async tx => {
+          const referralRef = doc(db, 'referrals', d.id);
+          const referrerRef = doc(db, 'users', user.uid);
+          const [referralSnap, referrerSnap] = await Promise.all([
+            tx.get(referralRef),
+            tx.get(referrerRef),
+          ]);
+          if (referralSnap.data()?.creditAwarded) return;
+          const credits = referrerSnap.data()?.credits ?? { balance: 0, lifetimeEarned: 0 };
+          tx.update(referrerRef, {
+            'credits.balance': (credits.balance ?? 0) + 1,
+            'credits.lifetimeEarned': (credits.lifetimeEarned ?? 0) + 1,
           });
-        } catch (err) {
-          // Non-fatal: credit award will retry on next fetch
-          console.error('[fetchReferralData] credit award failed:', err);
-        }
+          tx.update(referralRef, { creditAwarded: true });
+        });
+      } catch (err) {
+        console.error('[fetchReferralData] credit award failed:', err);
       }
+    }
 
-      return {
-        id: d.id,
-        referredId: data.referredId as string,
-        referredName: data.referredName ?? 'Unknown',
-        referredPhoto: data.referredPhoto ?? null,
-        status: isVerified ? 'verified' : 'pending',
-        createdAt: data.createdAt,
-      } satisfies ReferralItem;
-    }),
-  );
+    referrals.push({
+      id: d.id,
+      referredId: data.referredId as string,
+      referredName: data.referredName ?? 'Unknown',
+      referredPhoto: data.referredPhoto ?? null,
+      status: data.status as 'verified' | 'pending',
+      createdAt: data.createdAt,
+    });
+  }
 
   return {
     referralCode,
@@ -152,7 +210,7 @@ export const registerReferral = async (
     referredId: newUser.uid,
     referredName: newUser.name,
     referredPhoto: newUser.photo,
-    status: 'pending',
+    status: 'verified',
     creditAwarded: false,
     createdAt: serverTimestamp(),
   });

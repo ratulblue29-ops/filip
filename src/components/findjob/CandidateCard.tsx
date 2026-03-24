@@ -63,7 +63,7 @@ const CandidateCard = ({ candidate }: CandidateCardProps) => {
   return (
     <View style={styles.card}>
       <Image
-        source={{ uri: candidate?.bannerImage || 'n/a' }}
+        source={candidate?.bannerImage ? { uri: candidate.bannerImage } : require('../../../assets/images/defaultProfile.png')}
         style={styles.candidateImage}
       />
 

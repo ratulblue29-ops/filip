@@ -69,9 +69,7 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
   return (
     <View key={item.id} style={styles.recCard}>
       <ImageBackground
-        source={{
-          uri: item?.bannerImage || 'n/a',
-        }}
+        source={item?.bannerImage ? { uri: item.bannerImage } : require('../../../assets/images/defaultProfile.png')}
         style={styles.cardImage}
       >
         <View style={styles.MainbadgeContainer}>
@@ -172,8 +170,8 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
               <Text style={styles.availValue}>
                 {item?.schedule?.start && item?.schedule?.end
                   ? `${formatDate(item.schedule.start)} - ${formatDate(
-                      item.schedule.end,
-                    )}`
+                    item.schedule.end,
+                  )}`
                   : 'Date not available'}
               </Text>
               {item.subAvailability && (

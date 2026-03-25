@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "842815751322-6vmu6u5ohafkr2b3fsqkd9f70l4vrctg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.filip",
+            "certificate_hash": "3943a88342136f8f7f8f2fdcee799912aa9a1f6a"
+          }
+        },
+        {
           "client_id": "842815751322-jf0hhgl50884vqgrsco27rm1pun7bqvd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

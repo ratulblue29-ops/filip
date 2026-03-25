@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#111',
-    paddingBottom: 60,
+    paddingBottom: 150,
     paddingHorizontal: 20,
   },
   header: {
@@ -46,10 +46,10 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    marginBottom: 16,
   },
   searchContainer: {
-    width: width * 0.78 - 12,
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1A1A1A',
@@ -57,6 +57,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: 'rgba(249, 250, 251, 0.10)',
+    height: 40,
   },
   filterBtnIcon: {
     backgroundColor: '#1D1D1D',
@@ -112,5 +113,70 @@ export const styles = StyleSheet.create({
     fontFamily: 'InterDisplayMedium',
     fontWeight: 500,
     lineHeight: 20,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  locationBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+  },
+  locationBtnDefault: {
+    backgroundColor: '#121212',
+  },
+  locationBtnActive: {
+    backgroundColor: '#FFD900',
+  },
+  locationBtnText: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  locationBtnTextActive: {
+    color: '#000',
+    fontWeight: '600',
+  },
+  resetBtn: {
+    padding: 6,
+    borderRadius: 24,
+    backgroundColor: '#1A1A1A',
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+  },
+  dropdown: {
+    position: 'absolute',
+    top: 44,
+    left: 0,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+    minWidth: 180,
+    zIndex: 20,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2A2A2A',
+  },
+  dropdownItemText: {
+    fontSize: 15,
+    color: '#FFF',
+  },
+  dropdownItemTextActive: {
+    fontSize: 15,
+    color: '#FFD900',
   },
 });

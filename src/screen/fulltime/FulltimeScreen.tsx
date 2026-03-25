@@ -9,7 +9,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
-import { Search, SlidersHorizontal } from 'lucide-react-native';
+import { Search, ChevronDown, X, Check } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   useInfiniteQuery,
@@ -31,24 +31,11 @@ import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
 import NotificationDot from '../../components/feed/NotificationDot';
 import { fetchMyOffers } from '../../services/applyToJob';
 
-// TYPES
-type Filter = {
-  id: string;
-  label: string;
-  active: boolean;
-};
-
-// FILTERS
-const INITIAL_FILTERS: Filter[] = [
-  { id: '1', label: 'All Jobs', active: true },
-  { id: '2', label: 'Kitchen', active: false },
-  { id: '3', label: 'Front House', active: false },
-  { id: '4', label: '$50k+', active: false },
-  { id: '5', label: 'Immediate Starts', active: false },
-];
-
 const FulltimeScreen = () => {
-  const [filters, setFilters] = useState<Filter[]>(INITIAL_FILTERS);
+  const [selectedLocation, setSelectedLocation] = useState('All');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState('All');
+  const [positionDropdownOpen, setPositionDropdownOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
 
   /* ---------------- PAGINATION FETCH JOBS ---------------- */
@@ -96,73 +83,55 @@ const FulltimeScreen = () => {
     return data?.pages?.flatMap(page => page.jobs) ?? [];
   }, [data]);
 
+  const locationFilters = useMemo(() => {
+    const locations = new Set<string>();
+    jobs.forEach((job: any) => {
+      if (Array.isArray(job.location)) {
+        job.location.forEach((loc: string) => {
+          if (loc?.trim()) locations.add(loc.trim());
+        });
+      }
+    });
+    return ['All', ...Array.from(locations)];
+  }, [jobs]);
+
+  const positionFilters = useMemo(() => {
+    const positions = new Set<string>();
+    jobs.forEach((job: any) => {
+      if (job.title?.trim()) positions.add(job.title.trim());
+    });
+    return ['All', ...Array.from(positions)];
+  }, [jobs]);
+
   // ACTIVE FILTER
-  const activeFilter = useMemo(
-    () => filters.find(f => f.active)?.label,
-    [filters],
-  );
-
-  // FILTER LOGIC
   const filteredJobs = useMemo(() => {
-    return jobs.filter(
-      (job: {
-        title: string;
-        description: string;
-        rate: { amount: number };
-        priority: string;
-      }) => {
-        const searchMatch =
-          job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-          job.description?.toLowerCase().includes(searchText.toLowerCase());
+    return jobs.filter((job: any) => {
+      const searchMatch =
+        job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+        job.description?.toLowerCase().includes(searchText.toLowerCase());
 
-        if (!searchMatch) return false;
+      if (!searchMatch) return false;
 
-        if (activeFilter === 'All Jobs') return true;
+      if (selectedLocation !== 'All') {
+        const locationMatch = Array.isArray(job.location) &&
+          job.location.some((loc: string) => loc?.toLowerCase() === selectedLocation.toLowerCase());
+        if (!locationMatch) return false;
+      }
 
-        if (activeFilter === 'Kitchen') {
-          return job.title?.toLowerCase().includes('kitchen');
-        }
+      if (selectedPosition !== 'All') {
+        if (job.title?.trim() !== selectedPosition) return false;
+      }
 
-        if (activeFilter === 'Front House') {
-          return (
-            job.title?.toLowerCase().includes('front') ||
-            job.title?.toLowerCase().includes('reception')
-          );
-        }
+      return true;
 
-        if (activeFilter === '$50k+') {
-          return job.rate?.amount >= 50000;
-        }
-
-        if (activeFilter === 'Immediate Starts') {
-          return job.priority === 'active';
-        }
-
-        return true;
-      },
-    );
-  }, [jobs, searchText, activeFilter]);
-
-  //FILTER HANDLER
-  const onFilterPress = useCallback((id: string) => {
-    setFilters(prev =>
-      prev.map(item => ({
-        ...item,
-        active: item.id === id,
-      })),
-    );
-  }, []);
-
-  const renderFilterItem: ListRenderItem<Filter> = useCallback(
-    ({ item }) => (
-      <FilterItem
-        label={item.label}
-        active={item.active}
-        onPress={() => onFilterPress(item.id)}
-      />
-    ),
-    [onFilterPress],
-  );
+      // Match against job.location array
+      // return Array.isArray(job.location) &&
+      //   job.location.some(
+      //     (loc: string) =>
+      //       loc?.toLowerCase() === selectedLocation.toLowerCase(),
+      //   );
+    });
+  }, [jobs, searchText, selectedLocation, selectedPosition]);
 
   const renderJobItem: ListRenderItem<any> = useCallback(
     ({ item }) => (
@@ -203,21 +172,83 @@ const FulltimeScreen = () => {
             style={styles.input}
           />
         </View>
-
-        <TouchableOpacity style={styles.filterBtnIcon}>
-          <SlidersHorizontal width={24} height={24} color="white" />
-        </TouchableOpacity>
       </View>
 
-      {/* Filters */}
-      <FlatList
-        data={filters}
-        horizontal
-        renderItem={renderFilterItem}
-        keyExtractor={item => item.id}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filterScroll}
-      />
+      {/* Location Filter */}
+      <View style={styles.filterRow}>
+        <TouchableOpacity
+          onPress={() => { setPositionDropdownOpen(false); setDropdownOpen(prev => !prev); }}
+          style={[styles.locationBtn, selectedLocation !== 'All' ? styles.locationBtnActive : styles.locationBtnDefault]}
+          activeOpacity={0.8}
+        >
+          <Text style={selectedLocation !== 'All' ? styles.locationBtnTextActive : styles.locationBtnText}>
+            {selectedLocation === 'All' ? 'Location' : selectedLocation}
+          </Text>
+          <ChevronDown size={20} color={selectedLocation !== 'All' ? '#000' : '#FFF'} />
+        </TouchableOpacity>
+
+        {selectedLocation !== 'All' && (
+          <TouchableOpacity
+            onPress={() => { setSelectedLocation('All'); setDropdownOpen(false); }}
+            style={styles.resetBtn}
+            activeOpacity={0.8}
+          >
+            <X size={16} color="#FFF" />
+          </TouchableOpacity>
+        )}
+
+        {dropdownOpen && (
+          <View style={styles.dropdown}>
+            {locationFilters.filter(l => l !== 'All').map(loc => (
+              <TouchableOpacity
+                key={loc}
+                onPress={() => { setSelectedLocation(loc); setDropdownOpen(false); }}
+                style={styles.dropdownItem}
+              >
+                <Text style={selectedLocation === loc ? styles.dropdownItemTextActive : styles.dropdownItemText}>{loc}</Text>
+                {selectedLocation === loc && <Check size={16} color="#FFD900" />}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Position Dropdown */}
+        <TouchableOpacity
+          onPress={() => { setDropdownOpen(false); setPositionDropdownOpen(prev => !prev); }}
+          style={[styles.locationBtn, selectedPosition !== 'All' ? styles.locationBtnActive : styles.locationBtnDefault]}
+          activeOpacity={0.8}
+        >
+          <Text style={selectedPosition !== 'All' ? styles.locationBtnTextActive : styles.locationBtnText}>
+            {selectedPosition === 'All' ? 'Position' : selectedPosition}
+          </Text>
+          <ChevronDown size={20} color={selectedPosition !== 'All' ? '#000' : '#FFF'} />
+        </TouchableOpacity>
+
+        {selectedPosition !== 'All' && (
+          <TouchableOpacity
+            onPress={() => { setSelectedPosition('All'); setPositionDropdownOpen(false); }}
+            style={styles.resetBtn}
+            activeOpacity={0.8}
+          >
+            <X size={16} color="#FFF" />
+          </TouchableOpacity>
+        )}
+
+        {positionDropdownOpen && (
+          <View style={[styles.dropdown, { left: 120 }]}>
+            {positionFilters.filter(p => p !== 'All').map(pos => (
+              <TouchableOpacity
+                key={pos}
+                onPress={() => { setSelectedPosition(pos); setPositionDropdownOpen(false); }}
+                style={styles.dropdownItem}
+              >
+                <Text style={selectedPosition === pos ? styles.dropdownItemTextActive : styles.dropdownItemText}>{pos}</Text>
+                {selectedPosition === pos && <Check size={16} color="#FFD900" />}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
 
       {/* Job List */}
       <FlatList

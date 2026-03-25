@@ -1,4 +1,4 @@
-import { Banknote, Bookmark, Clock, MapPin } from 'lucide-react-native';
+import { Banknote, Bookmark, Clock, MapPin, ChevronDown, ChevronUp } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { JobCardProps } from '../../@types/JobCardProps.type';
@@ -42,6 +42,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
   const isApplied = job.isApplied ?? false;
   // Modal controls apply form
   const [modalVisible, setModalVisible] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   // const handleApply = async () => {
   //   if (isApplied || loading) return;
@@ -91,9 +92,8 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
           <InfoTag text={job.location} iconType="location" />
           {job.rate && (
             <InfoTag
-              text={`€ ${job.rate.amount}/${
-                job.rate.unit.charAt(0).toUpperCase() + job.rate.unit.slice(1)
-              }`}
+              text={`€ ${job.rate.amount}/${job.rate.unit.charAt(0).toUpperCase() + job.rate.unit.slice(1)
+                }`}
               iconType="salary"
             />
           )}
@@ -105,6 +105,23 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
           />
         </View>
       </View>
+
+      {/* Description Accordion */}
+      {job.description ? (
+        <TouchableOpacity
+          style={styles.accordionRow}
+          onPress={() => setExpanded(prev => !prev)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.accordionLabel}>Description</Text>
+          {expanded
+            ? <ChevronUp width={16} height={16} color="#9CA3AF" />
+            : <ChevronDown width={16} height={16} color="#9CA3AF" />}
+        </TouchableOpacity>
+      ) : null}
+      {expanded && job.description ? (
+        <Text style={styles.descriptionText}>{job.description}</Text>
+      ) : null}
 
       {/* Apply Button */}
       {/* <TouchableOpacity
@@ -236,5 +253,28 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontFamily: 'InterDisplayMedium',
     lineHeight: 24,
+  },
+  accordionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    marginBottom: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(245,245,245,0.07)',
+  },
+  accordionLabel: {
+    color: '#9CA3AF',
+    fontSize: 13,
+    fontFamily: 'InterDisplayMedium',
+    fontWeight: '500',
+  },
+  descriptionText: {
+    color: '#D1D5DB',
+    fontSize: 13,
+    fontFamily: 'InterDisplayRegular',
+    fontWeight: '400',
+    lineHeight: 20,
+    marginBottom: 12,
   },
 });

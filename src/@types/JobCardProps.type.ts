@@ -5,6 +5,7 @@ export interface JobCardProps {
     title: string;
     location: string;
     type: string;
+    description?: string;
     rate?: {
       amount: number;
       unit: string;

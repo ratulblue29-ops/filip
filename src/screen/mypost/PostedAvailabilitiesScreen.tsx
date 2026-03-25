@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Text,
   View,
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -15,11 +16,12 @@ import {
   CalendarRange,
   BriefcaseBusiness,
   Sun,
+  MoreVertical,
 } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useQuery } from '@tanstack/react-query';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import styles from './style';
-import { fetchMyJobs } from '../../services/jobs';
+import { fetchMyJobs, closeJob } from '../../services/jobs';
 import { formatSchedule, timeAgo } from '../../helper/timeanddateHelper';
 import AvailabilitySkeleton from '../../components/skeleton/AvailabilitySkeleton';
 import PostTypeModal from '../../components/availiability/PostTypeModal';
@@ -33,16 +35,47 @@ const PostedAvailabilitiesScreen = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'past'>('all');
   const [showPostTypeModal, setShowPostTypeModal] = useState<boolean>(false);
   const [selectedJob, setSelectedJob] = useState<Mypost | null>(null);
+  const [menuJobId, setMenuJobId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   // notification get for dot
   const { hasUnread } = useUnreadNotifications();
   // Queries
-  const { data: availabilities = [], isLoading } = useQuery<Mypost[]>({
+  const { data: availabilities = [], isLoading, refetch } = useQuery<Mypost[]>({
     queryKey: ['my-jobs'],
     queryFn: fetchMyJobs,
   });
 
+  // Refetch on every focus — catches status changes made from other screens (e.g. hire action)
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
   const handleGoBack = () => navigation.goBack();
   const handleAddNew = () => setShowPostTypeModal(true);
+  const handleCloseJob = (jobId: string) => {
+    setMenuJobId(null);
+    Alert.alert(
+      'Close Job',
+      'Close this job? It will be removed from the feed.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Close Job',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await closeJob(jobId);
+              queryClient.invalidateQueries({ queryKey: ['my-jobs'] });
+            } catch {
+              Alert.alert('Error', 'Failed to close job. Please try again.');
+            }
+          },
+        },
+      ],
+    );
+  };
 
   // Status styles
   const getStatusStyle = (status: string) => {
@@ -75,8 +108,16 @@ const PostedAvailabilitiesScreen = () => {
     }
   };
   // Filter availabilities based on activeTab
+  // const filteredAvailabilities = availabilities.filter((item: any) => {
+  //   if (activeTab === 'all') return true;
+  //   if (activeTab === 'active') return item.status === 'active';
+  //   if (activeTab === 'past')
+  //     return ['consumed', 'withdrawn', 'expired'].includes(item.status);
+  //   return true;
+  // });
+  // 'all' excludes withdrawn — Option Y (withdrawn only visible in 'past' tab)
   const filteredAvailabilities = availabilities.filter((item: any) => {
-    if (activeTab === 'all') return true;
+    if (activeTab === 'all') return item.status !== 'withdrawn';
     if (activeTab === 'active') return item.status === 'active';
     if (activeTab === 'past')
       return ['consumed', 'withdrawn', 'expired'].includes(item.status);
@@ -129,7 +170,10 @@ const PostedAvailabilitiesScreen = () => {
             <TouchableOpacity
               key={item.id}
               style={styles.availabilityCard}
-              onPress={() => setSelectedJob(item)}
+              onPress={() => {
+                if (menuJobId === item.id) { setMenuJobId(null); return; }
+                if (item.type !== 'fulltime' || item.status !== 'active') setSelectedJob(item);
+              }}
             >
               <View style={styles.cardHeader}>
                 <View style={styles.iconCircle}>
@@ -166,8 +210,28 @@ const PostedAvailabilitiesScreen = () => {
                     </Text>
                   </View>
                 </View>
-                <ChevronRight width={24} height={24} color="#ffffff" />
+                {item.type === 'fulltime' && item.status === 'active' ? (
+                  <TouchableOpacity
+                    onPress={() => setMenuJobId(menuJobId === item.id ? null : item.id)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <MoreVertical size={24} color="#ffffff" />
+                  </TouchableOpacity>
+                ) : (
+                  <ChevronRight width={24} height={24} color="#ffffff" />
+                )}
               </View>
+              {/* 3-dot dropdown — fulltime active only */}
+              {menuJobId === item.id && (
+                <View style={styles.menuDropdown}>
+                  <TouchableOpacity
+                    style={styles.menuItem}
+                    onPress={() => handleCloseJob(item.id)}
+                  >
+                    <Text style={styles.menuItemText}>Close Job</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </TouchableOpacity>
           ))
         )}

@@ -1,4 +1,4 @@
-export type OfferStatus = 'pending' | 'accepted' | 'rejected';
+export type OfferStatus = 'pending' | 'accepted' | 'rejected' | 'hired';
 
 export interface OfferItem {
   id: string;

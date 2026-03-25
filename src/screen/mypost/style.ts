@@ -222,6 +222,23 @@ const styles = StyleSheet.create({
         color: '#6B7280',
         textAlign: 'center',
     },
+    menuDropdown: {
+        marginTop: 10,
+        backgroundColor: '#2A2A2A',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#3A3A3A',
+        overflow: 'hidden',
+    },
+    menuItem: {
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+    },
+    menuItemText: {
+        fontSize: 14,
+        fontFamily: 'InterDisplayMedium',
+        color: '#FF4444',
+    },
 });
 
 export default styles;

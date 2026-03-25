@@ -304,3 +304,60 @@ export const fetchReceivedApplications = async () => {
     return bS - aS;
   });
 };
+
+// Hire an applicant — marks application as hired + closes the job atomically
+// export const hireApplicant = async (
+//   applicationId: string,
+//   jobId: string,
+// ): Promise<void> => {
+//   const db = getDb();
+//   const user = getCurrentUser();
+//   if (!user) throw new Error('User not logged in');
+
+//   await runTransaction(db, async transaction => {
+//     const appRef = doc(db, 'jobApplications', applicationId);
+//     const jobRef = doc(db, 'jobs', jobId);
+
+//     transaction.update(appRef, {
+//       status: 'hired',
+//       updatedAt: serverTimestamp(),
+//     });
+
+//     transaction.update(jobRef, {
+//       'visibility.priority': 'consumed',
+//       updatedAt: serverTimestamp(),
+//     });
+//   });
+// };
+export const hireApplicant = async (
+  applicationId: string,
+  jobId: string,
+): Promise<void> => {
+  const db = getDb();
+  const user = getCurrentUser();
+  if (!user) throw new Error('User not logged in');
+
+  await runTransaction(db, async transaction => {
+    const appRef = doc(db, 'jobApplications', applicationId);
+    const jobRef = doc(db, 'jobs', jobId);
+
+    // get() required before any write in RN Firebase transactions
+    const [appSnap, jobSnap] = await Promise.all([
+      transaction.get(appRef),
+      transaction.get(jobRef),
+    ]);
+
+    if (!appSnap.exists()) throw new Error('Application not found');
+    if (!jobSnap.exists()) throw new Error('Job not found');
+
+    transaction.update(appRef, {
+      status: 'hired',
+      updatedAt: serverTimestamp(),
+    });
+
+    transaction.update(jobRef, {
+      'visibility.priority': 'consumed',
+      updatedAt: serverTimestamp(),
+    });
+  });
+};

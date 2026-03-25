@@ -23,12 +23,12 @@ const computePriority = (
   },
   schedule: { start: string; end: string },
 ) => {
+  if (visibility?.priority === 'consumed') return 'consumed';
+  if (visibility?.priority === 'withdrawn') return 'withdrawn';
+
   const now = new Date();
   if (!schedule?.end) return 'active';
   const end = new Date(schedule.end);
-
-  if (visibility?.priority === 'consumed') return 'consumed';
-  if (visibility?.priority === 'withdrawn') return 'withdrawn';
   if (now > end) return 'expired';
 
   return 'active';
@@ -663,4 +663,9 @@ export const updateJob = async (
     ...payload,
     updatedAt: serverTimestamp(),
   });
+};
+
+// Close a full-time job post — removes it from the feed immediately
+export const closeJob = async (jobId: string): Promise<void> => {
+  await updateJob(jobId, { 'visibility.priority': 'withdrawn' });
 };

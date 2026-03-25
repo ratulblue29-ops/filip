@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StatusBar,
   ActivityIndicator,
   Linking,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -22,12 +23,40 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { StyleSheet } from 'react-native';
 import { fetchReceivedApplications } from '../../services/applyToJob';
+import { useQueryClient } from '@tanstack/react-query';
+import { hireApplicant } from '../../services/applyToJob';
 
 const JobApplicationsScreen = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   // jobId passed from notification tap — used to filter applications for that specific job
   const { jobId } = route.params as { jobId: string };
+
+  const queryClient = useQueryClient();
+  // tracks locally hired applicants for instant UI feedback
+  const [hiredIds, setHiredIds] = useState<string[]>([]);
+
+  const handleHire = (applicationId: string, jobId: string) => {
+    Alert.alert(
+      'Hire Applicant',
+      'Hire this applicant? The job will be closed.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Hire',
+          onPress: async () => {
+            try {
+              await hireApplicant(applicationId, jobId);
+              setHiredIds(prev => [...prev, applicationId]);
+              queryClient.invalidateQueries({ queryKey: ['receivedApplications'] });
+            } catch {
+              Alert.alert('Error', 'Failed to hire. Please try again.');
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ['receivedApplications'],
@@ -109,6 +138,21 @@ const JobApplicationsScreen = () => {
           />
         </TouchableOpacity>
       )}
+
+      {/* Hire button — shown for pending, hired badge after action */}
+      {item.status === 'hired' || hiredIds.includes(item.id) ? (
+        <View style={styles.hiredBadge}>
+          <Text style={styles.hiredBadgeText}>Hired ✓</Text>
+        </View>
+      ) : item.status === 'pending' ? (
+        <TouchableOpacity
+          style={styles.hireBtn}
+          onPress={() => handleHire(item.id, item.jobId)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.hireBtnText}>Hire</Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 
@@ -234,6 +278,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'InterDisplay-SemiBold',
     flex: 1,
+  },
+  hireBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#22C55E',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  hireBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'InterDisplay-SemiBold',
+  },
+  hiredBadge: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#14532D',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: '#22C55E',
+  },
+  hiredBadgeText: {
+    color: '#22C55E',
+    fontSize: 14,
+    fontFamily: 'InterDisplay-SemiBold',
   },
 });
 

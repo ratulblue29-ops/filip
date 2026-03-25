@@ -242,7 +242,7 @@ const ViewProfileScreen: React.FC = () => {
       <ChooseAvailabilityModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        posts={posts}
+        posts={posts.filter((p: { type: string }) => p.type !== 'fulltime')}
         loading={postsLoading}
         onSelect={handleSelectPost}
       />

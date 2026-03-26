@@ -29,17 +29,28 @@ import ChatAccessModal from '../../components/message/ChatAccessModal';
 import { fetchUserReviews } from '../../services/review';
 import { ReviewItem } from '../../@types/Review.type';
 import { timeAgo } from '../../helper/timeAgo';
+import ApplyModal from '../../components/fulltime/ApplyModal';
 
-type RootStackParamList = { viewProfile: { userId: string } };
+type RootStackParamList = {
+  viewProfile: {
+    userId: string;
+    sourceType?: 'fulltime_applicant';
+    jobId?: string;
+    jobTitle?: string;
+    jobOwnerId?: string;
+  };
+};
 type ViewProfileRouteProp = RouteProp<RootStackParamList, 'viewProfile'>;
 
 const ViewProfileScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<ViewProfileRouteProp>();
-  const { userId } = route.params;
+  const { userId, sourceType, jobId, jobTitle, jobOwnerId } = route.params;
+  const isFulltimeApplicant = sourceType === 'fulltime_applicant';
 
   const [modalVisible, setModalVisible] = useState(false);
   const [accessModalVisible, setAccessModalVisible] = useState(false);
+  const [applyModalVisible, setApplyModalVisible] = useState(false);
 
   /* ── Target user profile ── */
   const {
@@ -252,18 +263,34 @@ const ViewProfileScreen: React.FC = () => {
       />
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.chatButton} onPress={handleChat}>
-          <MessageCircleMore size={20} color="#FFD900" strokeWidth={2.5} />
-          <Text style={styles.chatButtonText}>Chat</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.mainButton}
-          onPress={handleSendEngagement}
-        >
-          <CalendarCheck2 size={20} color="#000" strokeWidth={2.5} />
-          <Text style={styles.mainButtonText}>Send Engagement</Text>
-        </TouchableOpacity>
+        {isFulltimeApplicant ? (
+          <TouchableOpacity
+            style={styles.mainButton}
+            onPress={() => setApplyModalVisible(true)}
+          >
+            <CalendarCheck2 size={20} color="#000" strokeWidth={2.5} />
+            <Text style={styles.mainButtonText}>Apply Now</Text>
+          </TouchableOpacity>
+        ) : (
+          <>
+            <TouchableOpacity style={styles.chatButton} onPress={handleChat}>
+              <MessageCircleMore size={20} color="#FFD900" strokeWidth={2.5} />
+              <Text style={styles.chatButtonText}>Chat</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.mainButton} onPress={handleSendEngagement}>
+              <CalendarCheck2 size={20} color="#000" strokeWidth={2.5} />
+              <Text style={styles.mainButtonText}>Send Engagement</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
+      {isFulltimeApplicant && jobId && jobOwnerId && (
+        <ApplyModal
+          visible={applyModalVisible}
+          onClose={() => setApplyModalVisible(false)}
+          job={{ id: jobId, userId: jobOwnerId, title: jobTitle ?? '' }}
+        />
+      )}
     </SafeAreaView>
   );
 };

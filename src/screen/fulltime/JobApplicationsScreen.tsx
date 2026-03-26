@@ -25,9 +25,11 @@ import { StyleSheet } from 'react-native';
 import { fetchReceivedApplications } from '../../services/applyToJob';
 import { useQueryClient } from '@tanstack/react-query';
 import { hireApplicant } from '../../services/applyToJob';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigator/RootNavigator';
 
 const JobApplicationsScreen = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<any>();
   // jobId passed from notification tap — used to filter applications for that specific job
   const { jobId } = route.params as { jobId: string };
@@ -71,7 +73,19 @@ const JobApplicationsScreen = () => {
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.card}>
       {/* Applicant info */}
-      <View style={styles.applicantRow}>
+      <TouchableOpacity
+        style={styles.applicantRow}
+        activeOpacity={0.7}
+        onPress={() =>
+          navigation.navigate('viewProfile', {
+            userId: item.applicantId,
+            sourceType: 'fulltime_applicant',
+            jobId: item.jobId,
+            jobTitle: item.jobTitle,
+            jobOwnerId: item.jobOwnerId,
+          })
+        }
+      >
         <Image
           source={{
             uri:
@@ -84,76 +98,89 @@ const JobApplicationsScreen = () => {
           <Text style={styles.applicantName}>{item.applicantName}</Text>
           <Text style={styles.jobTitle}>{item.jobTitle}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
 
       {/* Message */}
-      {!!item.message && (
-        <View style={styles.detailRow}>
-          <MessageSquare size={16} color="#9CA3AF" />
-          <Text style={styles.detailText}>{item.message}</Text>
-        </View>
-      )}
+      {
+        !!item.message && (
+          <View style={styles.detailRow}>
+            <MessageSquare size={16} color="#9CA3AF" />
+            <Text style={styles.detailText}>{item.message}</Text>
+          </View>
+        )
+      }
 
       {/* Phone — tapping opens the dialler with the number pre-filled */}
-      {!!item.phone && (
-        <TouchableOpacity
-          style={styles.detailRow}
-          onPress={() => Linking.openURL(`tel:${item.phone}`)}
-          activeOpacity={0.7}
-        >
-          <Phone size={16} color="#FFD900" />
-          <Text style={[styles.detailText, { color: '#FFD900' }]}>
-            {item.phone}
-          </Text>
-        </TouchableOpacity>
-      )}
+      {
+        !!item.phone && (
+          <TouchableOpacity
+            style={styles.detailRow}
+            onPress={() => Linking.openURL(`tel:${item.phone}`)}
+            activeOpacity={0.7}
+          >
+            <Phone size={16} color="#FFD900" />
+            <Text style={[styles.detailText, { color: '#FFD900' }]}>
+              {item.phone}
+            </Text>
+          </TouchableOpacity>
+        )
+      }
 
       {/* Email — tapping opens the mail app with the address pre-filled */}
-      {!!item.email && (
-        <TouchableOpacity
-          style={styles.detailRow}
-          onPress={() => Linking.openURL(`mailto:${item.email}`)}
-          activeOpacity={0.7}
-        >
-          <Mail size={16} color="#FFD900" />
-          <Text style={[styles.detailText, { color: '#FFD900' }]}>
-            {item.email}
-          </Text>
-        </TouchableOpacity>
-      )}
+      {
+        !!item.email && (
+          <TouchableOpacity
+            style={styles.detailRow}
+            onPress={() => Linking.openURL(`mailto:${item.email}`)}
+            activeOpacity={0.7}
+          >
+            <Mail size={16} color="#FFD900" />
+            <Text style={[styles.detailText, { color: '#FFD900' }]}>
+              {item.email}
+            </Text>
+          </TouchableOpacity>
+        )
+      }
 
       {/* CV — tapping opens the PDF in the device browser */}
-      {!!item.cvUrl && (
-        <TouchableOpacity
-          style={styles.cvBtn}
-          onPress={() => Linking.openURL(item.cvUrl)}
-          activeOpacity={0.7}
-        >
-          <FileText size={16} color="#1F2937" />
-          <Text style={styles.cvBtnText}>View CV</Text>
-          <ExternalLink
-            size={14}
-            color="#1F2937"
-            style={{ marginLeft: 'auto' }}
-          />
-        </TouchableOpacity>
-      )}
+      {
+        !!item.cvUrl && (
+          <TouchableOpacity
+            style={styles.cvBtn}
+            onPress={() => Linking.openURL(item.cvUrl)}
+            activeOpacity={0.7}
+          >
+            <FileText size={16} color="#1F2937" />
+            <Text style={styles.cvBtnText}>View CV</Text>
+            <ExternalLink
+              size={14}
+              color="#1F2937"
+              style={{ marginLeft: 'auto' }}
+            />
+          </TouchableOpacity>
+        )
+      }
 
       {/* Hire button — shown for pending, hired badge after action */}
-      {item.status === 'hired' || hiredIds.includes(item.id) ? (
-        <View style={styles.hiredBadge}>
-          <Text style={styles.hiredBadgeText}>Hired ✓</Text>
-        </View>
-      ) : item.status === 'pending' ? (
-        <TouchableOpacity
-          style={styles.hireBtn}
-          onPress={() => handleHire(item.id, item.jobId)}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.hireBtnText}>Hire</Text>
-        </TouchableOpacity>
-      ) : null}
-    </View>
+      {
+        item.status === 'hired' || hiredIds.includes(item.id) ? (
+          <View style={styles.hiredBadge}>
+            <Text style={styles.hiredBadgeText}>Hired ✓</Text>
+          </View>
+        ) : item.status === 'pending' ? (
+          <TouchableOpacity
+            style={[styles.hireBtn, item.jobStatus === 'consumed' && { backgroundColor: '#1F2937', opacity: 0.5 }]}
+            onPress={() => item.jobStatus !== 'consumed' && handleHire(item.id, item.jobId)}
+            activeOpacity={item.jobStatus === 'consumed' ? 1 : 0.7}
+            disabled={item.jobStatus === 'consumed'}
+          >
+            <Text style={styles.hireBtnText}>
+              {item.jobStatus === 'consumed' ? 'Position Filled' : 'Hire'}
+            </Text>
+          </TouchableOpacity>
+        ) : null
+      }
+    </View >
   );
 
   return (

@@ -276,6 +276,7 @@ export const fetchReceivedApplications = async () => {
     // Fetch job title
     const jobDoc = await getDoc(doc(db, 'jobs', app.jobId));
     const jobTitle = jobDoc.exists() ? (jobDoc.data() as any)?.title ?? '' : '';
+    const jobStatus = jobDoc.exists() ? (jobDoc.data() as any)?.visibility?.priority ?? 'active' : 'active';
 
     // Fetch applicant profile — employer needs name + photo to identify who applied
     const userDoc = await getDoc(doc(db, 'users', app.applicantId));
@@ -284,7 +285,9 @@ export const fetchReceivedApplications = async () => {
     applications.push({
       id: appDoc.id,
       jobId: app.jobId,
+      jobOwnerId: app.jobOwnerId,
       jobTitle,
+      jobStatus,
       applicantId: app.applicantId,
       applicantName: userData?.profile?.name ?? 'Unknown',
       applicantPhoto: userData?.profile?.photo ?? null,

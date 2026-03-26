@@ -2,6 +2,9 @@ import { Banknote, Bookmark, Clock, MapPin, ChevronDown, ChevronUp } from 'lucid
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { JobCardProps } from '../../@types/JobCardProps.type';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigator/RootNavigator';
 // import Toast from 'react-native-toast-message';
 // import { applyToJob } from '../../services/applyToJob';
 // import { useQueryClient } from '@tanstack/react-query';
@@ -40,6 +43,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
   // const queryClient = useQueryClient();
   // const isApplied = job.isApplied ?? false;
   const isApplied = job.isApplied ?? false;
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   // Modal controls apply form
   const [modalVisible, setModalVisible] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -62,7 +66,17 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
     <View style={styles.card}>
       {/* Header */}
       <View style={styles.headerRow}>
-        <View style={styles.titleSection}>
+        <TouchableOpacity
+          style={styles.titleSection}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('viewProfile', {
+            userId: job.userId,
+            sourceType: 'fulltime_applicant',
+            jobId: job.id,
+            jobTitle: job.title,
+            jobOwnerId: job.userId,
+          })}
+        >
           <Image
             source={{
               uri:
@@ -75,7 +89,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
             <Text style={styles.jobTitle}>{job.title}</Text>
             <Text style={styles.companyName}>{job?.user?.name}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity onPress={onBookmark}>
           <Bookmark
             width={24}
@@ -107,21 +121,25 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
       </View>
 
       {/* Description Accordion */}
-      {job.description ? (
-        <TouchableOpacity
-          style={styles.accordionRow}
-          onPress={() => setExpanded(prev => !prev)}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.accordionLabel}>Description</Text>
-          {expanded
-            ? <ChevronUp width={16} height={16} color="#9CA3AF" />
-            : <ChevronDown width={16} height={16} color="#9CA3AF" />}
-        </TouchableOpacity>
-      ) : null}
-      {expanded && job.description ? (
-        <Text style={styles.descriptionText}>{job.description}</Text>
-      ) : null}
+      {
+        job.description ? (
+          <TouchableOpacity
+            style={styles.accordionRow}
+            onPress={() => setExpanded(prev => !prev)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.accordionLabel}>Description</Text>
+            {expanded
+              ? <ChevronUp width={16} height={16} color="#9CA3AF" />
+              : <ChevronDown width={16} height={16} color="#9CA3AF" />}
+          </TouchableOpacity>
+        ) : null
+      }
+      {
+        expanded && job.description ? (
+          <Text style={styles.descriptionText}>{job.description}</Text>
+        ) : null
+      }
 
       {/* Apply Button */}
       {/* <TouchableOpacity
@@ -165,7 +183,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
         onClose={() => setModalVisible(false)}
         job={job}
       />
-    </View>
+    </View >
   );
 };
 

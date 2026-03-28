@@ -472,7 +472,11 @@ export const fetchFullTimeJobs = async (): Promise<Job[]> => {
 export const fetchSeasonalJobs = async () => {
   const db = getFirestore();
 
-  const q = query(collection(db, 'jobs'), where('type', '==', 'seasonal'));
+  const q = query(
+    collection(db, 'jobs'),
+    where('type', '==', 'seasonal'),
+    where('visibility.priority', '==', 'active'),
+  );
 
   const snap = await getDocs(q);
   const results = await Promise.all(

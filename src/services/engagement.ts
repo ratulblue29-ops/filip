@@ -6,6 +6,7 @@ import {
   addDoc,
   getDocs,
   getDoc,
+  setDoc,
   query,
   where,
   orderBy,
@@ -85,13 +86,16 @@ export const createEngagement = async (
     postType === 'seasonal'
       ? CREDIT_COSTS.ENGAGEMENT_SEASONAL
       : postType === 'daily'
-      ? CREDIT_COSTS.ENGAGEMENT_DAILY
-      : CREDIT_COSTS.ENGAGEMENT_FULLTIME;
+        ? CREDIT_COSTS.ENGAGEMENT_DAILY
+        : CREDIT_COSTS.ENGAGEMENT_FULLTIME;
 
   // Deduct credits — throws if balance insufficient, blocking engagement creation
-  await deductCredit('pre-check', creditCost);
+  // Pre-generate ref so engagementId exists before deduction — fixes audit trail
+  const engagementRef = doc(collection(db, 'engagements'));
 
-  const engagementRef = await addDoc(collection(db, 'engagements'), {
+  await deductCredit(engagementRef.id, creditCost);
+
+  await setDoc(engagementRef, {
     fromUserId: user.uid,       // employer
     workerId,                    // worker
     availabilityPostId,          // REQUIRED — strict 1:1
@@ -256,7 +260,7 @@ export const updateEngagementStatus = async (
     await refundCredit(engagementId, 'employer_withdrew', fromUserId, creditCostToRefund);
   }
 
-    sendPush({
+  sendPush({
     toUserId: fromUserId,
     title: 'Engagement Withdrawn',
     body: 'An employer has withdrawn their engagement request',

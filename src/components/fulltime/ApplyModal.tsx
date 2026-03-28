@@ -26,6 +26,7 @@ import { applyToFullTimeJob } from '../../services/applyToJob';
 import { fetchUserCvUrl, uploadCv } from '../../services/cv';
 // import { fetchCurrentUser } from '../../services/user';
 import { StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   visible: boolean;
@@ -34,6 +35,7 @@ type Props = {
 };
 
 const ApplyModal = ({ visible, onClose, job }: Props) => {
+  const { t } = useTranslation();
   // const navigation = useNavigation<any>();
   const [message, setMessage] = useState('');
   const [phone, setPhone] = useState('');
@@ -68,7 +70,7 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
 
       const file = result[0];
       if (file.size && file.size > 10 * 1024 * 1024) {
-        Toast.show({ type: 'error', text1: 'File too large (max 10 MB)' });
+        Toast.show({ type: 'error', text1: t('apply_modal.toast_too_large') });
         return;
       }
 
@@ -77,7 +79,7 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
       await queryClient.invalidateQueries({ queryKey: ['user-cv-url'] });
       setCvUrl(url);
       setCvFileName(file.name ?? 'cv.pdf');
-      Toast.show({ type: 'success', text1: 'CV uploaded!' });
+      Toast.show({ type: 'success', text1: t('apply_modal.toast_cv_uploaded') });
     } catch (err: any) {
       Toast.show({ type: 'error', text1: err.message ?? 'Upload failed' });
     } finally {
@@ -136,7 +138,7 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
         <View style={styles.sheet}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Apply for {job.title}</Text>
+            <Text style={styles.title}>{t('apply_modal.title', { title: job.title })}</Text>
             <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
               <X size={22} color="#fff" />
             </TouchableOpacity>
@@ -297,7 +299,7 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
                 ) : (
                   <>
                     <Upload size={16} color="#fff" />
-                    <Text style={styles.cvBtnText}>Upload New</Text>
+                    <Text style={styles.cvBtnText}>{t('apply_modal.upload_new')}</Text>
                   </>
                 )}
               </TouchableOpacity>
@@ -313,7 +315,7 @@ const ApplyModal = ({ visible, onClose, job }: Props) => {
               {loading ? (
                 <ActivityIndicator color="#1F2937" />
               ) : (
-                <Text style={styles.submitText}>Submit Application</Text>
+                <Text style={styles.submitText}>{t('apply_modal.submit')}</Text>
               )}
             </TouchableOpacity>
             {/* </>

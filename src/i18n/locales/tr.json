@@ -136,5 +136,37 @@
     "view_plans": "View Plans",
     "settings": "Settings",
     "logout": "Log Out"
+  },
+  "apply_modal": {
+    "title": "Apply for {{title}}",
+    "label_message": "Short Message / Introduction",
+    "placeholder_message": "Tell the employer about yourself...",
+    "label_phone": "Phone Number",
+    "placeholder_phone": "+1 234 567 890",
+    "label_email": "Email Address",
+    "placeholder_email": "you@example.com",
+    "label_cv": "CV / Resume (optional)",
+    "cv_attached": "CV attached",
+    "preview_cv": "Preview CV",
+    "use_existing": "Use Existing",
+    "upload_new": "Upload New",
+    "submit": "Submit Application",
+    "toast_too_large": "File too large (max 10 MB)",
+    "toast_cv_uploaded": "CV uploaded!",
+    "toast_upload_failed": "Upload failed",
+    "toast_message_required": "Message is required",
+    "toast_phone_required": "Phone number is required",
+    "toast_email_required": "Email is required",
+    "toast_submitted": "Application submitted!"
+  },
+  "job_card": {
+    "description": "Description",
+    "applied": "Applied",
+    "apply_now": "Apply Now"
+  },
+  "skill_input": {
+    "label": "Skills & Expertise",
+    "view_all": "View All",
+    "placeholder": "Add A Skill (E.G. Barista)"
   }
 }

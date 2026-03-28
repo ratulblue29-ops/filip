@@ -136,5 +136,37 @@
     "view_plans": "Pogledaj planove",
     "settings": "Postavke",
     "logout": "Odjavi se"
+  },
+  "apply_modal": {
+    "title": "Prijavi se za {{title}}",
+    "label_message": "Kratka poruka / Uvod",
+    "placeholder_message": "Recite poslodavcu nešto o sebi...",
+    "label_phone": "Broj telefona",
+    "placeholder_phone": "+1 234 567 890",
+    "label_email": "Email adresa",
+    "placeholder_email": "vi@primjer.com",
+    "label_cv": "CV / Životopis (neobavezno)",
+    "cv_attached": "CV priložen",
+    "preview_cv": "Pregledaj CV",
+    "use_existing": "Koristi postojeći",
+    "upload_new": "Učitaj novi",
+    "submit": "Pošalji prijavu",
+    "toast_too_large": "Datoteka je prevelika (maks 10 MB)",
+    "toast_cv_uploaded": "CV učitan!",
+    "toast_upload_failed": "Učitavanje nije uspjelo",
+    "toast_message_required": "Poruka je obavezna",
+    "toast_phone_required": "Broj telefona je obavezan",
+    "toast_email_required": "Email je obavezan",
+    "toast_submitted": "Prijava poslana!"
+  },
+  "job_card": {
+    "description": "Opis",
+    "applied": "Prijavljeno",
+    "apply_now": "Prijavi se"
+  },
+  "skill_input": {
+    "label": "Vještine i stručnost",
+    "view_all": "Pogledaj sve",
+    "placeholder": "Dodaj vještinu (npr. Barista)"
   }
 }

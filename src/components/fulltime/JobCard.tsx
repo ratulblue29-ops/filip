@@ -9,6 +9,7 @@ import { RootStackParamList } from '../../navigator/RootNavigator';
 // import { applyToJob } from '../../services/applyToJob';
 // import { useQueryClient } from '@tanstack/react-query';
 import ApplyModal from './ApplyModal';
+import { useTranslation } from 'react-i18next';
 
 const InfoTag = ({
   text,
@@ -39,6 +40,7 @@ const InfoTag = ({
 };
 
 export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
+  const { t } = useTranslation();
   // const [loading, setLoading] = useState(false);
   // const queryClient = useQueryClient();
   // const isApplied = job.isApplied ?? false;
@@ -128,7 +130,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
             onPress={() => setExpanded(prev => !prev)}
             activeOpacity={0.7}
           >
-            <Text style={styles.accordionLabel}>Description</Text>
+            <Text style={styles.accordionLabel}>{t('job_card.description')}</Text>
             {expanded
               ? <ChevronUp width={16} height={16} color="#9CA3AF" />
               : <ChevronDown width={16} height={16} color="#9CA3AF" />}
@@ -173,7 +175,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onBookmark }) => {
         <Text
           style={[styles.applyButtonText, isApplied && { color: '#6B7280' }]}
         >
-          {isApplied ? 'Applied' : 'Apply Now'}
+          {isApplied ? t('job_card.applied') : t('job_card.apply_now')}
         </Text>
       </TouchableOpacity>
 

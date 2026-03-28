@@ -190,7 +190,7 @@ const DailyAvailabilityCreation = () => {
     } else if (
       selectedDate &&
       endTime.getHours() * 60 + endTime.getMinutes() <=
-        startTime.getHours() * 60 + startTime.getMinutes()
+      startTime.getHours() * 60 + startTime.getMinutes()
     ) {
       newErrors.time = 'End time must be after start time';
     }
@@ -254,7 +254,7 @@ const DailyAvailabilityCreation = () => {
           <Coins color={COLORS.primary} size={18} />
           <Text style={styles.creditBannerText}>
             Posting costs{' '}
-            <Text style={styles.creditBannerHighlight}>2 credit</Text>. If no
+            <Text style={styles.creditBannerHighlight}>1 credit</Text>. If no
             engagement is received by end of day, your credit is refunded.
           </Text>
         </View>

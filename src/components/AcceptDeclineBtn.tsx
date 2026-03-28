@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface AcceptDeclineBtnProps {
   handleAccept: () => void;
@@ -9,14 +10,15 @@ const AcceptDeclineBtn = ({
   handleAccept,
   handleDecline,
 }: AcceptDeclineBtnProps) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.actionButtons}>
       <TouchableOpacity style={styles.declineButton} onPress={handleDecline}>
-        <Text style={styles.declineButtonText}>Decline</Text>
+        <Text style={styles.declineButtonText}>{t('accept_decline.decline')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
-        <Text style={styles.acceptButtonText}>Accept Offer</Text>
+        <Text style={styles.acceptButtonText}>{t('accept_decline.accept')}</Text>
       </TouchableOpacity>
     </View>
   );

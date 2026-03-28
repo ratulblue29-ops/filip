@@ -14,6 +14,7 @@ import { Feedtype } from '../../@types/Feed.type';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addToWishlist, removeFromWishlist } from '../../services/wishlist';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   item: Feedtype;
@@ -21,6 +22,7 @@ type Props = {
 };
 
 const FeedCard = ({ item, wishlistIds }: Props) => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
 
@@ -111,7 +113,7 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
             {item?.user?.verified === true && (
               <View style={styles.verifiedContainer}>
                 <BadgeCheck width={16} height={16} color="#FFD900" />
-                <Text style={styles.verifiedText}>Verified</Text>
+                <Text style={styles.verifiedText}>{t('common.verified')}</Text>
               </View>
             )}
           </View>
@@ -136,11 +138,11 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
             <View style={styles.dailyInfoItem}>
               <Clock width={22} height={22} color="#FFD900" />
               <View>
-                <Text style={styles.dailyInfoLabel}>Time</Text>
+                <Text style={styles.dailyInfoLabel}>{t('feed_card.time')}</Text>
                 <Text style={styles.dailyInfoValue}>
                   {item.startTime && item.endTime
                     ? `${item.startTime} – ${item.endTime}`
-                    : 'Not specified'}
+                    : t('common.not_specified')}
                 </Text>
                 {item.date ? (
                   <Text style={styles.dailyInfoLabel}>{item.date}</Text>
@@ -152,9 +154,9 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
 
             <View style={styles.dailyInfoItem}>
               <View>
-                <Text style={styles.dailyInfoLabel}>Target Position</Text>
+                <Text style={styles.dailyInfoLabel}>{t('feed_card.target_position')}</Text>
                 <Text style={styles.dailyInfoValue} numberOfLines={1}>
-                  {item.targetPosition || 'Not specified'}
+                  {item.targetPosition || t('common.not_specified')}
                 </Text>
               </View>
             </View>
@@ -165,14 +167,14 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
             <Clock width={24} height={24} color="#FFD900" />
             <View>
               <Text style={styles.availLabel}>
-                {item.subAvailability ? 'Availability' : 'Next Available'}
+                {item.subAvailability ? t('feed_card.availability') : t('feed_card.next_available')}
               </Text>
               <Text style={styles.availValue}>
                 {item?.schedule?.start && item?.schedule?.end
                   ? `${formatDate(item.schedule.start)} - ${formatDate(
                     item.schedule.end,
                   )}`
-                  : 'Date not available'}
+                  : t('common.date_unavailable')}
               </Text>
               {item.subAvailability && (
                 <Text style={styles.availSub}>{item.subAvailability}</Text>
@@ -196,7 +198,7 @@ const FeedCard = ({ item, wishlistIds }: Props) => {
             navigation.navigate('viewProfile', { userId: item?.user?.id })
           }
         >
-          <Text style={styles.viewProfileText}>View Profile</Text>
+          <Text style={styles.viewProfileText}>{t('feed_card.view_profile')}</Text>
         </TouchableOpacity>
       </View>
     </View>

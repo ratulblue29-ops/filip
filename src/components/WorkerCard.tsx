@@ -10,6 +10,7 @@ import { fetchWorkerActivePosts } from '../services/engagement';
 import ChooseAvailabilityModal from './availiability/ChooseAvailabilityModal';
 import Toast from 'react-native-toast-message';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 const WorkerCard = ({
   isLoading,
@@ -18,6 +19,7 @@ const WorkerCard = ({
   isLoading: boolean;
   worker: Worker;
 }) => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -89,10 +91,10 @@ const WorkerCard = ({
             €{worker?.rate?.amount}
             <Text style={styles.hrText}> {worker?.rate?.unit}</Text>
           </Text>
-          <Text style={styles.distanceText}>{worker.distance} Mi Away</Text>
+          <Text style={styles.distanceText}>{worker.distance} {t('worker_card.mi_away')}</Text>
           {!worker.user?.opentowork === true && (
             <View style={styles.busyTag}>
-              <Text style={styles.busyText}>Busy</Text>
+              <Text style={styles.busyText}>{t('worker_card.busy')}</Text>
             </View>
           )}
         </View>
@@ -121,19 +123,19 @@ const WorkerCard = ({
                 navigation.navigate('viewProfile', { userId: worker.user.id })
               }
             >
-              <Text style={styles.outlineBtnText}>View Profile</Text>
+              <Text style={styles.outlineBtnText}>{t('common.view_profile')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.filledBtn}
               onPress={handleSendOffer}
             >
-              <Text style={styles.filledBtnText}>Send Offer</Text>
+              <Text style={styles.filledBtnText}>{t('worker_card.send_offer')}</Text>
             </TouchableOpacity>
           </>
         ) : (
           <TouchableOpacity style={styles.disabledBtn} disabled>
-            <Text style={styles.disabledBtnText}>Currently Unavailable</Text>
+            <Text style={styles.disabledBtnText}>{t('worker_card.unavailable')}</Text>
           </TouchableOpacity>
         )}
       </View>

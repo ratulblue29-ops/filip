@@ -2,16 +2,18 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import React from 'react'
 import styles from '../../screen/SeosonalAvailabilityCreation/style';
 import { X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 const AvailiabilityCategory = ({ categoryInput, setCategoryInput, categories, removeCategory, addCategory }:
     { categoryInput: string, setCategoryInput: (text: string) => void, categories: string[], removeCategory: (index: number) => void, addCategory: () => void }) => {
+    const { t } = useTranslation();
     return (
         <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Category</Text>
+            <Text style={styles.sectionTitle}>{t('category.title')}</Text>
 
             <View style={[styles.addLocationRow, style.LocationRow]}>
                 <TextInput
                     style={[styles.jobText, style.input]}
-                    placeholder="Add Category"
+                    placeholder={t('category.placeholder')}
                     placeholderTextColor="#9CA3AF"
                     value={categoryInput}
                     onChangeText={setCategoryInput}

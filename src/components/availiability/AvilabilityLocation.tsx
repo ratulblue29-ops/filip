@@ -2,16 +2,17 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import React from 'react'
 import styles from '../../screen/SeosonalAvailabilityCreation/style';
 import { X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 const AvilabilityLocation = ({ newLocation, setNewLocation, locations, removeLocation, addLocation }:
     { newLocation: string; setNewLocation: (text: string) => void; locations: string[]; removeLocation: (index: number) => void; addLocation: () => void }) => {
+    const { t } = useTranslation();
     return (
         <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Preferred Location</Text>
-
+            <Text style={styles.sectionTitle}>{t('availability_location.title')}</Text>
             <View style={[styles.addLocationRow, style.LocationRow]}>
                 <TextInput
                     style={[styles.jobText, { flex: 1 }]}
-                    placeholder="Add locations"
+                    placeholder={t('availability_location.placeholder')}
                     placeholderTextColor="#9CA3AF"
                     value={newLocation}
                     onChangeText={setNewLocation}

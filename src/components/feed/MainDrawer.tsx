@@ -26,8 +26,10 @@ import { getAuth, signOut } from '@react-native-firebase/auth';
 import { getFirestore, doc, getDoc } from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import ResumeDocsModal from '../modals/ResumeDocsModal';
+import { useTranslation } from 'react-i18next';
 
 const MainDrawer = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const [showBanner, setShowBanner] = useState(true);
   const [showResumeModal, setShowResumeModal] = useState(false);
@@ -73,8 +75,8 @@ const MainDrawer = () => {
   const profileSkills =
     userData?.profile?.skills?.length > 0
       ? userData.profile.skills.join(', ')
-      : 'No skills';
-  const profileCity = userData?.profile?.city || 'Not set';
+      : t('common.no_skills');
+  const profileCity = userData?.profile?.city || t('common.not_set');
 
   return (
     <View style={styles.drawerContainer}>
@@ -110,7 +112,7 @@ const MainDrawer = () => {
         </View> */}
 
         <View style={styles.drawerSection}>
-          <Text style={styles.sectionHeader}>Dashboard</Text>
+          <Text style={styles.sectionHeader}>{t('drawer.dashboard')}</Text>
 
           {/* <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
             <View style={styles.menuLeft}>
@@ -131,7 +133,7 @@ const MainDrawer = () => {
               <View style={styles.iconCircle}>
                 <Bookmark width={20} height={18} color="#FFF" />
               </View>
-              <Text style={styles.menuText}>Saved Posts</Text>
+              <Text style={styles.menuText}>{t('drawer.saved_posts')}</Text>
             </View>
             <ChevronRight width={20} height={20} color="#9CA3AF" />
           </TouchableOpacity>
@@ -145,7 +147,7 @@ const MainDrawer = () => {
               <View style={styles.iconCircle}>
                 <UsersAddIcon width={20} height={18} color="#FFF" />
               </View>
-              <Text style={styles.menuText}>Referral Program</Text>
+              <Text style={styles.menuText}>{t('drawer.referral')}</Text>
             </View>
             <ChevronRight width={20} height={20} color="#9CA3AF" />
           </TouchableOpacity>
@@ -159,7 +161,7 @@ const MainDrawer = () => {
               <View style={styles.iconCircle}>
                 <MessageCircle width={20} height={18} color="#FFF" />
               </View>
-              <Text style={styles.menuText}>My Chats</Text>
+              <Text style={styles.menuText}>{t('drawer.chats')}</Text>
             </View>
             <ChevronRight width={20} height={20} color="#9CA3AF" />
           </TouchableOpacity>
@@ -175,14 +177,14 @@ const MainDrawer = () => {
               <View style={styles.iconCircle}>
                 <ClipboardList width={20} height={18} color="#FFF" />
               </View>
-              <Text style={styles.menuText}>Job Applications</Text>
+              <Text style={styles.menuText}>{t('drawer.job_applications')}</Text>
             </View>
             <ChevronRight width={20} height={20} color="#9CA3AF" />
           </TouchableOpacity>
         </View>
 
         <View style={styles.drawerSection}>
-          <Text style={styles.sectionHeader}>Professional</Text>
+          <Text style={styles.sectionHeader}>{t('drawer.professional')}</Text>
 
           <TouchableOpacity
             style={styles.menuItem}
@@ -195,10 +197,8 @@ const MainDrawer = () => {
               </View>
 
               <View>
-                <Text style={styles.menuText}>My Posted Availability</Text>
-                <Text style={styles.menuSubtext}>
-                  Post & See Availabilities
-                </Text>
+                <Text style={styles.menuText}>{t('drawer.my_availability')}</Text>
+                <Text style={styles.menuSubtext}>{t('drawer.availability_sub')}</Text>
               </View>
             </View>
 
@@ -216,7 +216,7 @@ const MainDrawer = () => {
               </View>
 
               <View>
-                <Text style={styles.menuText}>Resume & Docs</Text>
+                <Text style={styles.menuText}>{t('drawer.resume_docs')}</Text>
                 {/* <Text style={styles.menuSubtext}>Last Updated 2 Days Ago</Text> */}
               </View>
             </View>
@@ -240,18 +240,15 @@ const MainDrawer = () => {
             </View>
 
             <View>
-              <Text style={styles.bannerTitle}>Upgrade To Pro</Text>
-
-              <Text style={styles.bannerSubtitle}>
-                Get Priority On High-Paying{'\n'}Gigs At Luxury Hotels
-              </Text>
+              <Text style={styles.bannerTitle}>{t('drawer.upgrade_title')}</Text>
+              <Text style={styles.bannerSubtitle}>{t('drawer.upgrade_subtitle')}</Text>
 
               <TouchableOpacity
                 style={styles.viewPlansBtn}
                 activeOpacity={0.7}
                 onPress={() => navigation.navigate('membership')}
               >
-                <Text style={styles.viewPlansText}>View Plans</Text>
+                <Text style={styles.viewPlansText}>{t('drawer.view_plans')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -264,7 +261,7 @@ const MainDrawer = () => {
             onPress={() => navigation.navigate('profile')}
           >
             <Settings width={20} height={20} color="#FFF" />
-            <Text style={styles.footerText}>Settings</Text>
+            <Text style={styles.footerText}>{t('drawer.settings')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -283,7 +280,7 @@ const MainDrawer = () => {
             }}
           >
             <LogOut width={20} height={20} color="#EF4444" />
-            <Text style={styles.logoutText}>Log Out</Text>
+            <Text style={styles.logoutText}>{t('drawer.logout')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

@@ -1,0 +1,111 @@
+{
+  "language": {
+    "screen_title": "Jezik",
+    "search_placeholder": "Pretraži jezik...",
+    "save_changes": "Sačuvaj izmene",
+    "cancel": "Otkaži",
+    "default": "Podrazumevano"
+  },
+  "tabs": {
+    "find_workers": "Pronađi radnike",
+    "full_time": "Puno radno vreme"
+  },
+  "common": {
+    "cancel": "Otkaži",
+    "view_profile": "Pogledaj profil",
+    "verified": "Verifikovan",
+    "not_specified": "Nije navedeno",
+    "date_unavailable": "Datum nije dostupan",
+    "no_skills": "Bez veština",
+    "not_set": "Nije postavljeno"
+  },
+  "accept_decline": {
+    "decline": "Odbij",
+    "accept": "Prihvati ponudu"
+  },
+  "worker_card": {
+    "mi_away": "Mi dalje",
+    "busy": "Zauzet",
+    "send_offer": "Pošalji ponudu",
+    "unavailable": "Trenutno nedostupan"
+  },
+  "active_post": {
+    "title": "Aktivan oglas",
+    "subtitle": "Odmah vidljiv poslodavcima"
+  },
+  "availability_price": {
+    "label": "Satnica",
+    "unit": "/ sat"
+  },
+  "category": {
+    "title": "Kategorija",
+    "placeholder": "Dodaj kategoriju"
+  },
+  "availability_heading": {
+    "job_details": "Detalji posla",
+    "target_position": "Ciljna pozicija",
+    "job_title_placeholder": "Unesite naziv posla"
+  },
+  "availability_location": {
+    "title": "Željena lokacija",
+    "placeholder": "Dodaj lokacije"
+  },
+  "choose_availability": {
+    "title": "Odaberi dostupnost",
+    "subtitle": "Izaberi oglas dostupnosti za slanje",
+    "empty": "Ovaj radnik nema aktivnih oglasa",
+    "full_time": "Puno radno vreme",
+    "daily": "Dnevno",
+    "seasonal": "Sezonski",
+    "cancel": "Otkaži"
+  },
+  "post_type": {
+    "title": "Objavi posao i dostupnost",
+    "full_time": "Posao na puno radno vreme",
+    "seasonal": "Sezonska dostupnost",
+    "daily": "Dnevna smena",
+    "cancel": "Otkaži"
+  },
+  "resume": {
+    "title": "CV / Biografija"
+  },
+  "upload_banner": {
+    "upload": "Otpremi baner sliku",
+    "ratio": "Preporučeni odnos 16:9"
+  },
+  "review": {
+    "heading": "Oceni iskustvo",
+    "subheading": "Kako je bilo raditi sa {{name}}?",
+    "placeholder": "Napiši recenziju... (opciono)",
+    "submit": "Pošalji recenziju",
+    "skip": "Preskoči za sada"
+  },
+  "feed_card": {
+    "time": "Vreme",
+    "target_position": "Ciljna pozicija",
+    "availability": "Dostupnost",
+    "next_available": "Sledeća dostupnost",
+    "view_profile": "Pogledaj profil"
+  },
+  "gig": {
+    "available_now": "Dostupno sada",
+    "empty": "Nema objavljene dostupnosti",
+    "see_more": "Vidi više"
+  },
+  "drawer": {
+    "dashboard": "Kontrolna tabla",
+    "saved_posts": "Sačuvani oglasi",
+    "referral": "Program preporuke",
+    "chats": "Moji razgovori",
+    "job_applications": "Prijave za posao",
+    "professional": "Profesionalno",
+    "my_availability": "Moja objavljena dostupnost",
+    "availability_sub": "Objavi i pogledaj dostupnosti",
+    "resume_docs": "CV i dokumenti",
+    "upgrade_title": "Nadogradi na Pro",
+    "upgrade_subtitle": "Dobij prioritet za visoko plaćene\nposlove u luksuznim hotelima",
+    "view_plans": "Pogledaj planove",
+    "settings": "Podešavanja",
+    "logout": "Odjavi se"
+  }
+}

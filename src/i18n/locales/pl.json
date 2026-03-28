@@ -1,0 +1,111 @@
+{
+  "language": {
+    "screen_title": "Język",
+    "search_placeholder": "Szukaj języka...",
+    "save_changes": "Zapisz zmiany",
+    "cancel": "Anuluj",
+    "default": "Domyślny"
+  },
+  "tabs": {
+    "find_workers": "Find Workers",
+    "full_time": "Full-Time"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "view_profile": "View Profile",
+    "verified": "Verified",
+    "not_specified": "Not specified",
+    "date_unavailable": "Date not available",
+    "no_skills": "No skills",
+    "not_set": "Not set"
+  },
+  "accept_decline": {
+    "decline": "Decline",
+    "accept": "Accept Offer"
+  },
+  "worker_card": {
+    "mi_away": "Mi Away",
+    "busy": "Busy",
+    "send_offer": "Send Offer",
+    "unavailable": "Currently Unavailable"
+  },
+  "active_post": {
+    "title": "Active Post",
+    "subtitle": "Immediately Visible To Employers"
+  },
+  "availability_price": {
+    "label": "Hourly Rate",
+    "unit": "/ hr"
+  },
+  "category": {
+    "title": "Category",
+    "placeholder": "Add Category"
+  },
+  "availability_heading": {
+    "job_details": "Job Details",
+    "target_position": "Target Position",
+    "job_title_placeholder": "Enter job title"
+  },
+  "availability_location": {
+    "title": "Preferred Location",
+    "placeholder": "Add locations"
+  },
+  "choose_availability": {
+    "title": "Choose Availability",
+    "subtitle": "Select one availability post to send engagement",
+    "empty": "This worker has no active availability posts",
+    "full_time": "Full Time",
+    "daily": "Daily",
+    "seasonal": "Seasonal",
+    "cancel": "Cancel"
+  },
+  "post_type": {
+    "title": "Post Job & Availability",
+    "full_time": "Full Time Job",
+    "seasonal": "Seasonal Availability",
+    "daily": "Daily Shift Availability",
+    "cancel": "Cancel"
+  },
+  "resume": {
+    "title": "Resume/CV"
+  },
+  "upload_banner": {
+    "upload": "Upload banner image",
+    "ratio": "Recommended ratio 16:9"
+  },
+  "review": {
+    "heading": "Rate Your Experience",
+    "subheading": "How was working with {{name}}?",
+    "placeholder": "Write a review... (optional)",
+    "submit": "Submit Review",
+    "skip": "Skip for now"
+  },
+  "feed_card": {
+    "time": "Time",
+    "target_position": "Target Position",
+    "availability": "Availability",
+    "next_available": "Next Available",
+    "view_profile": "View Profile"
+  },
+  "gig": {
+    "available_now": "Available Now",
+    "empty": "No availability posted yet",
+    "see_more": "See More"
+  },
+  "drawer": {
+    "dashboard": "Dashboard",
+    "saved_posts": "Saved Posts",
+    "referral": "Referral Program",
+    "chats": "My Chats",
+    "job_applications": "Job Applications",
+    "professional": "Professional",
+    "my_availability": "My Posted Availability",
+    "availability_sub": "Post & See Availabilities",
+    "resume_docs": "Resume & Docs",
+    "upgrade_title": "Upgrade To Pro",
+    "upgrade_subtitle": "Get Priority On High-Paying\nGigs At Luxury Hotels",
+    "view_plans": "View Plans",
+    "settings": "Settings",
+    "logout": "Log Out"
+  }
+}

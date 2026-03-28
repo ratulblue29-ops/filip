@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { useTranslation } from 'react-i18next';
 type PostTypeModalProps = {
   visible: boolean;
   onClose: () => void;
@@ -15,6 +16,7 @@ const PostTypeModal: React.FC<PostTypeModalProps> = ({
   onSelectSeasonal,
   onSelectDaily,
 }) => {
+  const { t } = useTranslation();
   return (
     <Modal
       visible={visible}
@@ -24,28 +26,28 @@ const PostTypeModal: React.FC<PostTypeModalProps> = ({
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Post Job & Availability</Text>
+          <Text style={styles.modalTitle}>{t('post_type.title')}</Text>
 
           <TouchableOpacity
             style={styles.modalOption}
             onPress={onSelectFullTime}
           >
-            <Text style={styles.modalOptionText}>Full Time Job</Text>
+            <Text style={styles.modalOptionText}>{t('post_type.full_time')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.modalOption}
             onPress={onSelectSeasonal}
           >
-            <Text style={styles.modalOptionText}>Seasonal Availability</Text>
+            <Text style={styles.modalOptionText}>{t('post_type.seasonal')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.modalOption} onPress={onSelectDaily}>
-            <Text style={styles.modalOptionText}>Daily Shift Availability</Text>
+            <Text style={styles.modalOptionText}>{t('post_type.daily')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.modalCancel} onPress={onClose}>
-            <Text style={styles.modalCancelText}>Cancel</Text>
+            <Text style={styles.modalCancelText}>{t('post_type.cancel')}</Text>
           </TouchableOpacity>
         </View>
       </View>

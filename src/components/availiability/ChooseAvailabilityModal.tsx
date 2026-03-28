@@ -14,6 +14,7 @@ import {
   CalendarRange,
   MapPin,
 } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 type AvailabilityPost = {
   id: string;
@@ -39,6 +40,7 @@ const ChooseAvailabilityModal = ({
   loading,
   onSelect,
 }: ChooseAvailabilityModalProps) => {
+  const { t } = useTranslation();
   return (
     <Modal
       visible={visible}
@@ -50,15 +52,13 @@ const ChooseAvailabilityModal = ({
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Choose Availability</Text>
+            <Text style={styles.title}>{t('choose_availability.title')}</Text>
             <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
               <X size={22} color="#fff" />
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.subtitle}>
-            Select one availability post to send engagement
-          </Text>
+          <Text style={styles.subtitle}>{t('choose_availability.subtitle')}</Text>
 
           {/* Content */}
           {loading ? (
@@ -68,9 +68,7 @@ const ChooseAvailabilityModal = ({
               style={styles.loader}
             />
           ) : posts.length === 0 ? (
-            <Text style={styles.emptyText}>
-              This worker has no active availability posts
-            </Text>
+            <Text style={styles.emptyText}>{t('choose_availability.empty')}</Text>
           ) : (
             <FlatList
               data={posts}
@@ -115,10 +113,10 @@ const ChooseAvailabilityModal = ({
                     <View style={styles.typeBadge}>
                       <Text style={styles.typeBadgeText}>
                         {item.type === 'fulltime'
-                          ? 'Full Time'
+                          ? t('choose_availability.full_time')
                           : item.type === 'daily'
-                          ? 'Daily'
-                          : 'Seasonal'}
+                            ? t('choose_availability.daily')
+                            : t('choose_availability.seasonal')}
                       </Text>
                     </View>
                   </View>
@@ -133,7 +131,7 @@ const ChooseAvailabilityModal = ({
             onPress={onClose}
             activeOpacity={0.7}
           >
-            <Text style={styles.cancelText}>Cancel</Text>
+            <Text style={styles.cancelText}>{t('choose_availability.cancel')}</Text>
           </TouchableOpacity>
         </View>
       </View>

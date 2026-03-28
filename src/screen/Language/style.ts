@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
   },
 
   flagIcon: {
+    width: 35,
     height: 25,
     marginRight: 12,
   },

@@ -5,6 +5,7 @@ import HomeIcon from '../components/svg/HomeIcon';
 import ExploreIcon from '../components/svg/ExploreIcon';
 import ChatIcon from '../components/svg/ChatIcon';
 import ProfileIcon from '../components/svg/ProfileIcon';
+import { useTranslation } from 'react-i18next';
 
 const ICONS: any = {
   Feed: HomeIcon,
@@ -14,6 +15,7 @@ const ICONS: any = {
 };
 
 export default function CustomTabBar({ state, navigation }: any) {
+  const { t } = useTranslation();
   return (
     <View style={styles.wrapper}>
       <View style={styles.container}>
@@ -35,10 +37,10 @@ export default function CustomTabBar({ state, navigation }: any) {
                   {focused && (
                     <Text style={styles.label}>
                       {route.name === 'FindWorkers'
-                        ? 'Find Workers'
+                        ? t('tabs.find_workers')
                         : route.name === 'fulltime'
-                        ? 'Full-Time'
-                        : route.name}
+                          ? t('tabs.full_time')
+                          : route.name}
                     </Text>
                   )}
                 </Text>

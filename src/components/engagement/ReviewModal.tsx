@@ -12,6 +12,7 @@ import { Star, X } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { submitReview } from '../../services/review';
+import { useTranslation } from 'react-i18next';
 
 type ReviewModalProps = {
   visible: boolean;
@@ -30,6 +31,7 @@ const ReviewModal = ({
   toUserName,
   role,
 }: ReviewModalProps) => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [rating, setRating] = useState(0);
   const [text, setText] = useState('');
@@ -72,8 +74,8 @@ const ReviewModal = ({
             <X size={20} color="#fff" />
           </TouchableOpacity>
 
-          <Text style={s.heading}>Rate Your Experience</Text>
-          <Text style={s.subheading}>How was working with {toUserName}?</Text>
+          <Text style={s.heading}>{t('review.heading')}</Text>
+          <Text style={s.subheading}>{t('review.subheading', { name: toUserName })}</Text>
 
           {/* Star Rating */}
           <View style={s.starsRow}>
@@ -95,7 +97,7 @@ const ReviewModal = ({
 
           <TextInput
             style={s.input}
-            placeholder="Write a review... (optional)"
+            placeholder={t('review.placeholder')}
             placeholderTextColor="#555"
             multiline
             numberOfLines={4}
@@ -112,12 +114,12 @@ const ReviewModal = ({
             {isPending ? (
               <ActivityIndicator color="#000" />
             ) : (
-              <Text style={s.submitText}>Submit Review</Text>
+              <Text style={s.submitText}>{t('review.submit')}</Text>
             )}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-            <Text style={s.skipText}>Skip for now</Text>
+            <Text style={s.skipText}>{t('review.skip')}</Text>
           </TouchableOpacity>
         </View>
       </View>

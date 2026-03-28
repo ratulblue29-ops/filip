@@ -19,6 +19,7 @@ import { navigationRef } from './src/utils/navigationRef';
 import { handleNotificationNavigation } from './src/utils/notificationNavigation';
 import { registerFCMToken } from './src/services/FCMnotification';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
+import { initI18n } from './src/i18n';
 
 // Ignore deprecated Firebase namespaced API warnings
 LogBox.ignoreLogs([
@@ -108,6 +109,10 @@ const App = () => {
     });
 
     return unsubscribeBackground;
+  }, []);
+
+  useEffect(() => {
+    initI18n().catch(err => console.warn('[i18n] init failed:', err));
   }, []);
 
   return (

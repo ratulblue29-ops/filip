@@ -16,6 +16,7 @@ import FeedCardSkeleton from '../skeleton/FeedCardSkeleton';
 
 import { fetchRecommendedJobsPaginated } from '../../services/jobs';
 import { fetchWishlistIds } from '../../services/wishlist';
+import { useTranslation } from 'react-i18next';
 
 type GigProps = {
   refreshing: boolean;
@@ -23,6 +24,7 @@ type GigProps = {
 };
 
 const Gig = ({ refreshing, onRefresh }: GigProps) => {
+  const { t } = useTranslation();
   // RECOMMENDED JOBS
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
@@ -78,7 +80,7 @@ const Gig = ({ refreshing, onRefresh }: GigProps) => {
   return (
     <View>
       <View style={styles.headerRow}>
-        <Text style={styles.sectionTitle}>Available Now</Text>
+        <Text style={styles.sectionTitle}>{t('gig.available_now')}</Text>
       </View>
 
       <FlatList
@@ -89,7 +91,7 @@ const Gig = ({ refreshing, onRefresh }: GigProps) => {
         )}
         ListEmptyComponent={
           <View style={styles.noResultContainer}>
-            <Text style={styles.noResultText}>No availability posted yet</Text>
+            <Text style={styles.noResultText}>{t('gig.empty')}</Text>
           </View>
         }
         showsVerticalScrollIndicator={false}
@@ -110,7 +112,7 @@ const Gig = ({ refreshing, onRefresh }: GigProps) => {
                 {isFetchingNextPage ? (
                   <ActivityIndicator color="#fcd303" />
                 ) : (
-                  <Text style={styles.seeAllText}>See More</Text>
+                  <Text style={styles.seeAllText}>{t('gig.see_more')}</Text>
                 )}
               </TouchableOpacity>
             ) : null}

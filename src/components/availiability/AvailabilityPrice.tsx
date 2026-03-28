@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 const AvailabilityPrice = ({
     price,
@@ -8,9 +9,10 @@ const AvailabilityPrice = ({
     price: string;
     setPrice: React.Dispatch<React.SetStateAction<string>>;
 }) => {
+    const { t } = useTranslation();
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Hourly Rate</Text>
+            <Text style={styles.label}>{t('availability_price.label')}</Text>
             <View style={styles.inputWrapper}>
                 <Text style={styles.currency}>€</Text>
                 <TextInput
@@ -21,7 +23,7 @@ const AvailabilityPrice = ({
                     value={price}
                     onChangeText={setPrice}
                 />
-                <Text style={styles.unit}>/ hr</Text>
+                <Text style={styles.unit}>{t('availability_price.unit')}</Text>
             </View>
         </View>
     );

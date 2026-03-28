@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Briefcase, Clock, MapPin, SendHorizontal } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../screen/dailyAvailability/style';
+import { useTranslation } from 'react-i18next';
 
 type DailyJob = {
   id: string;
@@ -31,12 +32,13 @@ const DEFAULT_AVATAR =
   'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg';
 
 const DailyCard = ({ item }: Props) => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
 
   const locationText =
     item.location.length > 0
       ? item.location.join(', ')
-      : item.user.city || 'N/A';
+      : item.user.city || t('daily_card.na');
 
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -78,7 +80,7 @@ const DailyCard = ({ item }: Props) => {
                 backgroundColor: isToday ? '#4ADE80' : isSoon ? '#F59E0B' : '#6B7280',
               }} />
               <Text style={{ color: '#FFF', fontSize: 12, fontFamily: 'InterDisplayMedium' }}>
-                {isToday ? 'Available Today' : isSoon ? 'Starts Soon' : 'Ended'}
+                {isToday ? t('status.available_today') : isSoon ? t('status.starts_soon') : t('status.ended')}
               </Text>
             </View>
             <View style={styles.rateChip}>
@@ -96,9 +98,9 @@ const DailyCard = ({ item }: Props) => {
         <View style={styles.infoItem}>
           <Briefcase size={18} color="#FFD900" />
           <View>
-            <Text style={styles.infoLabel}>Position</Text>
+            <Text style={styles.infoLabel}>{t('daily_card.position')}</Text>
             <Text style={styles.infoValue} numberOfLines={1}>
-              {item.targetPosition || 'Not specified'}
+              {item.targetPosition || t('common.not_specified')}
             </Text>
           </View>
         </View>
@@ -113,7 +115,7 @@ const DailyCard = ({ item }: Props) => {
             <Text style={styles.infoValue}>
               {item.startTime && item.endTime
                 ? `${item.startTime} – ${item.endTime}`
-                : 'N/A'}
+                : t('daily_card.na')}
             </Text>
           </View>
         </View>
@@ -127,7 +129,7 @@ const DailyCard = ({ item }: Props) => {
         }
         activeOpacity={0.8}
       >
-        <Text style={styles.engageButtonText}>View Profile</Text>
+        <Text style={styles.engageButtonText}>{t('common.view_profile')}</Text>
         <SendHorizontal width={18} height={18} color="#1F2937" />
       </TouchableOpacity>
     </View>

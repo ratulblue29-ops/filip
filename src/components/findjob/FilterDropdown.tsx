@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { ChevronDown, Check, X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 type FilterDropdownProps = {
   label: string;
@@ -22,6 +23,7 @@ const FilterDropdown = ({
   selected,
   onSelect,
 }: FilterDropdownProps) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const isActive = selected !== null;
@@ -73,7 +75,7 @@ const FilterDropdown = ({
                   setOpen(false);
                 }}
               >
-                <Text style={s.clearText}>Clear filter</Text>
+                <Text style={s.clearText}>{t('filter_dropdown.clear')}</Text>
               </TouchableOpacity>
             )}
 

@@ -8,12 +8,14 @@ import { useQuery } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
 import { fetchWorkerActivePosts } from '../../services/engagement';
 import ChooseAvailabilityModal from '../availiability/ChooseAvailabilityModal';
+import { useTranslation } from 'react-i18next';
 
 type CandidateCardProps = {
   candidate: Worker;
 };
 
 const CandidateCard = ({ candidate }: CandidateCardProps) => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -80,7 +82,7 @@ const CandidateCard = ({ candidate }: CandidateCardProps) => {
           ]}
         />
         <Text style={styles.statusText}>
-          {isAvailableNow ? 'Available Now' : isStartsSoon ? 'Starts Soon' : 'Ended'}
+          {isAvailableNow ? t('status.available_now') : isStartsSoon ? t('status.starts_soon') : t('status.ended')}
         </Text>
       </View>
 
@@ -128,7 +130,7 @@ const CandidateCard = ({ candidate }: CandidateCardProps) => {
         </View>
 
         <TouchableOpacity style={styles.engageButton} onPress={handleEngage}>
-          <Text style={styles.engageButtonText}>Engage Candidate</Text>
+          <Text style={styles.engageButtonText}>{t('candidate_card.engage')}</Text>
           <SendHorizontal width={18} height={18} color="#1F2937" />
         </TouchableOpacity>
       </View>

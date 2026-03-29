@@ -32,8 +32,10 @@ import { useStripe } from '@stripe/stripe-react-native';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchCurrentUser } from '../../services/user';
+import { usePaymentFlag } from '../../hooks/usePaymentFlag';
 
 const CreditsScreen = () => {
+  const paymentEnabled = usePaymentFlag();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
@@ -182,118 +184,123 @@ const CreditsScreen = () => {
         </View>
 
         {/* Purchase Pack Section */}
-        <Text style={styles.sectionTitle}>Purchase Pack</Text>
+        {paymentEnabled && (
+          <>
+            <Text style={styles.sectionTitle}>Purchase Pack</Text>
 
-        <View style={styles.packGrid}>
-          {/* 1 Credit Pack */}
-          <View style={styles.smallPackCard}>
-            <View style={styles.clockIconWrapper}>
-              <Clock4 width={24} height={24} color="#FFD900" />
-            </View>
-            <Text style={styles.smallPackTitle}>Starter</Text>
-            <Text style={styles.smallPackTitle}>1 Credit</Text>
 
-            <TouchableOpacity
-              style={styles.starterPackButton}
-              activeOpacity={0.7}
-              onPress={() => handleBuyCredits('credit_1')}
-              disabled={loadingPack !== null}
-            >
-              <Text style={styles.starterPackButtonText}>
-                {loadingPack === 'credit_1' ? '...' : '€1.99'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* 5 Credits Pack */}
-          <View style={styles.smallPackCard}>
-            <View style={styles.offersBadge}>
-              <Text style={styles.offersBadgeText}>Offers</Text>
-            </View>
-            <View style={styles.clockIconWrapper}>
-              <Clock4 width={24} height={24} color="#FFD900" />
-            </View>
-            <Text style={styles.smallPackTitle}>Bundle</Text>
-            <Text style={styles.smallPackTitle}>5 Credits</Text>
-
-            <TouchableOpacity
-              style={styles.seasonalPackButton}
-              activeOpacity={0.7}
-              onPress={() => handleBuyCredits('credit_5')}
-              disabled={loadingPack !== null}
-            >
-              <Text style={styles.seasonalPackButtonText}>
-                {loadingPack === 'credit_5' ? '...' : '€7.99'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* 12 Credits Pack */}
-        <View style={styles.premiumPackCard}>
-          <View style={styles.popularBadge}>
-            <Text style={styles.popularBadgeText}>Most Popular</Text>
-          </View>
-
-          <View style={styles.premiumPackContent}>
-            <View style={styles.premiumPackLeft}>
-              <View style={styles.wrapGem}>
-                <Gem width={32} height={32} color="#ffffff" />
-              </View>
-
-              <View style={styles.premiumPackInfo}>
-                <Text style={styles.premiumPackTitle}>Pro Pack</Text>
-                <Text style={styles.premiumPackCredits}>12 Credits</Text>
-
-                <View style={styles.saveBadge}>
-                  <Text style={styles.saveBadgeText}>Save 20%</Text>
+            <View style={styles.packGrid}>
+              {/* 1 Credit Pack */}
+              <View style={styles.smallPackCard}>
+                <View style={styles.clockIconWrapper}>
+                  <Clock4 width={24} height={24} color="#FFD900" />
                 </View>
+                <Text style={styles.smallPackTitle}>Starter</Text>
+                <Text style={styles.smallPackTitle}>1 Credit</Text>
+
+                <TouchableOpacity
+                  style={styles.starterPackButton}
+                  activeOpacity={0.7}
+                  onPress={() => handleBuyCredits('credit_1')}
+                  disabled={loadingPack !== null}
+                >
+                  <Text style={styles.starterPackButtonText}>
+                    {loadingPack === 'credit_1' ? '...' : '€1.99'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* 5 Credits Pack */}
+              <View style={styles.smallPackCard}>
+                <View style={styles.offersBadge}>
+                  <Text style={styles.offersBadgeText}>Offers</Text>
+                </View>
+                <View style={styles.clockIconWrapper}>
+                  <Clock4 width={24} height={24} color="#FFD900" />
+                </View>
+                <Text style={styles.smallPackTitle}>Bundle</Text>
+                <Text style={styles.smallPackTitle}>5 Credits</Text>
+
+                <TouchableOpacity
+                  style={styles.seasonalPackButton}
+                  activeOpacity={0.7}
+                  onPress={() => handleBuyCredits('credit_5')}
+                  disabled={loadingPack !== null}
+                >
+                  <Text style={styles.seasonalPackButtonText}>
+                    {loadingPack === 'credit_5' ? '...' : '€7.99'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
 
-            <TouchableOpacity
-              style={styles.premiumPackButton}
-              activeOpacity={0.7}
-              onPress={() => handleBuyCredits('credit_12')}
-              disabled={loadingPack !== null}
-            >
-              <Text style={styles.premiumPackButtonText}>
-                {loadingPack === 'credit_12' ? '...' : '€14.99'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* 30 Credits Pack */}
-        <View style={styles.elitePackCard}>
-          <View style={styles.bestValueBadge}>
-            <Text style={styles.bestValueBadgeText}>Best Value</Text>
-          </View>
-
-          <View style={styles.elitePackContent}>
-            <View style={styles.elitePackLeft}>
-              <View style={styles.wrapMedalIcon}>
-                <MedalIcon width={32} height={32} color="#000000" />
+            {/* 12 Credits Pack */}
+            <View style={styles.premiumPackCard}>
+              <View style={styles.popularBadge}>
+                <Text style={styles.popularBadgeText}>Most Popular</Text>
               </View>
 
-              <View style={styles.elitePackInfo}>
-                <Text style={styles.elitePackTitle}>ELITE</Text>
-                <Text style={styles.elitePackCredits}>30 Credits</Text>
+              <View style={styles.premiumPackContent}>
+                <View style={styles.premiumPackLeft}>
+                  <View style={styles.wrapGem}>
+                    <Gem width={32} height={32} color="#ffffff" />
+                  </View>
+
+                  <View style={styles.premiumPackInfo}>
+                    <Text style={styles.premiumPackTitle}>Pro Pack</Text>
+                    <Text style={styles.premiumPackCredits}>12 Credits</Text>
+
+                    <View style={styles.saveBadge}>
+                      <Text style={styles.saveBadgeText}>Save 20%</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.premiumPackButton}
+                  activeOpacity={0.7}
+                  onPress={() => handleBuyCredits('credit_12')}
+                  disabled={loadingPack !== null}
+                >
+                  <Text style={styles.premiumPackButtonText}>
+                    {loadingPack === 'credit_12' ? '...' : '€14.99'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
 
-            <TouchableOpacity
-              style={styles.elitePackButton}
-              activeOpacity={0.7}
-              onPress={() => handleBuyCredits('credit_30')}
-              disabled={loadingPack !== null}
-            >
-              <Text style={styles.elitePackButtonText}>
-                {loadingPack === 'credit_30' ? '...' : '€34.99'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            {/* 30 Credits Pack */}
+            <View style={styles.elitePackCard}>
+              <View style={styles.bestValueBadge}>
+                <Text style={styles.bestValueBadgeText}>Best Value</Text>
+              </View>
+
+              <View style={styles.elitePackContent}>
+                <View style={styles.elitePackLeft}>
+                  <View style={styles.wrapMedalIcon}>
+                    <MedalIcon width={32} height={32} color="#000000" />
+                  </View>
+
+                  <View style={styles.elitePackInfo}>
+                    <Text style={styles.elitePackTitle}>ELITE</Text>
+                    <Text style={styles.elitePackCredits}>30 Credits</Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.elitePackButton}
+                  activeOpacity={0.7}
+                  onPress={() => handleBuyCredits('credit_30')}
+                  disabled={loadingPack !== null}
+                >
+                  <Text style={styles.elitePackButtonText}>
+                    {loadingPack === 'credit_30' ? '...' : '€34.99'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        )}
 
         {/* Earn Free Credits Section */}
         <View style={styles.dividerRow}>

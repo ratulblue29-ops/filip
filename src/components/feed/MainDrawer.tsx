@@ -27,8 +27,10 @@ import { getFirestore, doc, getDoc } from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import ResumeDocsModal from '../modals/ResumeDocsModal';
 import { useTranslation } from 'react-i18next';
+import { usePaymentFlag } from '../../hooks/usePaymentFlag';
 
 const MainDrawer = () => {
+  const paymentEnabled = usePaymentFlag();
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const [showBanner, setShowBanner] = useState(true);
@@ -225,7 +227,7 @@ const MainDrawer = () => {
           </TouchableOpacity>
         </View>
 
-        {showBanner && (
+        {showBanner && paymentEnabled && (
           <View style={styles.premiumBanner}>
             <TouchableOpacity
               style={styles.closeButton}

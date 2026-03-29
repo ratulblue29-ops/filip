@@ -19,8 +19,10 @@ import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
 import { useStripe } from '@stripe/stripe-react-native';
 import Toast from 'react-native-toast-message';
+import { usePaymentFlag } from '../../hooks/usePaymentFlag';
 
 const MemberShipScreen = () => {
+  const paymentEnabled = usePaymentFlag();
   const navigation = useNavigation<any>();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
@@ -199,15 +201,22 @@ const MemberShipScreen = () => {
               <Text style={styles.featureTextDisabled}>Direct Messaging</Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.standardButton}
-            onPress={handleChooseStandard}
-            disabled={loading}
-          >
-            <Text style={styles.standardButtonText}>
-              {loading ? 'Processing...' : 'Choose Standard'}
-            </Text>
-          </TouchableOpacity>
+          {paymentEnabled ? (
+            <TouchableOpacity
+              style={styles.standardButton}
+              onPress={handleChooseStandard}
+              disabled={loading}
+            >
+              <Text style={styles.standardButtonText}>
+                {loading ? 'Processing...' : 'Choose Standard'}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.standardButton} disabled>
+              <Text style={styles.standardButtonText}>Coming Soon</Text>
+            </TouchableOpacity>
+          )}
+
         </View>
         {/* Premium Plan */}
         <View style={styles.premiumCard}>
@@ -235,17 +244,17 @@ const MemberShipScreen = () => {
               <Text style={styles.featureText}>Priority Support</Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.premiumButton}
-            onPress={handleGoPremium}
-            disabled={loading}
-          >
-            <Text style={styles.premiumButtonText}>
-              {loading ? 'Processing...' : 'Go Premium'}
-            </Text>
-          </TouchableOpacity>
+          {paymentEnabled ? (
+            <TouchableOpacity style={styles.premiumButton} onPress={handleGoPremium} disabled={loading}>
+              <Text style={styles.premiumButtonText}>{loading ? 'Processing...' : 'Go Premium'}</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.premiumButton} disabled>
+              <Text style={styles.premiumButtonText}>Coming Soon</Text>
+            </TouchableOpacity>
+          )}
         </View>
-        {loading && <ActivityIndicator style={styles.loading} />}
+        {paymentEnabled && loading && <ActivityIndicator style={styles.loading} />}
       </ScrollView>
     </SafeAreaView>
   );

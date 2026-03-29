@@ -20,8 +20,10 @@ import { fetchDailyJobs } from '../../services/jobs';
 import { styles } from './style';
 import CandidateCardSkeleton from '../../components/skeleton/CandidateCardSkeleton';
 import FilterDropdown from '../../components/findjob/FilterDropdown';
+import { useTranslation } from 'react-i18next';
 
 const DailyAvailabilityScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const [search, setSearch] = useState('');
   const [availabilityFilter, setAvailabilityFilter] = useState<string | null>(null);
@@ -44,7 +46,7 @@ const DailyAvailabilityScreen = () => {
     return [...new Set(all)] as string[];
   }, [jobs]);
 
-  const availabilityOptions = ['Available Today', 'Starts Soon'];
+  const availabilityOptions = [t('daily_screen.available_today'), t('daily_screen.starts_soon')];
 
   const handleReset = () => {
     setAvailabilityFilter(null);
@@ -84,18 +86,18 @@ const DailyAvailabilityScreen = () => {
       );
     }
 
-    if (availabilityFilter === 'Available Today') {
+    if (availabilityFilter === t('daily_screen.available_today')) {
       const now = new Date();
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       result = result.filter((j: any) => j.date === today);
-    } else if (availabilityFilter === 'Starts Soon') {
+    } else if (availabilityFilter === t('daily_screen.starts_soon')) {
       const now = new Date();
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       result = result.filter((j: any) => j.date > today);
     }
 
     return result;
-  }, [jobs, search, locationFilter, availabilityFilter]);
+  }, [jobs, search, locationFilter, availabilityFilter, t]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -106,7 +108,7 @@ const DailyAvailabilityScreen = () => {
         {/* <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft width={22} height={22} color="white" />
         </TouchableOpacity> */}
-        <Text style={styles.headerTitle}>Daily Talent</Text>
+        <Text style={styles.headerTitle}>{t('daily_screen.title')}</Text>
         <NotificationDot hasUnread={hasUnread} />
       </View>
 
@@ -114,7 +116,7 @@ const DailyAvailabilityScreen = () => {
       <View style={styles.searchContainer}>
         <Search width={24} height={24} color="white" />
         <TextInput
-          placeholder="Search by position, name, city..."
+          placeholder={t('daily_screen.search_placeholder')}
           placeholderTextColor="#9CA3AF"
           style={styles.input}
           value={search}
@@ -128,10 +130,10 @@ const DailyAvailabilityScreen = () => {
           style={styles.chip}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.chipText}>Seasonal</Text>
+          <Text style={styles.chipText}>{t('find_workers.seasonal')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.chip, styles.activeChip]}>
-          <Text style={styles.activeChipText}>Daily</Text>
+          <Text style={styles.activeChipText}>{t('find_workers.daily')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -141,8 +143,8 @@ const DailyAvailabilityScreen = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           data={[
-            { key: 'availability', label: 'Availability', options: availabilityOptions, selected: availabilityFilter, onSelect: setAvailabilityFilter },
-            { key: 'location', label: 'Location', options: locationOptions, selected: locationFilter, onSelect: setLocationFilter },
+            { key: 'availability', label: t('find_workers.availability'), options: availabilityOptions, selected: availabilityFilter, onSelect: setAvailabilityFilter },
+            { key: 'location', label: t('find_workers.location'), options: locationOptions, selected: locationFilter, onSelect: setLocationFilter },
           ]}
           keyExtractor={item => item.key}
           renderItem={({ item }) => (
@@ -158,10 +160,10 @@ const DailyAvailabilityScreen = () => {
 
       {/* List Header */}
       <View style={styles.listHeader}>
-        <Text style={styles.countText}>{filtered.length} Available</Text>
+        <Text style={styles.countText}>{filtered.length} {t('daily_screen.available')}</Text>
         {hasActiveFilters ? (
           <TouchableOpacity onPress={handleReset}>
-            <Text style={{ color: '#FF4444', fontSize: 13, fontFamily: 'InterDisplayRegular' }}>Reset</Text>
+            <Text style={{ color: '#FF4444', fontSize: 13, fontFamily: 'InterDisplayRegular' }}>{t('find_workers.reset')}</Text>
           </TouchableOpacity>
         ) : null}
       </View>

@@ -40,6 +40,7 @@ import { fetchMyNotifications } from '../../services/notification';
 import { NotificationItem } from '../../@types/notificationIte.type';
 // import { createOrGetChat } from '../../services/chat';
 import { updateEngagementStatus } from '../../services/engagement';
+import { useTranslation } from 'react-i18next';
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 
@@ -163,6 +164,7 @@ const mapNotificationTypeToIcon = (type: string, isNew: boolean) => {
 /* ─── Screen ──────────────────────────────────────────────────────────────── */
 
 const NotificationScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
 
@@ -437,11 +439,11 @@ const NotificationScreen = () => {
           <ArrowLeft width={24} height={24} color="#fff" />
         </TouchableOpacity>
 
-        <Text style={styles.title}>Notifications</Text>
+        <Text style={styles.title}>{t('notifications.title')}</Text>
 
         <TouchableOpacity onPress={() => markAllRead()} disabled={isPending}>
           <Text style={styles.markAllRead}>
-            {isPending ? 'Marking...' : 'Mark all read'}
+            {isPending ? t('notifications.marking') : t('notifications.mark_all_read')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -450,7 +452,7 @@ const NotificationScreen = () => {
       <View style={styles.searchContainer}>
         <Search width={24} height={24} color="#fff" />
         <TextInput
-          placeholder="Search Notification"
+          placeholder={t('notifications.search_placeholder')}
           placeholderTextColor="#9CA3AF"
           style={styles.input}
           value={searchQuery}
@@ -482,7 +484,7 @@ const NotificationScreen = () => {
 
             return (
               <View key={section}>
-                <Text style={styles.sectionTitle}>{section}</Text>
+                <Text style={styles.sectionTitle}>{t(`notifications.${section.toLowerCase()}`)}</Text>
 
                 {items.map(item => (
                   // <TouchableOpacity
@@ -623,7 +625,7 @@ const NotificationScreen = () => {
                             style={styles.notificationDescription}
                             numberOfLines={1}
                           >
-                            €{item.jobRate}/{item.jobUnit} · Tap to view
+                            {`€${item.jobRate}/${item.jobUnit} · ${t('notifications.tap_to_view')}`}
                           </Text>
                         )}
                       </View>
@@ -702,9 +704,7 @@ const NotificationScreen = () => {
                                   fontSize: 13,
                                 }}
                               >
-                                {decision === 'accepted'
-                                  ? '✓ Accepted'
-                                  : '✕ Declined'}
+                                {decision === 'accepted' ? t('notifications.accepted') : t('notifications.declined')}
                               </Text>
                             </View>
                           );
@@ -737,7 +737,7 @@ const NotificationScreen = () => {
                                 <Text
                                   style={{ color: '#000', fontWeight: '600' }}
                                 >
-                                  Accept
+                                  {t('notifications.accept')}
                                 </Text>
                               )}
                             </TouchableOpacity>
@@ -768,7 +768,7 @@ const NotificationScreen = () => {
                                     fontWeight: '600',
                                   }}
                                 >
-                                  Decline
+                                  {t('notifications.decline')}
                                 </Text>
                               )}
                             </TouchableOpacity>
@@ -782,7 +782,7 @@ const NotificationScreen = () => {
           })}
 
           {filteredNotifications.length === 0 && (
-            <Text style={styles.noResults}>No notifications found</Text>
+            <Text style={styles.noResults}>{t('notifications.no_results')}</Text>
           )}
         </ScrollView>
       )}

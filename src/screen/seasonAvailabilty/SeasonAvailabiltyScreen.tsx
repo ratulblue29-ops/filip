@@ -20,8 +20,10 @@ import CandidateCardSkeleton from '../../components/skeleton/CandidateCardSkelet
 import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
 import NotificationDot from '../../components/feed/NotificationDot';
 import FilterDropdown from '../../components/findjob/FilterDropdown';
+import { useTranslation } from 'react-i18next';
 
 const SeasonAvailabilityScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const [search, setSearch] = useState('');
   const [positionFilter, setPositionFilter] = useState<string | null>(null);
@@ -68,8 +70,8 @@ const SeasonAvailabilityScreen = () => {
     return [...new Set(all)] as string[];
   }, [workers]);
 
-  const availabilityOptions = ['Available Now', 'Starts Soon'];
-  const sortOptions = ['Newest First', 'Oldest First'];
+  const availabilityOptions = [t('find_workers.available_now'), t('find_workers.starts_soon')];
+  const sortOptions = [t('find_workers.newest_first'), t('find_workers.oldest_first')];
 
   const filteredWorkers = useMemo(() => {
     if (!workers) return [];
@@ -104,14 +106,14 @@ const SeasonAvailabilityScreen = () => {
       );
     }
 
-    if (availabilityFilter === 'Available Now') {
+    if (availabilityFilter === t('find_workers.available_now')) {
       const now = new Date();
       result = result.filter((w: any) => {
         const start = w.dateRange?.start ? new Date(w.dateRange.start) : null;
         const end = w.dateRange?.end ? new Date(w.dateRange.end) : null;
         return start && end && now >= start && now <= end;
       });
-    } else if (availabilityFilter === 'Starts Soon') {
+    } else if (availabilityFilter === t('find_workers.starts_soon')) {
       const now = new Date();
       result = result.filter((w: any) => {
         const start = w.dateRange?.start ? new Date(w.dateRange.start) : null;
@@ -119,13 +121,13 @@ const SeasonAvailabilityScreen = () => {
       });
     }
 
-    if (sortBy === 'Newest First') {
+    if (sortBy === t('find_workers.newest_first')) {
       result.sort((a: any, b: any) => {
         const aTime = new Date(a.dateRange?.start ?? 0).getTime();
         const bTime = new Date(b.dateRange?.start ?? 0).getTime();
         return bTime - aTime;
       });
-    } else if (sortBy === 'Oldest First') {
+    } else if (sortBy === t('find_workers.oldest_first')) {
       result.sort((a: any, b: any) => {
         const aTime = new Date(a.dateRange?.start ?? 0).getTime();
         const bTime = new Date(b.dateRange?.start ?? 0).getTime();
@@ -141,6 +143,7 @@ const SeasonAvailabilityScreen = () => {
     availabilityFilter,
     sortBy,
     search,
+    t,
   ]);
 
   const hasActiveFilters =
@@ -161,7 +164,7 @@ const SeasonAvailabilityScreen = () => {
         <NotificationDot hasUnread={hasUnread} />
       </View> */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Find Workers</Text>
+        <Text style={styles.headerTitle}>{t('find_workers.title')}</Text>
         <NotificationDot hasUnread={hasUnread} />
       </View>
 
@@ -169,7 +172,7 @@ const SeasonAvailabilityScreen = () => {
       <View style={styles.searchContainer}>
         <Search width={24} height={24} color="white" />
         <TextInput
-          placeholder="Search"
+          placeholder={t('find_workers.search_placeholder')}
           placeholderTextColor="#9CA3AF"
           style={styles.input}
           value={search}
@@ -180,13 +183,13 @@ const SeasonAvailabilityScreen = () => {
       {/* Type Tabs */}
       <View style={styles.tabRow}>
         <TouchableOpacity style={[styles.chip, styles.activeChip]}>
-          <Text style={styles.activeChipText}>Seasonal</Text>
+          <Text style={styles.activeChipText}>{t('find_workers.seasonal')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.chip}
           onPress={() => navigation.navigate('Daily')}
         >
-          <Text style={styles.chipText}>Daily</Text>
+          <Text style={styles.chipText}>{t('find_workers.daily')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -237,21 +240,21 @@ const SeasonAvailabilityScreen = () => {
           data={[
             {
               key: 'position',
-              label: 'Position',
+              label: t('find_workers.position'),
               options: positionOptions,
               selected: positionFilter,
               onSelect: setPositionFilter,
             },
             {
               key: 'availability',
-              label: 'Availability',
+              label: t('find_workers.availability'),
               options: availabilityOptions,
               selected: availabilityFilter,
               onSelect: setAvailabilityFilter,
             },
             {
               key: 'location',
-              label: 'Location',
+              label: t('find_workers.location'),
               options: locationOptions,
               selected: locationFilter,
               onSelect: setLocationFilter,
@@ -281,7 +284,7 @@ const SeasonAvailabilityScreen = () => {
       </View> */}
       <View style={styles.listHeader}>
         <Text style={styles.countText}>
-          {filteredWorkers.length} Available Candidate
+          {filteredWorkers.length} {t('find_workers.available_candidate')}
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {hasActiveFilters ? (
@@ -293,12 +296,12 @@ const SeasonAvailabilityScreen = () => {
                   fontFamily: 'InterDisplayRegular',
                 }}
               >
-                Reset
+                {t('find_workers.reset')}
               </Text>
             </TouchableOpacity>
           ) : null}
           <FilterDropdown
-            label="Sort by"
+            label={t('find_workers.sort_by')}
             options={sortOptions}
             selected={sortBy}
             onSelect={setSortBy}

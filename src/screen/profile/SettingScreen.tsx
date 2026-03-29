@@ -24,8 +24,10 @@ import { useNavigation } from '@react-navigation/native';
 import styles from './style';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCurrentUser } from '../../services/user';
+import { useTranslation } from 'react-i18next';
 
 const SettingScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
 
   const { data: user } = useQuery({
@@ -42,7 +44,7 @@ const SettingScreen = () => {
     // },
     {
       id: '2',
-      label: 'Credit',
+      label: t('settings.credit'),
       icon: Gem,
       onPress: () => {
         navigation.navigate('credit');
@@ -50,7 +52,7 @@ const SettingScreen = () => {
     },
     {
       id: '3',
-      label: 'My Offer',
+      label: t('settings.my_offer'),
       icon: Tag,
       onPress: () => {
         navigation.navigate('offer');
@@ -58,7 +60,7 @@ const SettingScreen = () => {
     },
     {
       id: '4',
-      label: 'Language',
+      label: t('settings.language'),
       icon: Globe,
       onPress: () => {
         navigation.navigate('language');
@@ -66,7 +68,7 @@ const SettingScreen = () => {
     },
     {
       id: '5',
-      label: 'Engagement',
+      label: t('settings.engagement'),
       icon: Heart,
       onPress: () => {
         navigation.navigate('engagement');
@@ -74,7 +76,7 @@ const SettingScreen = () => {
     },
     {
       id: '6',
-      label: 'Notification',
+      label: t('settings.notification'),
       icon: Bell,
       onPress: () => {
         navigation.navigate('notification');
@@ -82,7 +84,7 @@ const SettingScreen = () => {
     },
     {
       id: '7',
-      label: 'Help And Support',
+      label: t('settings.help_support'),
       icon: UserProfileIcon,
       onPress: () => {
         navigation.navigate('HelpSupport');
@@ -90,7 +92,7 @@ const SettingScreen = () => {
     },
     {
       id: '8',
-      label: 'Term And Condition',
+      label: t('settings.terms'),
       icon: FileText,
       onPress: () => {
         navigation.navigate('TermsConditions');
@@ -107,7 +109,7 @@ const SettingScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft size={24} color="#ffffff" />
         </TouchableOpacity>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title}>{t('settings.title')}</Text>
         <View />
       </View>
 

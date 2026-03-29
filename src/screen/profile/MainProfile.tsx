@@ -33,8 +33,10 @@ import {
 } from '../../store/pendingSkillsStore';
 import { fetchUserCvUrl } from '../../services/cv';
 import ResumeDocsModal from '../../components/modals/ResumeDocsModal';
+import { useTranslation } from 'react-i18next';
 
 const MainProfile: React.FC = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const hasInitialized = useRef(false);
   const route = useRoute<any>();
@@ -146,8 +148,8 @@ const MainProfile: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       Toast.show({
         type: 'success',
-        text1: 'Profile Updated',
-        text2: 'Profile saved successfully',
+        text1: t('profile.profile_updated'),
+        text2: t('profile.profile_saved'),
       });
       setLocalPhoto(null);
       setIsEditing(false);
@@ -155,7 +157,7 @@ const MainProfile: React.FC = () => {
     onError: (err: any) => {
       Toast.show({
         type: 'error',
-        text1: 'Update Failed',
+        text1: t('profile.update_failed'),
         text2: err.message || 'Something went wrong',
       });
     },
@@ -163,17 +165,17 @@ const MainProfile: React.FC = () => {
   // handle profile save
   const handleSaveProfile = async () => {
     if (!city.trim()) {
-      Toast.show({ type: 'error', text1: 'City is required' });
+      Toast.show({ type: 'error', text1: t('profile.city_required') });
       return;
     }
 
     if (!about.trim()) {
-      Toast.show({ type: 'error', text1: 'About Me is required' });
+      Toast.show({ type: 'error', text1: t('profile.about_required') });
       return;
     }
 
     if (skills.length === 0) {
-      Toast.show({ type: 'error', text1: 'Please add at least one skill' });
+      Toast.show({ type: 'error', text1: t('profile.skill_required') });
       return;
     }
 
@@ -186,7 +188,7 @@ const MainProfile: React.FC = () => {
       } catch (err) {
         Toast.show({
           type: 'error',
-          text1: 'Photo upload failed',
+          text1: t('profile.photo_upload_failed'),
         });
         return;
       }
@@ -211,7 +213,7 @@ const MainProfile: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.headerTitle}>Profile</Text>
+          <Text style={styles.headerTitle}>{t('profile.title')}</Text>
 
           <View style={styles.container}>
             {/* Banner */}
@@ -239,13 +241,13 @@ const MainProfile: React.FC = () => {
 
             {/* About */}
             <View style={styles.viewSection}>
-              <Text style={styles.viewSectionLabel}>About Me</Text>
+              <Text style={styles.viewSectionLabel}>{t('profile.about_me')}</Text>
               <Text style={styles.viewSectionValue}>{about || '—'}</Text>
             </View>
 
             {/* Hourly Rate */}
             <View style={styles.viewSection}>
-              <Text style={styles.viewSectionLabel}>Hourly Rate</Text>
+              <Text style={styles.viewSectionLabel}>{t('profile.hourly_rate')}</Text>
               <Text style={styles.viewSectionValue}>
                 {hourlyRate ? `€${hourlyRate}` : '—'}
               </Text>
@@ -253,7 +255,7 @@ const MainProfile: React.FC = () => {
 
             {/* Skills */}
             <View style={styles.viewSection}>
-              <Text style={styles.viewSectionLabel}>Skills</Text>
+              <Text style={styles.viewSectionLabel}>{t('profile.skills')}</Text>
               <View style={styles.skillWrap}>
                 {skills.length > 0 ? (
                   skills.map((skill, i) => (
@@ -276,19 +278,19 @@ const MainProfile: React.FC = () => {
                 ]}
               />
               <Text style={styles.viewSectionValue}>
-                {openToWork ? 'Open To Work' : 'Not Available'}
+                {openToWork ? t('profile.open_to_work') : t('profile.not_available')}
               </Text>
             </View>
 
             {/* CV Section */}
             <View style={styles.viewSection}>
-              <Text style={styles.viewSectionLabel}>CV / Resume</Text>
+              <Text style={styles.viewSectionLabel}>{t('profile.cv_resume')}</Text>
 
               {/* Status box — mirrors ResumeDocsModal statusBox */}
               <View style={styles.cvStatusBox}>
                 <FileText size={20} color={cvUrl ? '#FFD900' : '#6B7280'} />
                 <Text style={styles.viewSectionValue}>
-                  {cvUrl ? 'CV on file — ready to use' : 'No CV uploaded yet'}
+                  {cvUrl ? t('profile.cv_on_file') : t('profile.no_cv')}
                 </Text>
                 {cvUrl && (
                   <CheckCircle size={18} color="#22C55E" style={{ marginLeft: 'auto' }} />
@@ -304,7 +306,7 @@ const MainProfile: React.FC = () => {
                     activeOpacity={0.8}
                   >
                     <ExternalLink size={18} color="#fff" />
-                    <Text style={styles.cvViewBtnText}>View CV</Text>
+                    <Text style={styles.cvViewBtnText}>{t('profile.view_cv')}</Text>
                   </TouchableOpacity>
                 )}
 
@@ -316,17 +318,17 @@ const MainProfile: React.FC = () => {
                 >
                   <Upload size={18} color="#1F2937" />
                   <Text style={styles.cvUploadBtnText}>
-                    {cvUrl ? 'Replace CV' : 'Upload CV'}
+                    {cvUrl ? t('profile.replace_cv') : t('profile.upload_cv')}
                   </Text>
                 </TouchableOpacity>
               </View>
             </View>
 
             {/* Reviews */}
-            <Text style={styles.label}>My Reviews</Text>
+            <Text style={styles.label}>{t('profile.my_reviews')}</Text>
             {reviews.length === 0 ? (
               <Text style={{ color: '#555', marginTop: 12, fontFamily: 'InterDisplay-Regular' }}>
-                No reviews yet
+                {t('profile.no_reviews')}
               </Text>
             ) : (
               reviews.map((review: any) => (
@@ -347,7 +349,7 @@ const MainProfile: React.FC = () => {
               style={styles.editBtn}
               onPress={() => setIsEditing(true)}
             >
-              <Text style={styles.editBtnText}>Edit Profile</Text>
+              <Text style={styles.editBtnText}>{t('profile.edit_btn')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -375,10 +377,10 @@ const MainProfile: React.FC = () => {
                 fontFamily: 'InterDisplay-Regular',
               }}
             >
-              ← Back
+              {t('profile.back')}
             </Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit Profile</Text>
+          <Text style={styles.headerTitle}>{t('profile.edit_title')}</Text>
 
           {/* Photo */}
           <View style={styles.photoSection}>
@@ -398,54 +400,54 @@ const MainProfile: React.FC = () => {
                 </View>
               </View>
             </TouchableOpacity>
-            <Text style={styles.uploadText}>Upload Photo</Text>
-            <Text style={styles.subText}>Format: PNG/JPG</Text>
+            <Text style={styles.uploadText}>{t('profile.upload_photo')}</Text>
+            <Text style={styles.subText}>{t('profile.photo_format')}</Text>
           </View>
 
           {/* Full Name */}
-          <Text style={styles.label}>Full Name</Text>
+          <Text style={styles.label}>{t('profile.full_name')}</Text>
           <TextInput
             style={styles.input}
             value={fullName}
             onChangeText={setFullName}
-            placeholder="Full Name"
+            placeholder={t('profile.full_name_placeholder')}
             placeholderTextColor="#9CA3AF"
           />
 
           {/* About */}
-          <Text style={styles.label}>About Me</Text>
+          <Text style={styles.label}>{t('profile.about_me')}</Text>
           <TextInput
             style={styles.textArea}
             value={about}
             onChangeText={setAbout}
             multiline
             maxLength={300}
-            placeholder="Tell something about yourself"
+            placeholder={t('profile.about_placeholder')}
             placeholderTextColor="#9CA3AF"
           />
           <Text style={styles.counter}>{about.length}/300</Text>
 
           {/* City */}
-          <Text style={styles.label}>Base City</Text>
+          <Text style={styles.label}>{t('profile.base_city')}</Text>
           <View style={styles.inputWithIcon}>
             <TextInput
               style={styles.flexInput}
               value={city}
               onChangeText={setCity}
-              placeholder="Your city"
+              placeholder={t('profile.city_placeholder')}
               placeholderTextColor="#9CA3AF"
             />
             <MapPin size={24} color="#374151" />
           </View>
 
           {/* Hourly */}
-          <Text style={styles.label}>Hourly Rate</Text>
+          <Text style={styles.label}>{t('profile.hourly_rate')}</Text>
           <TextInput
             style={styles.input}
             value={hourlyRate}
             onChangeText={setHourlyRate}
             keyboardType="numeric"
-            placeholder="€25"
+            placeholder={t('profile.hourly_placeholder')}
             placeholderTextColor="#9CA3AF"
           />
 
@@ -475,8 +477,8 @@ const MainProfile: React.FC = () => {
           {/* Open to work */}
           <View style={styles.switchRow}>
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Open To Work</Text>
-              <Text style={styles.subText}>Show users you are available</Text>
+              <Text style={styles.label}>{t('profile.open_to_work')}</Text>
+              <Text style={styles.subText}>{t('profile.open_to_work_sub')}</Text>
             </View>
             <Switch
               value={openToWork}
@@ -493,7 +495,7 @@ const MainProfile: React.FC = () => {
             disabled={isPending}
           >
             <Text style={styles.saveText}>
-              {isPending ? 'Saving...' : 'Save Profile'}
+              {isPending ? t('profile.saving') : t('profile.save_profile')}
             </Text>
           </TouchableOpacity>
         </View>

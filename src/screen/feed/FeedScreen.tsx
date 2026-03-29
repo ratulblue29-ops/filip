@@ -33,6 +33,7 @@ import {
   fetchSentEngagements,
 } from '../../services/engagement';
 import { getAuth } from '@react-native-firebase/auth';
+import { useTranslation } from 'react-i18next';
 
 const COLORS = {
   secondaryText: '#9E9E9E',
@@ -41,6 +42,7 @@ const COLORS = {
 const Drawer = createDrawerNavigator();
 
 const FeedContent = ({ navigation }: any) => {
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
   const [debouncedText, setDebouncedText] = useState('');
   const [reviewModal, setReviewModal] = useState<{
@@ -140,9 +142,9 @@ const FeedContent = ({ navigation }: any) => {
 
   const getGreeting = () => {
     const hours = new Date().getHours();
-    if (hours < 12) return 'Good morning';
-    if (hours < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hours < 12) return t('feed.good_morning');
+    if (hours < 18) return t('feed.good_afternoon');
+    return t('feed.good_evening');
   };
 
   /* ---------------- AVATAR ---------------- */
@@ -150,8 +152,8 @@ const FeedContent = ({ navigation }: any) => {
     user?.profile?.photo && user.profile.photo.trim().length > 0
       ? { uri: user.profile.photo }
       : {
-          uri: 'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg',
-        };
+        uri: 'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg',
+      };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -183,7 +185,7 @@ const FeedContent = ({ navigation }: any) => {
       <View style={styles.searchContainer}>
         <Search width={20} height={20} color="white" />
         <TextInput
-          placeholder="Search availability…"
+          placeholder={t('feed.search_placeholder')}
           placeholderTextColor={COLORS.secondaryText}
           style={styles.input}
           value={searchText}
@@ -195,7 +197,7 @@ const FeedContent = ({ navigation }: any) => {
 
       {searchText.length > 0 && debouncedText.length < 3 ? (
         <View style={styles.noResultContainer}>
-          <Text style={styles.noResultText}>Type at least 3 characters</Text>
+          <Text style={styles.noResultText}>{t('feed.type_more')}</Text>
         </View>
       ) : debouncedText.length > 2 ? (
         <FlatList
@@ -209,7 +211,7 @@ const FeedContent = ({ navigation }: any) => {
           ListEmptyComponent={
             !searchLoading ? (
               <View style={styles.noResultContainer}>
-                <Text style={styles.noResultText}>No results found</Text>
+                <Text style={styles.noResultText}>{t('feed.no_results')}</Text>
               </View>
             ) : null
           }

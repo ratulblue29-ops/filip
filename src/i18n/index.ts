@@ -2,17 +2,17 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import en from './locales/en.json';
-import sr from './locales/sr.json';
-import hr from './locales/hr.json';
-import fr from './locales/fr.json';
-import de from './locales/de.json';
-import pl from './locales/pl.json';
-import tr from './locales/tr.json';
-import it from './locales/it.json';
-import es from './locales/es.json';
-import pt from './locales/pt.json';
-import ru from './locales/ru.json';
+import en from './locales/en.json'; //English
+import sr from './locales/sr.json'; //Serbian
+import hr from './locales/hr.json'; //Croatian
+import fr from './locales/fr.json'; //French
+import de from './locales/de.json'; //German
+import pl from './locales/pl.json'; //Polish
+import tr from './locales/tr.json'; //Turkish
+import it from './locales/it.json'; //Italian
+import es from './locales/es.json'; //Spanish
+import pt from './locales/pt.json'; //Portuguese
+import ru from './locales/ru.json'; //Russian
 
 const LANGUAGE_KEY = '@app_language';
 

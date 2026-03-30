@@ -22,6 +22,7 @@ import { addItemToList, removeItemFromList } from '../../helper/listHelper';
 import UploadBanner from '../../components/availiability/UploadBanner';
 import { createJob } from '../../services/jobs';
 import { uploadJobBanner } from '../../services/uploadPhoto';
+import { useTranslation } from 'react-i18next';
 
 // Workplace options for toggle selector
 // const WORKPLACE_OPTIONS = ['On-site', 'Remote', 'Hybrid'] as const;
@@ -35,6 +36,7 @@ type RateType = (typeof RATE_OPTIONS)[number];
 const ABOUT_MIN_CHARS = 30;
 
 const SeasonalAvailabilityCreationScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
 
@@ -143,8 +145,8 @@ const SeasonalAvailabilityCreationScreen = () => {
       queryClient.invalidateQueries({ queryKey: ['my-jobs'] });
       Toast.show({
         type: 'success',
-        text1: 'Availability Posted',
-        text2: 'Your seasonal availability has been posted successfully.',
+        text1: t('seasonal_creation.toast_posted'),
+        text2: t('seasonal_creation.toast_posted_sub'),
       });
       navigation.goBack();
     },
@@ -152,8 +154,8 @@ const SeasonalAvailabilityCreationScreen = () => {
     onError: (error: any) => {
       Toast.show({
         type: 'error',
-        text1: 'Error posting availability',
-        text2: error?.message || 'Something went wrong',
+        text1: t('seasonal_creation.toast_error'),
+        text2: error?.message || t('seasonal_creation.toast_error_sub'),
       });
     },
   });
@@ -164,7 +166,7 @@ const SeasonalAvailabilityCreationScreen = () => {
     const newErrors: Record<string, string> = {};
 
     if (!title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('seasonal_creation.error_title');
     }
 
     // if (!targetPosition.trim()) {
@@ -172,25 +174,25 @@ const SeasonalAvailabilityCreationScreen = () => {
     // }
 
     if (!startDate || !endDate) {
-      newErrors.dates = 'Select both start and end dates';
+      newErrors.dates = t('seasonal_creation.error_dates');
     } else if (new Date(startDate) > new Date(endDate)) {
-      newErrors.dates = 'End date must be after start date';
+      newErrors.dates = t('seasonal_creation.error_dates_order');
     }
 
     if (categories.length === 0) {
-      newErrors.skills = 'Add at least 1 skill';
+      newErrors.skills = t('seasonal_creation.error_skills');
     }
 
     if (locations.length === 0) {
-      newErrors.locations = 'Add at least 1 preferred location';
+      newErrors.locations = t('seasonal_creation.error_locations');
     }
 
     if (!rateAmount || parseFloat(rateAmount) <= 0) {
-      newErrors.rate = 'Enter a valid rate amount';
+      newErrors.rate = t('seasonal_creation.error_rate');
     }
 
     if (aboutText.trim().length < ABOUT_MIN_CHARS) {
-      newErrors.about = `About must be at least ${ABOUT_MIN_CHARS} characters`;
+      newErrors.about = t('seasonal_creation.error_about', { min: ABOUT_MIN_CHARS });
     }
 
     setErrors(newErrors);
@@ -210,10 +212,10 @@ const SeasonalAvailabilityCreationScreen = () => {
       {/* ── Header ── */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleGoBack} activeOpacity={0.7}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{t('seasonal_creation.cancel')}</Text>
         </TouchableOpacity>
 
-        <Text style={styles.title}>Create Availability</Text>
+        <Text style={styles.title}>{t('seasonal_creation.title')}</Text>
 
         <TouchableOpacity
           onPress={handlePost}
@@ -221,7 +223,7 @@ const SeasonalAvailabilityCreationScreen = () => {
           disabled={mutation.isPending}
         >
           <Text style={styles.postText}>
-            {mutation.isPending ? 'Posting...' : 'Post'}
+            {mutation.isPending ? t('seasonal_creation.posting') : t('seasonal_creation.post')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -232,8 +234,8 @@ const SeasonalAvailabilityCreationScreen = () => {
       >
         {/* ── Title ── */}
         <AvailiablityHeading
-          setTitle={t => {
-            setTitle(t);
+          setTitle={val => {
+            setTitle(val);
             clearError('title');
           }}
         />
@@ -294,7 +296,7 @@ const SeasonalAvailabilityCreationScreen = () => {
 
         {/* ── Rate Type + Amount ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Rate</Text>
+          <Text style={styles.sectionTitle}>{t('seasonal_creation.section_rate')}</Text>
 
           {/* Rate type selector */}
           <View style={styles.toggleGroup}>
@@ -332,8 +334,8 @@ const SeasonalAvailabilityCreationScreen = () => {
               placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
               value={rateAmount}
-              onChangeText={t => {
-                setRateAmount(t);
+              onChangeText={val => {
+                setRateAmount(val);
                 clearError('rate');
               }}
             />
@@ -345,7 +347,7 @@ const SeasonalAvailabilityCreationScreen = () => {
 
         {/* ── Availability Dates ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Availability</Text>
+          <Text style={styles.sectionTitle}>{t('seasonal_creation.section_availability')}</Text>
 
           <View style={styles.dateRow}>
             <View style={styles.dateCard}>
@@ -411,15 +413,15 @@ const SeasonalAvailabilityCreationScreen = () => {
 
         {/* ── About You ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About You</Text>
+          <Text style={styles.sectionTitle}>{t('seasonal_creation.section_about')}</Text>
           <TextInput
             style={styles.textArea}
-            placeholder="Describe your experience..."
+            placeholder={t('seasonal_creation.about_placeholder')}
             placeholderTextColor="#9CA3AF"
             multiline
             value={aboutText}
-            onChangeText={t => {
-              setAboutText(t);
+            onChangeText={val => {
+              setAboutText(val);
               clearError('about');
             }}
             textAlignVertical="top"

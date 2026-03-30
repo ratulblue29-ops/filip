@@ -10,8 +10,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './style';
+import { useTranslation } from 'react-i18next';
 
 const TermsConditionsScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const [isChecked, setIsChecked] = useState(false);
 
@@ -33,7 +35,7 @@ const TermsConditionsScreen = () => {
         <TouchableOpacity onPress={handleGoBack} activeOpacity={0.7}>
           <ArrowLeft width={24} height={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Terms & Conditions</Text>
+        <Text style={styles.title}>{t('terms.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -41,64 +43,49 @@ const TermsConditionsScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>1. Introduction</Text>
+          <Text style={styles.sectionTitle}>{t('terms.section_1_title')}</Text>
           <Text style={styles.bodyText}>
-            Welcome To Our Hospitality Network. By Using This App, You Agree To
-            The Following Terms Regarding Availability, Engagements, And Job
-            Postings. These Terms Ensure A Transparent And Efficient Environment
-            For All Users.
+            {t('terms.section_1_body')}
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>2. Platform Role</Text>
+          <Text style={styles.sectionTitle}>{t('terms.section_2_title')}</Text>
           <Text style={styles.bodyText}>
-            Our Platform Acts Strictly As An Intermediary To Connect Hospitality
-            Professionals (Workers) With Potential Employers. We Do Not Employ
-            Any Workers Directly, Nor Do We Act As An Employment Agency. The
-            Platform Facilitates Connections But Does Not Direct, Control, Or
-            Supervise The Work Performed.
+            {t('terms.section_2_body')}
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>3. User Agreements</Text>
+          <Text style={styles.sectionTitle}>{t('terms.section_3_title')}</Text>
           <Text style={styles.bodyText}>
-            All Employment Contracts, Shift Agreements, And Engagements Are
-            Strictly Between The Worker And The Employer. The Terms Of
-            Employment, Including Hours, Duties, Rates, And Compensation, Are To
-            Be Negotiated And Agreed Upon Solely By The Involved Parties Without
-            Our Interference.
+            {t('terms.section_3_body')}
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>4. Disclaimers & Liability</Text>
+          <Text style={styles.sectionTitle}>{t('terms.section_4_title')}</Text>
           <Text style={styles.bodyText}>
-            We Assume No Responsibility For Agreements Made Between Users.
-            Specifically, We Are Not Liable For:
+            {t('terms.section_4_body')}
           </Text>
           <Text style={styles.bulletText}>
-            • Missed, Late, Or Disputed Payments Between Parties.
+            {t('terms.bullet_1')}
           </Text>
           <Text style={styles.bulletText}>
-            • The Quality Of Work Performed, Punctuality, Or Services Rendered.
+            {t('terms.bullet_2')}
           </Text>
           <Text style={styles.bulletText}>
-            • Any Damages, Theft, Or Losses Occurring On-Site Or During Shifts.
+            {t('terms.bullet_3')}
           </Text>
           <Text style={styles.bulletText}>
-            • Disputes Arising From Cancellations, No-Shows, Or Scheduling
-            Conflicts.
+            {t('terms.bullet_4')}
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>5. Termination</Text>
+          <Text style={styles.sectionTitle}>{t('terms.section_5_title')}</Text>
           <Text style={styles.bodyText}>
-            We Reserve The Right To Suspend Or Terminate Accounts That Violate
-            Our Community Guidelines, Harass Other Users, Or Breach These Terms,
-            Effectively Immediately And Without Prior Notice.
+            {t('terms.section_5_body')}
           </Text>
         </View>
 
@@ -113,9 +100,10 @@ const TermsConditionsScreen = () => {
             )}
           </View>
           <Text style={styles.checkboxText}>
-            I acknowledge that I have read, understood, and agree to the{' '}
-            <Text style={styles.linkText}>Terms of Service</Text> and{' '}
-            <Text style={styles.linkText}>Privacy Policy</Text>
+            {t('terms.checkbox_text')}
+            <Text style={styles.linkText}>{t('terms.checkbox_tos')}</Text>
+            {t('terms.checkbox_and')}
+            <Text style={styles.linkText}>{t('terms.checkbox_privacy')}</Text>
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -127,7 +115,7 @@ const TermsConditionsScreen = () => {
           <Text
             style={[styles.buttonText, !isChecked && styles.buttonTextDisabled]}
           >
-            Accept & Continue
+            {t('terms.accept_btn')}
           </Text>
           <ArrowRight width={20} height={20} color="#111827" />
         </TouchableOpacity>

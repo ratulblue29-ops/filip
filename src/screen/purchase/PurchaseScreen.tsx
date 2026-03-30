@@ -27,8 +27,10 @@ import {
 } from "@react-native-firebase/functions";
 
 import { useStripe } from "@stripe/stripe-react-native";
+import { useTranslation } from 'react-i18next';
 
 const PurchaseScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
@@ -44,7 +46,7 @@ const PurchaseScreen = () => {
       const user = auth.currentUser;
 
       if (!user) {
-        Alert.alert("Error", "User not logged in");
+        Alert.alert(t('purchase.alert_error'), t('purchase.alert_not_logged'));
         return;
       }
 
@@ -102,15 +104,15 @@ const PurchaseScreen = () => {
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: "GoldShift",
       });
-      if (initError) { Alert.alert("Payment Failed", initError.message); return; }
+      if (initError) { Alert.alert(t('purchase.alert_payment_failed'), initError.message); return; }
       const { error } = await presentPaymentSheet();
-      if (error) { Alert.alert("Payment Failed", error.message); return; }
-      Alert.alert("Success", "Payment successful!");
+      if (error) { Alert.alert(t('purchase.alert_payment_failed'), error.message); return; }
+      Alert.alert(t('purchase.alert_success'), t('purchase.alert_success_sub'));
       navigation.goBack();
 
     } catch (error: any) {
       console.log("FULL ERROR:", error);
-      Alert.alert("Error", error?.message || "Something went wrong");
+      Alert.alert(t('purchase.alert_error'), error?.message || t('purchase.alert_generic'));
     } finally {
       setLoading(false);
     }
@@ -131,10 +133,10 @@ const PurchaseScreen = () => {
         </View>
 
         <View style={styles.titleSection}>
-          <Text style={styles.mainTitle}>Unlock Your</Text>
-          <Text style={styles.secondaryTitle}>Full Potential</Text>
+          <Text style={styles.mainTitle}>{t('purchase.unlock')}</Text>
+          <Text style={styles.secondaryTitle}>{t('purchase.potential')}</Text>
           <Text style={styles.subtitle}>
-            Get hired faster and earn more with GoldShift Premium features.
+            {t('purchase.subtitle')}
           </Text>
         </View>
 
@@ -146,30 +148,30 @@ const PurchaseScreen = () => {
         <View style={styles.planListCardContainer}>
           <PlanListCard
             icon={<Infinity width={24} height={24} color="#F6DF60" />}
-            title="Unlimited Applications"
-            subtitle="Apply to as many jobs as you want."
+            title={t('purchase.feature_unlimited')}
+            subtitle={t('purchase.feature_unlimited_sub')}
           />
           <PlanListCard
             icon={<BadgeCheck width={24} height={24} color="#F6DF60" />}
-            title="Profile Highlight"
-            subtitle="Stand out in employer searches."
+            title={t('purchase.feature_highlight')}
+            subtitle={t('purchase.feature_highlight_sub')}
           />
           <PlanListCard
             icon={<CommissionIcon width={24} height={24} color="#F6DF60" />}
-            title="0% Commission"
-            subtitle="Keep 100% of what you earn."
+            title={t('purchase.feature_commission')}
+            subtitle={t('purchase.feature_commission_sub')}
           />
           <PlanListCard
             icon={<Zap width={20} height={20} color="#F6DF60" />}
-            title="Early Access"
-            subtitle="See gigs 1 hour before free users."
+            title={t('purchase.feature_early')}
+            subtitle={t('purchase.feature_early_sub')}
           />
 
           <View style={styles.priceContainer}>
-            <Text style={styles.priceText}>Total today</Text>
+            <Text style={styles.priceText}>{t('purchase.total_today')}</Text>
             <Text style={styles.priceTextActive}>
               {selectedPlan === "monthly" ? "€7.99" : "€24.99"}
-              <Text style={styles.priceMonth}>/month</Text>
+              <Text style={styles.priceMonth}>{t('purchase.per_month')}</Text>
             </Text>
           </View>
 
@@ -183,7 +185,7 @@ const PurchaseScreen = () => {
             ) : (
               <>
                 <Text style={styles.upgradeButtonText}>
-                  Upgrade Now
+                  {t('purchase.upgrade_btn')}
                 </Text>
                 <ArrowRight />
               </>

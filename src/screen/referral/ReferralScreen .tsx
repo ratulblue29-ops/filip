@@ -25,6 +25,7 @@ import Toast from 'react-native-toast-message';
 import { fetchReferralData } from '../../services/referral';
 import { ReferralItem } from '../../@types/Referral.type';
 import styles from './style';
+import { useTranslation } from 'react-i18next';
 
 // ─── Referral Row ────────────────────────────────────────────────────────────
 
@@ -33,6 +34,7 @@ type ReferralRowProps = {
 };
 
 const ReferralRow = ({ item }: ReferralRowProps) => {
+  const { t } = useTranslation();
   const isVerified = item.status === 'verified';
 
   return (
@@ -51,7 +53,7 @@ const ReferralRow = ({ item }: ReferralRowProps) => {
       <View style={styles.referralInfo}>
         <Text style={styles.referralName}>{item.referredName}</Text>
         <Text style={styles.referralSubtext}>
-          {isVerified ? 'Account verified' : 'Pending verification'}
+          {isVerified ? t('referral.account_verified') : t('referral.pending_verification')}
         </Text>
       </View>
 
@@ -72,7 +74,7 @@ const ReferralRow = ({ item }: ReferralRowProps) => {
             { color: isVerified ? '#FBBF24' : '#FFFBEB' },
           ]}
         >
-          {isVerified ? 'Verified' : 'Pending'}
+          {isVerified ? t('referral.status_verified') : t('referral.status_pending')}
         </Text>
       </View>
     </View>
@@ -82,6 +84,7 @@ const ReferralRow = ({ item }: ReferralRowProps) => {
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
 const ReferralScreen = () => {
+  const { t } = useTranslation();
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['referralData'],
     queryFn: fetchReferralData,
@@ -128,12 +131,12 @@ const ReferralScreen = () => {
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" />
         <View style={styles.centered}>
-          <Text style={styles.errorText}>Failed to load referral data.</Text>
+          <Text style={styles.errorText}>{t('referral.error_load')}</Text>
           <TouchableOpacity
             style={styles.retryButton}
             onPress={() => refetch()}
           >
-            <Text style={styles.retryText}>Retry</Text>
+            <Text style={styles.retryText}>{t('referral.retry')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -148,7 +151,7 @@ const ReferralScreen = () => {
         contentContainerStyle={styles.scrollContent}
       >
         {/* Header */}
-        <Text style={styles.headerTitle}>Referral Program</Text>
+        <Text style={styles.headerTitle}>{t('referral.title')}</Text>
 
         <View style={styles.giftIconContainer}>
           <View style={styles.iconCircle}>
@@ -158,15 +161,14 @@ const ReferralScreen = () => {
 
         {/* Hero */}
         <View style={styles.heroSection}>
-          <Text style={styles.title}>Invite & Earn</Text>
+          <Text style={styles.title}>{t('referral.invite_title')}</Text>
           <Text style={styles.subtitle}>
-            Get +1 Availability Credit For Every Friend Who Joins And Verifies
-            Their Account.
+            {t('referral.invite_subtitle')}
           </Text>
           <View style={styles.infoBadge}>
             <Info color="#FBBF24" size={16} />
             <Text style={styles.infoText}>
-              1 Credit = 1 Premium Shift Apply
+              {t('referral.info_badge')}
             </Text>
           </View>
         </View>
@@ -175,18 +177,18 @@ const ReferralScreen = () => {
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>{data.totalInvited}</Text>
-            <Text style={styles.statLabel}>Invited</Text>
+            <Text style={styles.statLabel}>{t('referral.stat_invited')}</Text>
           </View>
           <View style={[styles.statCard, styles.statCardActive]}>
             <Text style={[styles.statNumber, { color: '#FFD900' }]}>
               {data.totalVerified}
             </Text>
-            <Text style={styles.statLabel}>Verified</Text>
+            <Text style={styles.statLabel}>{t('referral.stat_verified')}</Text>
           </View>
         </View>
 
         {/* Referral Code */}
-        <Text style={styles.sectionLabel}>Your Referral Code</Text>
+        <Text style={styles.sectionLabel}>{t('referral.your_code')}</Text>
         <View style={styles.codeContainer}>
           <Text style={styles.codeText}>{data.referralCode}</Text>
           <TouchableOpacity onPress={handleCopyCode} activeOpacity={0.7}>
@@ -201,16 +203,16 @@ const ReferralScreen = () => {
           activeOpacity={0.8}
         >
           <Share2 color="black" size={20} />
-          <Text style={styles.shareButtonText}>Share Invite Link</Text>
+          <Text style={styles.shareButtonText}>{t('referral.share_btn')}</Text>
         </TouchableOpacity>
 
         {/* Referrals List */}
         {data.referrals.length > 0 && (
           <>
             <View style={styles.listHeader}>
-              <Text style={styles.sectionLabel}>Your Referrals</Text>
+              <Text style={styles.sectionLabel}>{t('referral.your_referrals')}</Text>
               <View style={styles.recentBadge}>
-                <Text style={styles.recentBadgeText}>Recent</Text>
+                <Text style={styles.recentBadgeText}>{t('referral.recent')}</Text>
               </View>
             </View>
 
@@ -224,7 +226,7 @@ const ReferralScreen = () => {
         {data.referrals.length === 0 && (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
-              No referrals yet. Share your code and start earning!
+              {t('referral.empty')}
             </Text>
           </View>
         )}

@@ -24,8 +24,10 @@ import { useNavigation } from '@react-navigation/native';
 import UsersAddIcon from '../../components/svg/UsersAddIcon';
 import styles from './style';
 import WalletIcon from '../../components/svg/WalletIcon';
+import { useTranslation } from 'react-i18next';
 
 const HelpSupportScreen = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
 
@@ -42,26 +44,26 @@ const HelpSupportScreen = () => {
   const commonTopics = [
     {
       id: '1',
-      title: 'Finding Shifts',
+      title: t('help.topic_shifts'),
       icon: CalendarMinus2,
       image: require('../../../assets/images/2beea3565fc00c52e5ae8103f1d60533b212f778.jpg'),
     },
     {
       id: '2',
-      title: 'Getting Paid',
+      title: t('help.topic_paid'),
       icon: WalletIcon,
       image: require('../../../assets/images/021c47215cda0d6a4d27cccc7ae58617385bf192.jpg'),
     },
     {
       id: '3',
-      title: 'Employee Ratings',
+      title: t('help.topic_ratings'),
       icon: Star,
       iconFill: '#FFD900',
       image: require('../../../assets/images/75dab9d7643a97eb08def32ee971c9d635b2f13b.jpg'),
     },
     {
       id: '4',
-      title: 'Profile & Account',
+      title: t('help.topic_profile'),
       icon: UsersAddIcon,
       image: require('../../../assets/images/e22d7cf6e1cd02298794d578fc720a99d9f77d39.jpg'),
     },
@@ -97,7 +99,7 @@ const HelpSupportScreen = () => {
         <TouchableOpacity onPress={handleGoBack} activeOpacity={0.7}>
           <ArrowLeft width={24} height={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Help And Support</Text>
+        <Text style={styles.title}>{t('help.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -108,7 +110,7 @@ const HelpSupportScreen = () => {
         <View style={styles.searchContainer}>
           <Search width={24} height={24} color="white" />
           <TextInput
-            placeholder="Search Answer..."
+            placeholder={t('help.search_placeholder')}
             placeholderTextColor="#9CA3AF"
             style={styles.input}
             value={searchQuery}
@@ -117,7 +119,7 @@ const HelpSupportScreen = () => {
         </View>
 
         {/* Common Topics */}
-        <Text style={styles.sectionTitle}>Common Topics</Text>
+        <Text style={styles.sectionTitle}>{t('help.common_topics')}</Text>
         <View style={styles.topicsGrid}>
           {commonTopics.map(topic => {
             const IconComponent = topic.icon;
@@ -148,7 +150,7 @@ const HelpSupportScreen = () => {
         </View>
 
         {/* Frequently Asked */}
-        <Text style={styles.sectionTitle}>Frequently Asked</Text>
+        <Text style={styles.sectionTitle}>{t('help.faq_title')}</Text>
         <View style={styles.faqSection}>
           {faqs.map(faq => (
             <TouchableOpacity
@@ -173,29 +175,29 @@ const HelpSupportScreen = () => {
         </View>
 
         <TouchableOpacity style={styles.viewAllBtn} activeOpacity={0.7}>
-          <Text style={styles.viewAllText}>View All FAQs</Text>
+          <Text style={styles.viewAllText}>{t('help.view_all_faqs')}</Text>
           <ArrowRight width={20} height={20} color="#FFD900" />
         </TouchableOpacity>
 
         {/* Support Section */}
         <View style={styles.supportSection}>
-          <Text style={styles.supportTitle}>Still Need Help</Text>
+          <Text style={styles.supportTitle}>{t('help.still_need_help')}</Text>
           <Text style={styles.supportSubtext}>
-            Our Support Team Is Available 24/7
+            {t('help.support_sub_1')}
           </Text>
           <Text style={styles.supportSubtext}>
-            To Resolve Your Issue Quickly.
+            {t('help.support_sub_2')}
           </Text>
 
           <View style={styles.supportButtons}>
             <TouchableOpacity style={styles.liveChatBtn} activeOpacity={0.7}>
               <MessageSquareText width={20} height={20} color="#1F2937" />
-              <Text style={styles.liveChatText}>Live Chat</Text>
+              <Text style={styles.liveChatText}>{t('help.live_chat')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.emailBtn} activeOpacity={0.7}>
               <Mail width={20} height={20} color="#ffffff" />
-              <Text style={styles.emailText}>Email Support</Text>
+              <Text style={styles.emailText}>{t('help.email_support')}</Text>
             </TouchableOpacity>
           </View>
         </View>

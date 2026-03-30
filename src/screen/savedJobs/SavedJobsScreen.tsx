@@ -19,6 +19,7 @@ import { fetchWishlistJobs, removeFromWishlist } from '../../services/wishlist';
 import FilterItem from '../../components/FilterItem';
 import { RootStackParamList } from '../../navigator/RootNavigator';
 import ApplyModal from '../../components/fulltime/ApplyModal';
+import { useTranslation } from 'react-i18next';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -55,6 +56,7 @@ type CardProps = {
 
 const SavedJobCard = React.memo(
   ({ job, onUnsave, onAction, isActionLoading }: CardProps) => {
+    const { t } = useTranslation();
     const isFulltime = job.type === 'fulltime';
 
     return (
@@ -83,7 +85,7 @@ const SavedJobCard = React.memo(
             <View style={styles.locationRow}>
               <MapPin width={13} height={13} color="#9CA3AF" />
               <Text style={styles.locationText} numberOfLines={1}>
-                {job.location?.[0] ?? 'Location not set'}
+                {job.location?.[0] ?? t('saved_jobs.location_not_set')}
               </Text>
             </View>
           </View>
@@ -124,7 +126,7 @@ const SavedJobCard = React.memo(
             <ActivityIndicator color="#111827" size="small" />
           ) : (
             <Text style={styles.ctaBtnText}>
-              {isFulltime ? 'Apply Now' : 'Engage Candidate'}
+              {isFulltime ? t('saved_jobs.apply_now') : t('saved_jobs.engage_candidate')}
             </Text>
           )}
         </TouchableOpacity>
@@ -136,6 +138,7 @@ const SavedJobCard = React.memo(
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 const SavedJobsScreen = () => {
+  const { t } = useTranslation();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const queryClient = useQueryClient();
@@ -240,7 +243,7 @@ const SavedJobsScreen = () => {
         >
           <ChevronLeft width={24} height={24} color="#FFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Saved Posts</Text>
+        <Text style={styles.headerTitle}>{t('saved_jobs.title')}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -263,7 +266,7 @@ const SavedJobsScreen = () => {
           isPending ? (
             <ActivityIndicator color="#FFD900" style={styles.loader} />
           ) : (
-            <Text style={styles.emptyText}>No saved jobs here</Text>
+            <Text style={styles.emptyText}>{t('saved_jobs.empty')}</Text>
           )
         }
       />

@@ -29,8 +29,10 @@ import { Mypost } from '../../@types/Mypost.type';
 import NotificationDot from '../../components/feed/NotificationDot';
 import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
 import AvailabilityDetailModal from '../../components/mypost/AvailabilityDetailModal';
+import { useTranslation } from 'react-i18next';
 
 const PostedAvailabilitiesScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'past'>('all');
   const [showPostTypeModal, setShowPostTypeModal] = useState<boolean>(false);
@@ -95,16 +97,11 @@ const PostedAvailabilitiesScreen = () => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'Active';
-      case 'consumed':
-        return 'Consumed';
-      case 'withdrawn':
-        return 'Withdrawn';
-      case 'expired':
-        return 'Expired';
-      default:
-        return 'Active';
+      case 'active': return t('posted_availabilities.status_active');
+      case 'consumed': return t('posted_availabilities.status_consumed');
+      case 'withdrawn': return t('posted_availabilities.status_withdrawn');
+      case 'expired': return t('posted_availabilities.status_expired');
+      default: return t('posted_availabilities.status_active');
     }
   };
   // Filter availabilities based on activeTab
@@ -132,7 +129,7 @@ const PostedAvailabilitiesScreen = () => {
         <TouchableOpacity onPress={handleGoBack}>
           <ArrowLeft width={24} height={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>My Posted Availabilities</Text>
+        <Text style={styles.title}>{t('posted_availabilities.title')}</Text>
         <NotificationDot hasUnread={hasUnread} />
       </View>
 
@@ -161,9 +158,7 @@ const PostedAvailabilitiesScreen = () => {
 
         {!isLoading && filteredAvailabilities.length === 0 ? (
           <View style={styles.emptyMessageContainer}>
-            <Text style={styles.emptyMessageText}>
-              No availabilities found.
-            </Text>
+            <Text style={styles.emptyMessageText}>{t('posted_availabilities.empty')}</Text>
           </View>
         ) : (
           filteredAvailabilities.map((item: Mypost) => (
@@ -228,7 +223,7 @@ const PostedAvailabilitiesScreen = () => {
                     style={styles.menuItem}
                     onPress={() => handleCloseJob(item.id)}
                   >
-                    <Text style={styles.menuItemText}>Close Job</Text>
+                    <Text style={styles.menuItemText}>{t('posted_availabilities.menu_close')}</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -239,7 +234,7 @@ const PostedAvailabilitiesScreen = () => {
 
       {/* ADD BUTTON */}
       <TouchableOpacity style={styles.addButton} onPress={handleAddNew}>
-        <Text style={styles.addButtonText}>+ Post New</Text>
+        <Text style={styles.addButtonText}>{t('posted_availabilities.add_new')}</Text>
       </TouchableOpacity>
 
       {/* modal */}

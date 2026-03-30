@@ -33,8 +33,10 @@ import { useStripe } from '@stripe/stripe-react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchCurrentUser } from '../../services/user';
 import { usePaymentFlag } from '../../hooks/usePaymentFlag';
+import { useTranslation } from 'react-i18next';
 
 const CreditsScreen = () => {
+  const { t } = useTranslation();
   const paymentEnabled = usePaymentFlag();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
@@ -68,7 +70,7 @@ const CreditsScreen = () => {
       if (!firebaseUser) {
         Toast.show({
           type: 'error',
-          text1: 'Please login first to buy credits.',
+          text1: t('credit.login_required'),
         });
         return;
       }
@@ -118,7 +120,7 @@ const CreditsScreen = () => {
 
       Toast.show({
         type: 'success',
-        text1: 'Credits purchased successfully!',
+        text1: t('credit.purchased_success'),
       });
 
       // Refresh Firestore user credits instantly
@@ -145,7 +147,7 @@ const CreditsScreen = () => {
         <TouchableOpacity onPress={handleGoBack} activeOpacity={0.7}>
           <ArrowLeft width={24} height={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Credit Score</Text>
+        <Text style={styles.title}>{t('credit.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -155,14 +157,14 @@ const CreditsScreen = () => {
       >
         {/* Total Balance Card */}
         <View style={styles.balanceCard}>
-          <Text style={styles.balanceLabel}>Total Balance</Text>
+          <Text style={styles.balanceLabel}>{t('credit.total_balance')}</Text>
 
           {isLoading ? (
             <ActivityIndicator style={{ marginTop: 10 }} />
           ) : (
             <View style={styles.balanceAmountRow}>
               <Text style={styles.balanceNumber}>{displayBalance}</Text>
-              <Text style={styles.balanceText}>Credits</Text>
+              <Text style={styles.balanceText}>{t('credit.credits')}</Text>
             </View>
           )}
 
@@ -174,7 +176,7 @@ const CreditsScreen = () => {
               onPress={() => navigation.navigate('CreditHistory')}
             >
               <History width={20} height={20} color="#FFFFFF" />
-              <Text style={styles.actionButtonText}>History</Text>
+              <Text style={styles.actionButtonText}>{t('credit.history')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton} activeOpacity={0.7}>
@@ -186,7 +188,7 @@ const CreditsScreen = () => {
         {/* Purchase Pack Section */}
         {paymentEnabled && (
           <>
-            <Text style={styles.sectionTitle}>Purchase Pack</Text>
+            <Text style={styles.sectionTitle}>{t('credit.purchase_pack')}</Text>
 
 
             <View style={styles.packGrid}>
@@ -195,8 +197,8 @@ const CreditsScreen = () => {
                 <View style={styles.clockIconWrapper}>
                   <Clock4 width={24} height={24} color="#FFD900" />
                 </View>
-                <Text style={styles.smallPackTitle}>Starter</Text>
-                <Text style={styles.smallPackTitle}>1 Credit</Text>
+                <Text style={styles.smallPackTitle}>{t('credit.starter')}</Text>
+                <Text style={styles.smallPackTitle}>{t('credit.one_credit')}</Text>
 
                 <TouchableOpacity
                   style={styles.starterPackButton}
@@ -213,13 +215,13 @@ const CreditsScreen = () => {
               {/* 5 Credits Pack */}
               <View style={styles.smallPackCard}>
                 <View style={styles.offersBadge}>
-                  <Text style={styles.offersBadgeText}>Offers</Text>
+                  <Text style={styles.offersBadgeText}>{t('credit.offers_badge')}</Text>
                 </View>
                 <View style={styles.clockIconWrapper}>
                   <Clock4 width={24} height={24} color="#FFD900" />
                 </View>
-                <Text style={styles.smallPackTitle}>Bundle</Text>
-                <Text style={styles.smallPackTitle}>5 Credits</Text>
+                <Text style={styles.smallPackTitle}>{t('credit.bundle')}</Text>
+                <Text style={styles.smallPackTitle}>{t('credit.five_credits')}</Text>
 
                 <TouchableOpacity
                   style={styles.seasonalPackButton}
@@ -237,7 +239,7 @@ const CreditsScreen = () => {
             {/* 12 Credits Pack */}
             <View style={styles.premiumPackCard}>
               <View style={styles.popularBadge}>
-                <Text style={styles.popularBadgeText}>Most Popular</Text>
+                <Text style={styles.popularBadgeText}>{t('credit.most_popular')}</Text>
               </View>
 
               <View style={styles.premiumPackContent}>
@@ -247,11 +249,11 @@ const CreditsScreen = () => {
                   </View>
 
                   <View style={styles.premiumPackInfo}>
-                    <Text style={styles.premiumPackTitle}>Pro Pack</Text>
-                    <Text style={styles.premiumPackCredits}>12 Credits</Text>
+                    <Text style={styles.premiumPackTitle}>{t('credit.pro_pack')}</Text>
+                    <Text style={styles.premiumPackCredits}>{t('credit.twelve_credits')}</Text>
 
                     <View style={styles.saveBadge}>
-                      <Text style={styles.saveBadgeText}>Save 20%</Text>
+                      <Text style={styles.saveBadgeText}>{t('credit.save_20')}</Text>
                     </View>
                   </View>
                 </View>
@@ -272,7 +274,7 @@ const CreditsScreen = () => {
             {/* 30 Credits Pack */}
             <View style={styles.elitePackCard}>
               <View style={styles.bestValueBadge}>
-                <Text style={styles.bestValueBadgeText}>Best Value</Text>
+                <Text style={styles.bestValueBadgeText}>{t('credit.best_value')}</Text>
               </View>
 
               <View style={styles.elitePackContent}>
@@ -282,8 +284,8 @@ const CreditsScreen = () => {
                   </View>
 
                   <View style={styles.elitePackInfo}>
-                    <Text style={styles.elitePackTitle}>ELITE</Text>
-                    <Text style={styles.elitePackCredits}>30 Credits</Text>
+                    <Text style={styles.elitePackTitle}>{t('credit.elite')}</Text>
+                    <Text style={styles.elitePackCredits}>{t('credit.thirty_credits')}</Text>
                   </View>
                 </View>
 
@@ -304,7 +306,7 @@ const CreditsScreen = () => {
 
         {/* Earn Free Credits Section */}
         <View style={styles.dividerRow}>
-          <Text style={styles.dividerText}>Or Earn Free</Text>
+          <Text style={styles.dividerText}>{t('credit.or_earn_free')}</Text>
         </View>
 
         {/* Watch Videos Card */}
@@ -315,9 +317,9 @@ const CreditsScreen = () => {
             </View>
             <View style={styles.earnCardInfo}>
               <View style={styles.earnCardTitleRow}>
-                <Text style={styles.earnCardTitle}>Watch 5 Videos</Text>
+                <Text style={styles.earnCardTitle}>{t('credit.watch_videos')}</Text>
                 <View style={styles.creditBadge}>
-                  <Text style={styles.creditBadgeText}>+1 Credit</Text>
+                  <Text style={styles.creditBadgeText}>{t('credit.one_credit')}</Text>
                 </View>
               </View>
 
@@ -328,7 +330,7 @@ const CreditsScreen = () => {
               </View>
 
               <Text style={styles.progressText}>
-                0/5 Watched (Resets Weekly)
+                {t('credit.videos_progress')}
               </Text>
             </View>
           </View>
@@ -344,13 +346,13 @@ const CreditsScreen = () => {
             </View>
             <View style={styles.earnCardInfo}>
               <View style={styles.earnCardTitleRow}>
-                <Text style={styles.earnCardTitle}>Refer A Colleague</Text>
+                <Text style={styles.earnCardTitle}>{t('credit.refer_colleague')}</Text>
                 <View style={styles.creditBadge}>
-                  <Text style={styles.creditBadgeText}>+1 Credit</Text>
+                  <Text style={styles.creditBadgeText}>{t('credit.one_credit')}</Text>
                 </View>
               </View>
               <Text style={styles.referSubtext}>
-                Invite Friends To Join Goldshift
+                {t('credit.invite_friends')}
               </Text>
             </View>
           </View>

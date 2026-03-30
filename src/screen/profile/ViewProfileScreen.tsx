@@ -30,6 +30,7 @@ import { fetchUserReviews } from '../../services/review';
 import { ReviewItem } from '../../@types/Review.type';
 import { timeAgo } from '../../helper/timeAgo';
 import ApplyModal from '../../components/fulltime/ApplyModal';
+import { useTranslation } from 'react-i18next';
 
 type RootStackParamList = {
   viewProfile: {
@@ -43,6 +44,7 @@ type RootStackParamList = {
 type ViewProfileRouteProp = RouteProp<RootStackParamList, 'viewProfile'>;
 
 const ViewProfileScreen: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const route = useRoute<ViewProfileRouteProp>();
   const { userId, sourceType, jobId, jobTitle, jobOwnerId } = route.params;
@@ -99,7 +101,7 @@ const ViewProfileScreen: React.FC = () => {
       const chatId = await createOrGetChat(userId);
       navigation.navigate('ChatDetailScreen', { chatId, otherUserId: userId });
     } catch (err: any) {
-      Toast.show({ type: 'error', text1: 'Error', text2: err.message });
+      Toast.show({ type: 'error', text1: t('view_profile.error'), text2: err.message });
     }
   };
 
@@ -131,16 +133,14 @@ const ViewProfileScreen: React.FC = () => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <X size={20} color="#fff" strokeWidth={2.5} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Profile</Text>
+          <Text style={styles.headerTitle}>{t('view_profile.title')}</Text>
           <View />
         </View>
         <View
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
           <ActivityIndicator size="large" color="#FFD900" />
-          <Text style={{ marginTop: 10, color: '#fff' }}>
-            Loading profile...
-          </Text>
+          <Text style={{ marginTop: 10, color: '#fff' }}>{t('view_profile.loading')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -162,7 +162,7 @@ const ViewProfileScreen: React.FC = () => {
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
           <Text style={{ color: 'red', fontSize: 16 }}>
-            {(error as Error)?.message || 'Something went wrong'}
+            {(error as Error)?.message || t('view_profile.error')}
           </Text>
         </View>
       </SafeAreaView>
@@ -172,7 +172,7 @@ const ViewProfileScreen: React.FC = () => {
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={{ color: '#fff' }}>No user data found.</Text>
+        <Text style={{ color: '#fff' }}>{t('view_profile.no_user')}</Text>
       </SafeAreaView>
     );
   }
@@ -195,21 +195,21 @@ const ViewProfileScreen: React.FC = () => {
       >
         <ProfileHead photo={user.profile.photo} />
 
-        <Text style={styles.label}>Full Name</Text>
+        <Text style={styles.label}>{t('view_profile.full_name')}</Text>
         <Text style={styles.box}>{user.profile.name}</Text>
 
-        <Text style={styles.label}>City</Text>
+        <Text style={styles.label}>{t('view_profile.city')}</Text>
         <View style={styles.inputWithIcon}>
           <MapPin size={24} color="#fff" />
           <Text style={styles.flexInput}>{user.profile.city ?? 'N/A'}</Text>
         </View>
 
-        <Text style={styles.label}>Short Bio / CV</Text>
+        <Text style={styles.label}>{t('view_profile.bio')}</Text>
         <Text style={[styles.box, styles.bioText]}>
-          {user.profile.aboutMe ?? 'No bio available'}
+          {user.profile.aboutMe ?? t('view_profile.no_bio')}
         </Text>
 
-        <Text style={styles.label}>Professional Roles</Text>
+        <Text style={styles.label}>{t('view_profile.roles')}</Text>
         <View style={styles.rolesContainer}>
           <View style={styles.tagsWrapper}>
             {user.profile.skills.length > 0 ? (
@@ -219,12 +219,12 @@ const ViewProfileScreen: React.FC = () => {
                 </View>
               ))
             ) : (
-              <Text style={{ color: '#aaa' }}>No roles found</Text>
+              <Text style={{ color: '#aaa' }}>{t('view_profile.no_roles')}</Text>
             )}
           </View>
         </View>
 
-        <Text style={styles.label}>Reviews</Text>
+        <Text style={styles.label}>{t('view_profile.reviews')}</Text>
         {reviews.length === 0 ? (
           <Text
             style={{
@@ -233,7 +233,7 @@ const ViewProfileScreen: React.FC = () => {
               fontFamily: 'InterDisplayRegular',
             }}
           >
-            No reviews yet
+            {t('view_profile.no_reviews')}
           </Text>
         ) : (
           reviews.map(review => (
@@ -269,17 +269,17 @@ const ViewProfileScreen: React.FC = () => {
             onPress={() => setApplyModalVisible(true)}
           >
             <CalendarCheck2 size={20} color="#000" strokeWidth={2.5} />
-            <Text style={styles.mainButtonText}>Apply Now</Text>
+            <Text style={styles.mainButtonText}>{t('view_profile.apply_now')}</Text>
           </TouchableOpacity>
         ) : (
           <>
             <TouchableOpacity style={styles.chatButton} onPress={handleChat}>
               <MessageCircleMore size={20} color="#FFD900" strokeWidth={2.5} />
-              <Text style={styles.chatButtonText}>Chat</Text>
+              <Text style={styles.chatButtonText}>{t('view_profile.chat')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.mainButton} onPress={handleSendEngagement}>
               <CalendarCheck2 size={20} color="#000" strokeWidth={2.5} />
-              <Text style={styles.mainButtonText}>Send Engagement</Text>
+              <Text style={styles.mainButtonText}>{t('view_profile.send_engagement')}</Text>
             </TouchableOpacity>
           </>
         )}

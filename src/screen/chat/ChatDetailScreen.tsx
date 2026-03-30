@@ -29,8 +29,10 @@ import {
 import { ChatMessage } from '../../@types/Chat.type';
 import { getFirestore } from '@react-native-firebase/firestore';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 const ChatDetailScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { chatId } = route.params;
@@ -215,10 +217,10 @@ const ChatDetailScreen = () => {
           const time =
             item.createdAt && typeof item.createdAt.toDate === 'function'
               ? item.createdAt.toDate().toLocaleTimeString('en-US', {
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  hour12: true,
-                })
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+              })
               : '';
 
           return (
@@ -236,16 +238,16 @@ const ChatDetailScreen = () => {
                   chatId,
                   // Override offerCard status with live value from engagements collection
                   ...(item.metadata?.offerCard?.engagementId &&
-                  engagementStatuses[item.metadata.offerCard.engagementId]
+                    engagementStatuses[item.metadata.offerCard.engagementId]
                     ? {
-                        offerCard: {
-                          ...item.metadata.offerCard,
-                          status:
-                            engagementStatuses[
-                              item.metadata.offerCard.engagementId
-                            ],
-                        },
-                      }
+                      offerCard: {
+                        ...item.metadata.offerCard,
+                        status:
+                          engagementStatuses[
+                          item.metadata.offerCard.engagementId
+                          ],
+                      },
+                    }
                     : {}),
                 },
               }}
@@ -298,7 +300,7 @@ const ChatDetailScreen = () => {
           // Daily shift has ended — chat is permanently read-only
           <View style={styles.lockedBanner}>
             <Text style={styles.lockedBannerText}>
-              This shift has ended. Chat is now closed.
+              {t('chat.shift_ended')}
             </Text>
           </View>
         ) : chatUnlocked ? (
@@ -306,7 +308,7 @@ const ChatDetailScreen = () => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.textInput}
-              placeholder="Type a message..."
+              placeholder={t('chat.type_message')}
               placeholderTextColor="#666"
               value={message}
               onChangeText={setMessage}
@@ -320,7 +322,7 @@ const ChatDetailScreen = () => {
           <View style={styles.inputContainer}>
             <TextInput
               style={[styles.textInput, { opacity: 0.4 }]}
-              placeholder="Waiting for acceptance..."
+              placeholder={t('chat.waiting')}
               placeholderTextColor="#666"
               editable={false}
             />

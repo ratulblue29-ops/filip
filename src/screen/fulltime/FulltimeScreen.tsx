@@ -30,8 +30,10 @@ import JobCardSkeleton from '../../components/skeleton/JobCardSkeleton';
 import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
 import NotificationDot from '../../components/feed/NotificationDot';
 import { fetchMyOffers } from '../../services/applyToJob';
+import { useTranslation } from 'react-i18next';
 
 const FulltimeScreen = () => {
+  const { t } = useTranslation();
   const [selectedLocation, setSelectedLocation] = useState('All');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState('All');
@@ -156,7 +158,7 @@ const FulltimeScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Full-Time roles</Text>
+        <Text style={styles.headerTitle}>{t('fulltime_screen.title')}</Text>
         <NotificationDot hasUnread={hasUnread} />
       </View>
 
@@ -167,7 +169,7 @@ const FulltimeScreen = () => {
           <TextInput
             value={searchText}
             onChangeText={setSearchText}
-            placeholder="Search jobs"
+            placeholder={t('fulltime_screen.search_placeholder')}
             placeholderTextColor="#9CA3AF"
             style={styles.input}
           />
@@ -263,7 +265,7 @@ const FulltimeScreen = () => {
             <Text
               style={{ color: '#9CA3AF', textAlign: 'center', marginTop: 50 }}
             >
-              No jobs found
+              {t('fulltime_screen.no_jobs')}
             </Text>
           )
         }
@@ -277,7 +279,7 @@ const FulltimeScreen = () => {
                 {isFetchingNextPage ? (
                   <ActivityIndicator color="#fcd303" />
                 ) : (
-                  <Text style={styles.seeAllText}>See More</Text>
+                  <Text style={styles.seeAllText}>{t('fulltime_screen.see_more')}</Text>
                 )}
               </TouchableOpacity>
             ) : null}

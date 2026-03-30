@@ -16,6 +16,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { subscribeCreditTransactions } from '../../services/credit';
 import styles from './creditHistoryStyle';
 import { RootStackParamList } from '../../navigator/RootNavigator';
+import { useTranslation } from 'react-i18next';
 
 // Format Firestore Timestamp or Date to readable string
 const formatDate = (ts: any): string => {
@@ -31,6 +32,7 @@ const formatDate = (ts: any): string => {
 };
 
 const CreditHistoryScreen = () => {
+  const { t } = useTranslation();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -60,7 +62,7 @@ const CreditHistoryScreen = () => {
         >
           <ArrowLeft width={24} height={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Credit History</Text>
+        <Text style={styles.title}>{t('credit_history.title')}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -76,9 +78,9 @@ const CreditHistoryScreen = () => {
           />
         ) : transactions.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No transactions yet</Text>
+            <Text style={styles.emptyText}>{t('credit_history.no_transactions')}</Text>
             <Text style={styles.emptySubText}>
-              Your credit activity will appear here
+              {t('credit_history.no_transactions_sub')}
             </Text>
           </View>
         ) : (

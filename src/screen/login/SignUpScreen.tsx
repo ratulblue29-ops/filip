@@ -16,6 +16,7 @@ import styles from '../login/style';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigator/RootNavigator';
 import { signUpUser } from '../../services/auth';
+import { useTranslation } from 'react-i18next';
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -23,6 +24,7 @@ type SignUpScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const SignUpScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<SignUpScreenNavigationProp>();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -37,7 +39,7 @@ const SignUpScreen = () => {
     onSuccess: () => {
       Toast.show({
         type: 'success',
-        text1: 'Sign Up Successful',
+        text1: t('signup.toast_success'),
       });
       // Hard reset — clears Splash/Login/Signup from stack, no back button
       navigation.reset({ index: 0, routes: [{ name: 'BottomTabs' }] });
@@ -45,7 +47,7 @@ const SignUpScreen = () => {
     onError: (error: any) => {
       Toast.show({
         type: 'error',
-        text1: 'Sign Up Failed',
+        text1: t('signup.toast_failed'),
         text2: error.message,
       });
     },
@@ -73,9 +75,9 @@ const SignUpScreen = () => {
         </Text>
 
         {/* Full Name */}
-        <Text style={styles.label}>Full Name</Text>
+        <Text style={styles.label}>{t('signup.label_name')}</Text>
         <TextInput
-          placeholder="Enter your Full Name"
+          placeholder={t('signup.placeholder_name')}
           placeholderTextColor="#9CA3AF"
           style={styles.input}
           value={fullName}
@@ -83,9 +85,9 @@ const SignUpScreen = () => {
         />
 
         {/* Email */}
-        <Text style={styles.label}>Email Address</Text>
+        <Text style={styles.label}>{t('signup.label_email')}</Text>
         <TextInput
-          placeholder="Enter your email"
+          placeholder={t('signup.placeholder_email')}
           placeholderTextColor="#9CA3AF"
           style={styles.input}
           keyboardType="email-address"
@@ -95,7 +97,7 @@ const SignUpScreen = () => {
         />
 
         {/* City */}
-        <Text style={styles.label}>City</Text>
+        <Text style={styles.label}>{t('signup.label_city')}</Text>
         <View style={[styles.passwordWrapper, styles.signupWrapper]}>
           <TextInput
             placeholder="City"
@@ -110,9 +112,9 @@ const SignUpScreen = () => {
         </View>
 
         {/* Referral Code (optional) */}
-        <Text style={styles.label}>Referral Code (Optional)</Text>
+        <Text style={styles.label}>{t('signup.label_referral')}</Text>
         <TextInput
-          placeholder="Enter referral code"
+          placeholder={t('signup.placeholder_referral')}
           placeholderTextColor="#9CA3AF"
           style={styles.input}
           autoCapitalize="characters"
@@ -154,21 +156,14 @@ const SignUpScreen = () => {
             {acceptedTerms && <View style={styles.radioInner} />}
           </View>
           <Text style={styles.text}>
-            I agree to the{' '}
-            <Text
-              style={styles.link}
-              onPress={() => Linking.openURL('https://example.com/terms')}
-            >
-              Terms & Conditions
-            </Text>{' '}
-            and{' '}
-            <Text
-              style={styles.link}
-              onPress={() => Linking.openURL('https://example.com/privacy')}
-            >
-              Privacy Policy.
+            {t('signup.terms_prefix')}
+            <Text style={styles.link} onPress={() => Linking.openURL('https://example.com/terms')}>
+              {t('signup.terms_link')}
             </Text>
-            .
+            {t('signup.terms_and')}
+            <Text style={styles.link} onPress={() => Linking.openURL('https://example.com/privacy')}>
+              {t('signup.privacy_link')}
+            </Text>
           </Text>
         </TouchableOpacity>
 
@@ -179,15 +174,15 @@ const SignUpScreen = () => {
           disabled={mutation.isPending}
         >
           <Text style={styles.loginButton}>
-            {mutation.isPending ? 'Loading...' : 'Sign Up'}
+            {mutation.isPending ? t('signup.loading') : t('signup.sign_up')}
           </Text>
         </TouchableOpacity>
 
         {/* Already have account */}
         <View style={[styles.doyouHave, styles.signDoyouHave]}>
-          <Text style={styles.dontText}>Already have an account?</Text>
+          <Text style={styles.dontText}>{t('signup.has_account')}</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.textStyle_text}>Log In</Text>
+            <Text style={styles.textStyle_text}>{t('signup.log_in')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

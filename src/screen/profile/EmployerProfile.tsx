@@ -24,10 +24,10 @@ import {
 } from '@tanstack/react-query';
 import { fetchCurrentUser, updateEmployerProfile } from '../../services/user';
 import styles from './employerProfileStyle';
-
-
+import { useTranslation } from 'react-i18next';
 
 const EmployerProfile: React.FC = () => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
 
     const [photo, setPhoto] = useState<string | null>(null);
@@ -69,15 +69,15 @@ const EmployerProfile: React.FC = () => {
             queryClient.invalidateQueries({ queryKey: ['currentUser'] });
             Toast.show({
                 type: 'success',
-                text1: 'Profile Updated',
-                text2: 'Employer profile saved successfully',
+                text1: t('employer_profile.toast_updated'),
+                text2: t('employer_profile.toast_updated_sub'),
             });
         },
         onError: (err: any) => {
             Toast.show({
                 type: 'error',
-                text1: 'Update Failed',
-                text2: err.message || 'Something went wrong',
+                text1: t('employer_profile.toast_failed'),
+                text2: err.message || t('employer_profile.toast_failed_sub'),
             });
         },
     });
@@ -86,8 +86,8 @@ const EmployerProfile: React.FC = () => {
         if (!companyName.trim()) {
             Toast.show({
                 type: 'error',
-                text1: 'Validation Error',
-                text2: 'Company name is required',
+                text1: t('employer_profile.toast_validation'),
+                text2: t('employer_profile.toast_company_required'),
             });
             return;
         }
@@ -107,7 +107,7 @@ const EmployerProfile: React.FC = () => {
         <SafeAreaView style={styles.safeArea}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Header */}
-                <Text style={styles.headerTitle}>Edit Profile</Text>
+                <Text style={styles.headerTitle}>{t('employer_profile.header')}</Text>
 
                 {/* Photo */}
                 <View style={styles.photoSection}>
@@ -127,16 +127,16 @@ const EmployerProfile: React.FC = () => {
                         </View>
                     </TouchableOpacity>
 
-                    <Text style={styles.uploadText}>Upload Photo</Text>
+                    <Text style={styles.uploadText}>{t('employer_profile.upload_photo')}</Text>
                     <Text style={styles.subText}>
-                        Make A Great First Impression
+                        {t('employer_profile.upload_sub')}
                     </Text>
                 </View>
 
                 {/* Company */}
-                <Text style={styles.section}>Company Location</Text>
+                <Text style={styles.section}>{t('employer_profile.section_company')}</Text>
 
-                <Text style={styles.label}>Company Name</Text>
+                <Text style={styles.label}>{t('employer_profile.label_company')}</Text>
                 <TextInput
                     style={styles.input}
                     value={companyName}
@@ -145,28 +145,28 @@ const EmployerProfile: React.FC = () => {
                     placeholderTextColor="#9CA3AF"
                 />
 
-                <Text style={styles.label}>Industry</Text>
+                <Text style={styles.label}>{t('employer_profile.label_industry')}</Text>
                 <TouchableOpacity style={styles.dropdown}>
                     <Text style={styles.dropdownText}>
-                        {industry || 'Select Industry Type'}
+                        {industry || t('employer_profile.placeholder_industry')}
                     </Text>
                     <ChevronDown size={18} color="#9CA3AF" />
                 </TouchableOpacity>
 
-                <Text style={styles.label}>About Me</Text>
+                <Text style={styles.label}>{t('employer_profile.label_about')}</Text>
                 <TextInput
                     style={styles.textArea}
                     multiline
                     value={about}
                     onChangeText={setAbout}
-                    placeholder="Tell Employer About Your Experience In Hospitality..."
+                    placeholder={t('employer_profile.placeholder_about')}
                     placeholderTextColor="#9CA3AF"
                 />
 
                 {/* Location */}
-                <Text style={styles.section}>Location</Text>
+                <Text style={styles.section}>{t('employer_profile.section_location')}</Text>
 
-                <Text style={styles.label}>Business Address</Text>
+                <Text style={styles.label}>{t('employer_profile.label_address')}</Text>
                 <View style={styles.iconInput}>
                     <MapPin size={18} color="#9CA3AF" />
                     <TextInput
@@ -179,21 +179,21 @@ const EmployerProfile: React.FC = () => {
                 </View>
 
                 {/* Contact */}
-                <Text style={styles.section}>Primary Contact</Text>
+                <Text style={styles.section}>{t('employer_profile.section_contact')}</Text>
 
-                <Text style={styles.label}>Contact Person</Text>
+                <Text style={styles.label}>{t('employer_profile.label_contact')}</Text>
                 <View style={styles.iconInput}>
                     <User size={18} color="#9CA3AF" />
                     <TextInput
                         style={styles.flexInput}
                         value={contactName}
                         onChangeText={setContactName}
-                        placeholder="Full Name"
+                        placeholder={t('employer_profile.placeholder_contact')}
                         placeholderTextColor="#9CA3AF"
                     />
                 </View>
 
-                <Text style={styles.label}>Phone Number</Text>
+                <Text style={styles.label}>{t('employer_profile.label_phone')}</Text>
                 <View style={styles.iconInput}>
                     <Phone size={18} color="#9CA3AF" />
                     <TextInput
@@ -213,7 +213,7 @@ const EmployerProfile: React.FC = () => {
                     disabled={isPending}
                 >
                     <Text style={styles.saveText}>
-                        {isPending ? 'Saving...' : 'Save Profile'}
+                        {isPending ? t('employer_profile.saving') : t('employer_profile.save')}
                     </Text>
                 </TouchableOpacity>
             </ScrollView>

@@ -25,6 +25,7 @@ import Toast from 'react-native-toast-message';
 // import { fetchCurrentUser } from '../../services/user';
 import { useRoute } from '@react-navigation/native';
 import { setPendingSkills } from '../../store/pendingSkillsStore';
+import { useTranslation } from 'react-i18next';
 
 type Role = {
   code: string;
@@ -33,6 +34,7 @@ type Role = {
 };
 
 const RoleScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
   const route = useRoute<any>();
@@ -84,8 +86,8 @@ const RoleScreen = () => {
     onError: (err: any) => {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: err.message || 'Failed to update roles',
+        text1: t('role_screen.toast_error'),
+        text2: err.message || t('role_screen.toast_update_failed'),
       });
     },
   });
@@ -106,8 +108,8 @@ const RoleScreen = () => {
     if (selectedLanguages.length === 0) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Please select at least one role',
+        text1: t('role_screen.toast_error'),
+        text2: t('role_screen.toast_select_role'),
       });
       return;
     }
@@ -139,14 +141,12 @@ const RoleScreen = () => {
           <ChevronLeft width={24} height={24} color="#FFF" />
         </TouchableOpacity>
 
-        <Text style={styles.title}>Select Your Role</Text>
+        <Text style={styles.title}>{t('role_screen.title')}</Text>
 
         <View />
       </View>
-      <Text style={styles.skilltext}>
-        Select the positions you are interested in working to match with better
-        jobs.
-      </Text>
+      <Text style={styles.skilltext}>{t('role_screen.subtitle')}</Text>
+
       {/* Content */}
       <View style={styles.contentWrapper}>
         <ScrollView
@@ -200,7 +200,7 @@ const RoleScreen = () => {
           activeOpacity={0.7}
         >
           <Text style={styles.saveButtonText}>
-            {isPending ? 'Saving...' : 'Save Roles'}
+            {isPending ? t('role_screen.saving') : t('role_screen.save_roles')}
           </Text>
         </TouchableOpacity>
       </View>

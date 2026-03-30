@@ -20,6 +20,7 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigator/RootNavigator';
 import { signInWithGoogle } from '../../services/auth';
+import { useTranslation } from 'react-i18next';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -27,6 +28,7 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const LoginScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,8 +41,7 @@ const LoginScreen = () => {
     if (!email || !password) {
       Toast.show({
         type: 'error',
-        text1: 'Missing Fields',
-        text2: 'Please enter both email and password.',
+        text1: t('login.toast_missing'), text2: t('login.toast_missing_sub')
       });
       return;
     }
@@ -52,7 +53,7 @@ const LoginScreen = () => {
 
       Toast.show({
         type: 'success',
-        text1: 'Login Successful',
+        text1: t('login.toast_success'),
       });
 
       navigation.replace('BottomTabs');
@@ -60,20 +61,17 @@ const LoginScreen = () => {
       if (error.code === 'auth/user-not-found') {
         Toast.show({
           type: 'error',
-          text1: 'User not found',
-          text2: 'No account found with this email.',
+          text1: t('login.toast_not_found'), text2: t('login.toast_not_found_sub')
         });
       } else if (error.code === 'auth/wrong-password') {
         Toast.show({
           type: 'error',
-          text1: 'Wrong password',
-          text2: 'Please check your password.',
+          text1: t('login.toast_wrong_password'), text2: t('login.toast_wrong_password_sub')
         });
       } else {
         Toast.show({
           type: 'error',
-          text1: 'Login failed',
-          text2: 'Please try again later.',
+          text1: t('login.toast_failed'), text2: t('login.toast_failed_sub')
         });
       }
     } finally {
@@ -90,14 +88,14 @@ const LoginScreen = () => {
 
       Toast.show({
         type: 'success',
-        text1: isNewUser ? 'Signed in with Google' : 'Logged in with Google',
+        text1: isNewUser ? t('login.toast_google_new') : t('login.toast_google_existing'),
       });
 
       navigation.replace('BottomTabs');
     } catch (error: any) {
       Toast.show({
         type: 'error',
-        text1: 'Google Sign-In failed',
+        text1: t('login.toast_google_failed'),
         text2: error.message,
       });
     } finally {
@@ -194,9 +192,9 @@ const LoginScreen = () => {
 
         {/* Signup redirect */}
         <View style={styles.doyouHave}>
-          <Text style={styles.dontText}>Don't have an account?</Text>
+          <Text style={styles.dontText}>{t('login.no_account')}</Text>
           <TouchableOpacity onPress={() => navigation.navigate('signup')}>
-            <Text style={styles.textStyle_text}>Sign up</Text>
+            <Text style={styles.textStyle_text}>{t('login.sign_up')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

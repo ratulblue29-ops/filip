@@ -21,8 +21,10 @@ import styles from './style';
 import CupIcon from '../../components/svg/CupIcon';
 import { fetchMyOffers, updateOfferStatus } from '../../services/applyToJob';
 import AcceptDeclineBtn from '../../components/AcceptDeclineBtn';
+import { useTranslation } from 'react-i18next';
 
 const OfferScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
 
@@ -83,7 +85,7 @@ const OfferScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft width={24} height={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.title}>My offer</Text>
+        <Text style={styles.title}>{t('offer_screen.title')}</Text>
         <View style={styles.notificationWrapper}>
           <Bell width={24} height={24} color="#fff" />
         </View>
@@ -103,11 +105,7 @@ const OfferScreen = () => {
                 activeTab === tab && styles.activeTabText,
               ]}
             >
-              {tab === 'pending'
-                ? 'Pending'
-                : tab === 'upcoming'
-                ? 'Upcoming'
-                : 'History'}
+              {tab === 'pending' ? t('offer_screen.tab_pending') : tab === 'upcoming' ? t('offer_screen.tab_upcoming') : t('offer_screen.tab_history')}
             </Text>
           </TouchableOpacity>
         ))}
@@ -119,9 +117,7 @@ const OfferScreen = () => {
       >
         {/* Empty State */}
         {filteredOffers.length === 0 && (
-          <Text style={styles.emptyStateText}>
-            No offers found for this section
-          </Text>
+          <Text style={styles.emptyStateText}>{t('offer_screen.empty')}</Text>
         )}
 
         {filteredOffers.map(offer => {
@@ -168,7 +164,7 @@ const OfferScreen = () => {
 
               <TouchableOpacity onPress={() => toggleDescription(offer.id)}>
                 <Text style={styles.showMore}>
-                  {expandedCards.has(offer.id) ? 'Show Less' : 'Show More'}
+                  {expandedCards.has(offer.id) ? t('offer_screen.show_less') : t('offer_screen.show_more')}
                 </Text>
               </TouchableOpacity>
 

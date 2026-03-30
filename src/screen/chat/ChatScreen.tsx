@@ -24,8 +24,10 @@ import {
 import { timeAgo } from '../../helper/timeAgo';
 import { MessageData } from '../../@types/MessageData.type';
 import { ChatWithUser } from '../../@types/Chat.type';
+import { useTranslation } from 'react-i18next';
 
 const ChatScreen: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
   const currentUserId = getAuth().currentUser?.uid || '';
@@ -86,7 +88,7 @@ const ChatScreen: React.FC = () => {
         ]}
       >
         <ActivityIndicator size="large" color="#FFD900" />
-        <Text style={{ color: '#fff', marginTop: 10 }}>Loading chats...</Text>
+        <Text style={{ color: '#fff', marginTop: 10 }}>{t('chat.loading')}</Text>
       </SafeAreaView>
     );
   }
@@ -102,14 +104,14 @@ const ChatScreen: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <ChevronLeft width={24} height={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Messages</Text>
+        <Text style={styles.headerTitle}>{t('chat.title')}</Text>
       </View>
 
       {/* SEARCH */}
       <View style={styles.searchContainer}>
         <Search width={24} height={24} color="white" />
         <TextInput
-          placeholder="Search"
+          placeholder={t('chat.search_placeholder')}
           placeholderTextColor="#9E9E9E"
           style={styles.input}
         />
@@ -123,7 +125,7 @@ const ChatScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 40 }}>
-            <Text style={{ color: '#fff', fontSize: 16 }}>No chats yet</Text>
+            <Text style={{ color: '#fff', fontSize: 16 }}>{t('chat.no_chats')}</Text>
           </View>
         }
         renderItem={({ item }) => {

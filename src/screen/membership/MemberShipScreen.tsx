@@ -20,8 +20,10 @@ import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 import { useStripe } from '@stripe/stripe-react-native';
 import Toast from 'react-native-toast-message';
 import { usePaymentFlag } from '../../hooks/usePaymentFlag';
+import { useTranslation } from 'react-i18next';
 
 const MemberShipScreen = () => {
+  const { t } = useTranslation();
   const paymentEnabled = usePaymentFlag();
   const navigation = useNavigation<any>();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
@@ -42,7 +44,7 @@ const MemberShipScreen = () => {
       if (!user) {
         Toast.show({
           type: 'error',
-          text1: 'Please log in to purchase a membership plan.',
+          text1: t('membership.toast_login'),
         });
         return;
       }
@@ -91,7 +93,7 @@ const MemberShipScreen = () => {
       }
       Toast.show({
         type: 'success',
-        text1: 'Membership plan purchased successfully!',
+        text1: t('membership.toast_success'),
       });
     } catch (err: any) {
       Toast.show({
@@ -125,7 +127,7 @@ const MemberShipScreen = () => {
             <ArrowLeft width={22} height={22} color="white" />
           </View>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Membership Plans</Text>
+        <Text style={styles.headerTitle}>{t('membership.title')}</Text>
         <View />
       </View>
       <ScrollView
@@ -134,10 +136,9 @@ const MemberShipScreen = () => {
       >
         {/* Title Section */}
         <View style={styles.titleSection}>
-          <Text style={styles.mainTitle}>Upgrade Your Experience</Text>
+          <Text style={styles.mainTitle}>{t('membership.main_title')}</Text>
           <Text style={styles.subtitle}>
-            Unlock exclusive tools and visibility for{'\n'}
-            hospitality professionals.
+            {t('membership.subtitle')}
           </Text>
         </View>
         {/* Plan Toggle */}
@@ -208,12 +209,12 @@ const MemberShipScreen = () => {
               disabled={loading}
             >
               <Text style={styles.standardButtonText}>
-                {loading ? 'Processing...' : 'Choose Standard'}
+                {loading ? t('membership.processing') : t('membership.standard_btn')}
               </Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.standardButton} disabled>
-              <Text style={styles.standardButtonText}>Coming Soon</Text>
+              <Text style={styles.standardButtonText}>{t('membership.coming_soon')}</Text>
             </TouchableOpacity>
           )}
 
@@ -246,11 +247,11 @@ const MemberShipScreen = () => {
           </View>
           {paymentEnabled ? (
             <TouchableOpacity style={styles.premiumButton} onPress={handleGoPremium} disabled={loading}>
-              <Text style={styles.premiumButtonText}>{loading ? 'Processing...' : 'Go Premium'}</Text>
+              <Text style={styles.premiumButtonText}>{loading ? t('membership.processing') : t('membership.premium_btn')}</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.premiumButton} disabled>
-              <Text style={styles.premiumButtonText}>Coming Soon</Text>
+              <Text style={styles.premiumButtonText}>{t('membership.coming_soon')}</Text>
             </TouchableOpacity>
           )}
         </View>

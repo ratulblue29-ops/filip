@@ -22,8 +22,10 @@ import {
   fetchSentEngagements,
   updateEngagementStatus,
 } from '../../services/engagement';
+import { useTranslation } from 'react-i18next';
 
 const EngagementScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
 
@@ -70,11 +72,11 @@ const EngagementScreen = () => {
     }) =>
       updateEngagementStatus(engagementId, 'accepted', fromUserId, workerId),
     onSuccess: () => {
-      Toast.show({ type: 'success', text1: 'Engagement accepted' });
+      Toast.show({ type: 'success', text1: t('engagement.toast_accepted') });
       queryClient.invalidateQueries({ queryKey: ['receivedEngagements'] });
     },
     onError: (error: any) => {
-      Toast.show({ type: 'error', text1: error?.message || 'Accept failed' });
+      Toast.show({ type: 'error', text1: error?.message || t('engagement.toast_accept_failed') });
     },
   });
 
@@ -88,11 +90,11 @@ const EngagementScreen = () => {
       fromUserId: string;
     }) => updateEngagementStatus(engagementId, 'declined', fromUserId),
     onSuccess: () => {
-      Toast.show({ type: 'success', text1: 'Engagement declined' });
+      Toast.show({ type: 'success', text1: t('engagement.toast_declined') });
       queryClient.invalidateQueries({ queryKey: ['receivedEngagements'] });
     },
     onError: (error: any) => {
-      Toast.show({ type: 'error', text1: error?.message || 'Decline failed' });
+      Toast.show({ type: 'error', text1: error?.message || t('engagement.toast_decline_failed') });
     },
   });
 
@@ -114,15 +116,11 @@ const EngagementScreen = () => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'accepted':
-        return 'Accepted';
-      case 'pending':
-        return 'Pending';
+      case 'accepted': return t('engagement.status_accepted');
+      case 'pending': return t('engagement.status_pending');
       case 'declined':
-      case 'rejected':
-        return 'Rejected';
-      default:
-        return 'Pending';
+      case 'rejected': return t('engagement.status_rejected');
+      default: return t('engagement.status_pending');
     }
   };
 
@@ -134,7 +132,7 @@ const EngagementScreen = () => {
         <TouchableOpacity onPress={handleGoBack} activeOpacity={0.7}>
           <ArrowLeft width={24} height={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>My Engagement</Text>
+        <Text style={styles.title}>{t('engagement.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -153,7 +151,7 @@ const EngagementScreen = () => {
               activeTab === 'received' && styles.activeTabText,
             ]}
           >
-            Received Offers
+            {t('engagement.received_tab')}
           </Text>
         </TouchableOpacity>
 
@@ -171,7 +169,7 @@ const EngagementScreen = () => {
               activeTab === 'sent' && styles.activeTabText,
             ]}
           >
-            Sent Offers
+            {t('engagement.sent_tab')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -180,7 +178,7 @@ const EngagementScreen = () => {
         {isLoading ? (
           <ActivityIndicator size="large" color="#FFD900" />
         ) : engagementsToShow.length === 0 ? (
-          <Text style={styles.emptyStateText}>No offers found</Text>
+          <Text style={styles.emptyStateText}>{t('engagement.no_offers')}</Text>
         ) : (
           engagementsToShow.map((offer: any) => {
             const status = offer.status || 'pending';
@@ -191,7 +189,7 @@ const EngagementScreen = () => {
                 style={[
                   styles.offerCard,
                   (status === 'rejected' || status === 'declined') &&
-                    styles.offerCardRejected,
+                  styles.offerCardRejected,
                 ]}
               >
                 <View style={styles.cardHeader}>
@@ -210,7 +208,7 @@ const EngagementScreen = () => {
 
                   <View style={styles.cardInfo}>
                     <View style={styles.titleRow}>
-                      <Text style={styles.offerTitle}>Engagement Request</Text>
+                      <Text style={styles.offerTitle}>{t('engagement.request_title')}</Text>
                       <Text style={styles.offerRate}>{'—'}</Text>
                       <View style={getStatusStyle(status)}>
                         <Text
@@ -219,7 +217,7 @@ const EngagementScreen = () => {
                             status === 'accepted' && styles.statusTextAccepted,
                             status === 'pending' && styles.statusTextPending,
                             (status === 'rejected' || status === 'declined') &&
-                              styles.statusTextRejected,
+                            styles.statusTextRejected,
                           ]}
                         >
                           {getStatusText(status)}
@@ -234,7 +232,7 @@ const EngagementScreen = () => {
                     <View style={styles.scheduleRow}>
                       <Clock4 width={16} height={16} color="#FFD900" />
                       <Text style={styles.scheduleText}>
-                        {offer.schedule || 'No schedule'}
+                        {offer.schedule || t('engagement.no_schedule')}
                       </Text>
                     </View>
 
@@ -256,7 +254,7 @@ const EngagementScreen = () => {
                             isMutating && { opacity: 0.6 },
                           ]}
                         >
-                          <Text style={styles.acceptBtnText}>Accept</Text>
+                          <Text style={styles.acceptBtnText}>{t('engagement.accept')}</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -273,7 +271,7 @@ const EngagementScreen = () => {
                             isMutating && { opacity: 0.6 },
                           ]}
                         >
-                          <Text style={styles.declineBtnText}>Decline</Text>
+                          <Text style={styles.declineBtnText}>{t('engagement.decline')}</Text>
                         </TouchableOpacity>
                       </View>
                     )}

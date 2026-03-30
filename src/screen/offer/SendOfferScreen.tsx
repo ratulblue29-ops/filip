@@ -25,6 +25,7 @@ import { getAuth } from '@react-native-firebase/auth';
 import styles from './sendOfferStyle';
 import { createEngagement } from '../../services/engagement';
 import { sendMessage } from '../../services/chat';
+import { useTranslation } from 'react-i18next';
 
 // ─── Types ────────────────────────────────────────────────
 type RootStackParamList = {
@@ -60,6 +61,7 @@ const formatTime = (d: Date): string =>
 
 // ─── Component ────────────────────────────────────────────
 const SendOfferScreen = () => {
+  const { t } = useTranslation();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<any>();
@@ -187,11 +189,11 @@ const SendOfferScreen = () => {
   // ── Submit ──
   const handleSubmit = async () => {
     if (!wage.trim()) {
-      Toast.show({ type: 'error', text1: 'Offered wage is required' });
+      Toast.show({ type: 'error', text1: t('send_offer.toast_wage_required') });
       return;
     }
     if (!location.trim()) {
-      Toast.show({ type: 'error', text1: 'Location is required' });
+      Toast.show({ type: 'error', text1: t('send_offer.toast_location_required') });
       return;
     }
 
@@ -232,7 +234,7 @@ const SendOfferScreen = () => {
         },
       });
 
-      Toast.show({ type: 'success', text1: 'Offer sent!' });
+      Toast.show({ type: 'success', text1: t('send_offer.toast_sent') });
 
       // 4. Navigate into chat
       navigation.navigate('ChatDetailScreen', {
@@ -240,7 +242,7 @@ const SendOfferScreen = () => {
         otherUserId: workerId,
       });
     } catch (error: any) {
-      Toast.show({ type: 'error', text1: 'Error', text2: error.message });
+      Toast.show({ type: 'error', text1: t('send_offer.toast_error'), text2: error.message });
     } finally {
       setLoading(false);
     }
@@ -260,7 +262,7 @@ const SendOfferScreen = () => {
           <ArrowLeft size={24} color="#fff" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Send Offer</Text>
+        <Text style={styles.headerTitle}>{t('send_offer.title')}</Text>
 
         {/* spacer so title stays centred */}
         <View style={{ width: 24 }} />
@@ -273,7 +275,7 @@ const SendOfferScreen = () => {
       >
         <View style={styles.container}>
           {/* ── Availability Post (read-only) ── */}
-          <Text style={styles.label}>Availability Post</Text>
+          <Text style={styles.label}>{t('send_offer.label_post')}</Text>
           <View style={styles.inputWithIcon}>
             <FileText size={20} color="#FFD900" />
             <Text
@@ -287,7 +289,7 @@ const SendOfferScreen = () => {
           {/* ── DAILY: Work Date + Start Time + End Time ── */}
           {selectedPost.type === 'daily' && (
             <>
-              <Text style={styles.label}>Work Date</Text>
+              <Text style={styles.label}>{t('send_offer.label_work_date')}</Text>
               <TouchableOpacity
                 style={styles.inputWithIcon}
                 onPress={() => setShowDatePicker(true)}
@@ -379,7 +381,7 @@ const SendOfferScreen = () => {
               <View style={styles.rowBetween}>
                 {/* Start Time */}
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.subLabel}>Start Time</Text>
+                  <Text style={styles.subLabel}>{t('send_offer.label_start_time')}</Text>
                   <TouchableOpacity
                     style={styles.inputWithIcon}
                     onPress={() => setShowStartTimePicker(true)}
@@ -399,7 +401,7 @@ const SendOfferScreen = () => {
 
                 {/* End Time */}
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.subLabel}>End Time</Text>
+                  <Text style={styles.subLabel}>{t('send_offer.label_end_time')}</Text>
                   <TouchableOpacity
                     style={styles.inputWithIcon}
                     onPress={() => setShowEndTimePicker(true)}
@@ -450,7 +452,7 @@ const SendOfferScreen = () => {
           {/* ── SEASONAL: Start Date + End Date + Work Hours per Day ── */}
           {selectedPost.type === 'seasonal' && (
             <>
-              <Text style={styles.label}>Start Date</Text>
+              <Text style={styles.label}>{t('send_offer.label_start_date')}</Text>
               <TouchableOpacity
                 style={styles.inputWithIcon}
                 onPress={() => setShowStartDatePicker(true)}
@@ -480,7 +482,7 @@ const SendOfferScreen = () => {
                 />
               )}
 
-              <Text style={styles.label}>End Date</Text>
+              <Text style={styles.label}>{t('send_offer.label_end_date')}</Text>
               <TouchableOpacity
                 style={styles.inputWithIcon}
                 onPress={() => setShowEndDatePicker(true)}
@@ -510,7 +512,7 @@ const SendOfferScreen = () => {
                 />
               )}
 
-              <Text style={styles.label}>Work Hours (per day)</Text>
+              <Text style={styles.label}>{t('send_offer.label_hours')}</Text>
               <View style={styles.inputWithIcon}>
                 <Clock size={20} color="#9CA3AF" />
                 <TextInput
@@ -527,7 +529,7 @@ const SendOfferScreen = () => {
           )}
 
           {/* ── Offered Wage ── */}
-          <Text style={styles.label}>Offered Wage</Text>
+          <Text style={styles.label}>{t('send_offer.label_wage')}</Text>
 
           {/* Rate type toggle */}
           <View style={styles.toggleGroup}>
@@ -567,27 +569,27 @@ const SendOfferScreen = () => {
           </View>
 
           {/* ── Location ── */}
-          <Text style={styles.label}>Location</Text>
+          <Text style={styles.label}>{t('send_offer.label_location')}</Text>
           <View style={styles.inputWithIcon}>
             <MapPin size={20} color="#9CA3AF" />
             <TextInput
               style={styles.flexInput}
               value={location}
               onChangeText={setLocation}
-              placeholder="Work location"
+              placeholder={t('send_offer.placeholder_location')}
               placeholderTextColor="#9CA3AF"
             />
           </View>
 
           {/* ── Description (optional) ── */}
-          <Text style={styles.label}>Description (Optional)</Text>
+          <Text style={styles.label}>{t('send_offer.label_description')}</Text>
           <TextInput
             style={styles.textArea}
             value={description}
             onChangeText={setDescription}
             multiline
             maxLength={300}
-            placeholder="Any extra details about the role..."
+            placeholder={t('send_offer.placeholder_description')}
             placeholderTextColor="#9CA3AF"
           />
           <Text style={styles.counter}>{description.length}/300</Text>
@@ -602,7 +604,7 @@ const SendOfferScreen = () => {
             {loading ? (
               <ActivityIndicator color="#1F2937" />
             ) : (
-              <Text style={styles.saveText}>Send Offer</Text>
+              <Text style={styles.saveText}>{t('send_offer.btn_send')}</Text>
             )}
           </TouchableOpacity>
         </View>

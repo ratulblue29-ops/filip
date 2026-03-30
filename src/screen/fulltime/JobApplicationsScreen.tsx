@@ -27,8 +27,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { hireApplicant } from '../../services/applyToJob';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigator/RootNavigator';
+import { useTranslation } from 'react-i18next';
 
 const JobApplicationsScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<any>();
   // jobId passed from notification tap — used to filter applications for that specific job
@@ -40,8 +42,8 @@ const JobApplicationsScreen = () => {
 
   const handleHire = (applicationId: string, jobId: string) => {
     Alert.alert(
-      'Hire Applicant',
-      'Hire this applicant? The job will be closed.',
+      t('job_applications.hire_title'),
+      t('job_applications.hire_message'),
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -151,7 +153,7 @@ const JobApplicationsScreen = () => {
             activeOpacity={0.7}
           >
             <FileText size={16} color="#1F2937" />
-            <Text style={styles.cvBtnText}>View CV</Text>
+            <Text style={styles.cvBtnText}>{t('job_applications.view_cv')}</Text>
             <ExternalLink
               size={14}
               color="#1F2937"
@@ -165,7 +167,7 @@ const JobApplicationsScreen = () => {
       {
         item.status === 'hired' || hiredIds.includes(item.id) ? (
           <View style={styles.hiredBadge}>
-            <Text style={styles.hiredBadgeText}>Hired ✓</Text>
+            <Text style={styles.hiredBadgeText}>{t('job_applications.hired')}</Text>
           </View>
         ) : item.status === 'pending' ? (
           <TouchableOpacity
@@ -175,7 +177,7 @@ const JobApplicationsScreen = () => {
             disabled={item.jobStatus === 'consumed'}
           >
             <Text style={styles.hireBtnText}>
-              {item.jobStatus === 'consumed' ? 'Position Filled' : 'Hire'}
+              {item.jobStatus === 'consumed' ? t('job_applications.position_filled') : t('job_applications.hire_btn')}
             </Text>
           </TouchableOpacity>
         ) : null
@@ -195,7 +197,7 @@ const JobApplicationsScreen = () => {
         >
           <ArrowLeft size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Applications</Text>
+        <Text style={styles.headerTitle}>{t('job_applications.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -209,7 +211,7 @@ const JobApplicationsScreen = () => {
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No applications yet</Text>
+            <Text style={styles.emptyText}>{t('job_applications.no_applications')}</Text>
           }
         />
       )}

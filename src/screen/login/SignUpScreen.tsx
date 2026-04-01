@@ -16,6 +16,7 @@ import styles from '../login/style';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigator/RootNavigator';
 import { signUpUser } from '../../services/auth';
+import LanguagePicker from '../../components/LanguagePicker';
 import { useTranslation } from 'react-i18next';
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
@@ -67,6 +68,7 @@ const SignUpScreen = () => {
   return (
     <SafeAreaView style={[styles.container, styles.signupContainer]}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        <LanguagePicker />
         <Text style={styles.title}>
           {t('signup.title')}<Text style={styles.span}>{t('signup.title_span')}</Text>
         </Text>

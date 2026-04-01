@@ -20,6 +20,7 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigator/RootNavigator';
 import { signInWithGoogle } from '../../services/auth';
+import LanguagePicker from '../../components/LanguagePicker';
 import { useTranslation } from 'react-i18next';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
@@ -106,6 +107,7 @@ const LoginScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        <LanguagePicker />
         <Text style={styles.title}>
           {t('login.title')}<Text style={styles.span}>{t('login.title_span')}</Text>
         </Text>

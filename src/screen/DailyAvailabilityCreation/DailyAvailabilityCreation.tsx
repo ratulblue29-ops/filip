@@ -21,6 +21,7 @@ import Toast from 'react-native-toast-message';
 import { RootStackParamList } from '../../navigator/RootNavigator';
 import { createJob } from '../../services/jobs';
 import styles, { COLORS } from './style';
+import { useTranslation } from 'react-i18next';
 
 // Rate options — daily is added here since this is a shift-based post
 const RATE_OPTIONS = ['hourly', 'daily'] as const;
@@ -57,6 +58,7 @@ const DailyAvailabilityCreation = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   // ─── Date & time state ────────────────────────────────────────────────────
   const tomorrow = new Date();
@@ -163,8 +165,8 @@ const DailyAvailabilityCreation = () => {
       queryClient.invalidateQueries({ queryKey: ['my-jobs'] });
       Toast.show({
         type: 'success',
-        text1: 'Availability Posted',
-        text2: 'Your daily availability is now live.',
+        text1: t('daily_creation.toast_posted'),
+        text2: t('daily_creation.toast_posted_sub'),
       });
       navigation.goBack();
     },
@@ -172,8 +174,8 @@ const DailyAvailabilityCreation = () => {
     onError: (error: any) => {
       Toast.show({
         type: 'error',
-        text1: 'Post Failed',
-        text2: error?.message ?? 'Something went wrong.',
+        text1: t('daily_creation.toast_error'),
+        text2: error?.message ?? t('daily_creation.toast_error_sub'),
       });
     },
   });
@@ -183,25 +185,25 @@ const DailyAvailabilityCreation = () => {
   const handlePost = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!selectedDate) newErrors.date = 'Select a date';
+    if (!selectedDate) newErrors.date = t('daily_creation.error_date');
 
     if (!startTime || !endTime) {
-      newErrors.time = 'Select both start and end times';
+      newErrors.time = t('daily_creation.error_time');
     } else if (
       selectedDate &&
       endTime.getHours() * 60 + endTime.getMinutes() <=
       startTime.getHours() * 60 + startTime.getMinutes()
     ) {
-      newErrors.time = 'End time must be after start time';
+      newErrors.time = t('daily_creation.error_time_order');
     }
 
     if (!rateAmount || parseFloat(rateAmount) <= 0)
-      newErrors.rate = 'Enter a valid rate';
+      newErrors.rate = t('daily_creation.error_rate');
 
-    if (!city.trim()) newErrors.city = 'City is required';
+    if (!city.trim()) newErrors.city = t('daily_creation.error_city');
 
     if (!targetPosition.trim())
-      newErrors.targetPosition = 'Target position is required';
+      newErrors.targetPosition = t('daily_creation.error_position');
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -223,10 +225,10 @@ const DailyAvailabilityCreation = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{t('daily_creation.cancel')}</Text>
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Daily Availability</Text>
+        <Text style={styles.headerTitle}>{t('daily_creation.title')}</Text>
 
         <TouchableOpacity
           onPress={handlePost}
@@ -239,7 +241,7 @@ const DailyAvailabilityCreation = () => {
               mutation.isPending && styles.postTextDisabled,
             ]}
           >
-            {mutation.isPending ? 'Posting...' : 'Post'}
+            {mutation.isPending ? t('daily_creation.posting') : t('daily_creation.post')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -253,18 +255,16 @@ const DailyAvailabilityCreation = () => {
         <View style={styles.creditBanner}>
           <Coins color={COLORS.primary} size={18} />
           <Text style={styles.creditBannerText}>
-            Posting costs{' '}
-            <Text style={styles.creditBannerHighlight}>1 credit</Text>. If no
-            engagement is received by end of day, your credit is refunded.
+            {t('daily_creation.credit_banner')}
           </Text>
         </View>
 
         {/* ── Target Position ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Target Position</Text>
+          <Text style={styles.sectionTitle}>{t('daily_creation.section_position')}</Text>
           <TextInput
             style={styles.textArea}
-            placeholder="e.g. Barista, Waiter, Event Staff"
+            placeholder={t('daily_creation.placeholder_position')}
             placeholderTextColor={COLORS.gray}
             value={targetPosition}
             onChangeText={t => {
@@ -279,7 +279,7 @@ const DailyAvailabilityCreation = () => {
 
         {/* ── Date ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Date</Text>
+          <Text style={styles.sectionTitle}>{t('daily_creation.section_date')}</Text>
 
           <TouchableOpacity
             style={[
@@ -290,14 +290,14 @@ const DailyAvailabilityCreation = () => {
             activeOpacity={0.7}
           >
             <CalendarIcon color={COLORS.primary} size={20} />
-            <Text style={styles.pickerLabel}>Pick a date</Text>
+            <Text style={styles.pickerLabel}>{t('daily_creation.pick_date')}</Text>
             <Text
               style={[
                 styles.pickerValue,
                 !selectedDate && styles.pickerPlaceholder,
               ]}
             >
-              {selectedDate ? formatDate(selectedDate) : 'Tap to select'}
+              {selectedDate ? formatDate(selectedDate) : t('daily_creation.tap_to_select')}
             </Text>
           </TouchableOpacity>
 
@@ -308,7 +308,7 @@ const DailyAvailabilityCreation = () => {
 
         {/* ── Start & End Time ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Shift Hours</Text>
+          <Text style={styles.sectionTitle}>{t('daily_creation.section_time')}</Text>
 
           <View style={styles.pickerRow}>
             {/* Start time card */}
@@ -321,7 +321,7 @@ const DailyAvailabilityCreation = () => {
               activeOpacity={0.7}
             >
               <Clock color={COLORS.primary} size={18} />
-              <Text style={styles.pickerLabel}>Start</Text>
+              <Text style={styles.pickerLabel}>{t('daily_creation.start')}</Text>
               <Text
                 style={[
                   styles.pickerValue,
@@ -342,7 +342,7 @@ const DailyAvailabilityCreation = () => {
               activeOpacity={0.7}
             >
               <Clock color={COLORS.primary} size={18} />
-              <Text style={styles.pickerLabel}>End</Text>
+              <Text style={styles.pickerLabel}>{t('daily_creation.end')}</Text>
               <Text
                 style={[
                   styles.pickerValue,
@@ -377,7 +377,7 @@ const DailyAvailabilityCreation = () => {
               >
                 <TouchableOpacity onPress={onIOSCancel}>
                   <Text style={{ color: COLORS.gray, fontSize: 15 }}>
-                    Cancel
+                    {t('daily_creation.ios_cancel')}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={onIOSDone}>
@@ -388,7 +388,7 @@ const DailyAvailabilityCreation = () => {
                       fontWeight: '600',
                     }}
                   >
-                    Done
+                    {t('daily_creation.ios_done')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -408,7 +408,7 @@ const DailyAvailabilityCreation = () => {
 
         {/* ── Rate ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Rate</Text>
+          <Text style={styles.sectionTitle}>{t('daily_creation.section_rate')}</Text>
 
           <View style={styles.toggleGroup}>
             {RATE_OPTIONS.map(option => (
@@ -430,7 +430,7 @@ const DailyAvailabilityCreation = () => {
                     rateType === option && styles.toggleBtnTextActive,
                   ]}
                 >
-                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                  {t(`daily_creation.rate_${option}`)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -458,7 +458,7 @@ const DailyAvailabilityCreation = () => {
 
         {/* ── City ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>City</Text>
+          <Text style={styles.sectionTitle}>{t('daily_creation.section_city')}</Text>
 
           <TextInput
             style={styles.inputCard}
@@ -479,13 +479,13 @@ const DailyAvailabilityCreation = () => {
         {/* ── Description (optional) ── */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            Description{' '}
-            <Text style={{ color: COLORS.gray, fontSize: 14 }}>(optional)</Text>
+            {t('daily_creation.section_description')}{' '}
+            <Text style={{ color: COLORS.gray, fontSize: 14 }}>{t('daily_creation.description_optional')}</Text>
           </Text>
 
           <TextInput
             style={styles.textArea}
-            placeholder="e.g. Experienced barista, available for evening shift..."
+            placeholder={t('daily_creation.placeholder_description')}
             placeholderTextColor={COLORS.gray}
             multiline
             textAlignVertical="top"

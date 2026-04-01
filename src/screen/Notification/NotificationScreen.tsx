@@ -598,7 +598,7 @@ const NotificationScreen = () => {
                       <View style={styles.notificationContent}>
                         <View style={styles.notificationHeader}>
                           <Text style={styles.notificationTitle}>
-                            {item.title}
+                            {t(`notification_types.${item.type}.title`, { defaultValue: item.title })}
                           </Text>
                           <Text style={styles.notificationTime}>
                             {item.time}

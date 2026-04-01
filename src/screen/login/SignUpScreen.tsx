@@ -68,11 +68,9 @@ const SignUpScreen = () => {
     <SafeAreaView style={[styles.container, styles.signupContainer]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>
-          Join <Text style={styles.span}>GoldShift</Text>
+          {t('signup.title')}<Text style={styles.span}>{t('signup.title_span')}</Text>
         </Text>
-        <Text style={[styles.subtext, styles.signupSubtext]}>
-          Connect With The Best Staff
-        </Text>
+        <Text style={[styles.subtext, styles.signupSubtext]}>{t('signup.subtitle')}</Text>
 
         {/* Full Name */}
         <Text style={styles.label}>{t('signup.label_name')}</Text>
@@ -100,7 +98,7 @@ const SignUpScreen = () => {
         <Text style={styles.label}>{t('signup.label_city')}</Text>
         <View style={[styles.passwordWrapper, styles.signupWrapper]}>
           <TextInput
-            placeholder="City"
+            placeholder={t('signup.placeholder_city')}
             placeholderTextColor="#9CA3AF"
             style={styles.passwordInput}
             value={city}
@@ -123,10 +121,10 @@ const SignUpScreen = () => {
         />
 
         {/* Password */}
-        <Text style={styles.label}>Password</Text>
+        <Text style={styles.label}>{t('signup.label_password')}</Text>
         <View style={styles.passwordWrapper}>
           <TextInput
-            placeholder="Create a Password"
+            placeholder={t('signup.placeholder_password')}
             placeholderTextColor="#9CA3AF"
             style={styles.passwordInput}
             secureTextEntry={!passwordVisible}

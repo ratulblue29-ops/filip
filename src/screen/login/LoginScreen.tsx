@@ -107,16 +107,14 @@ const LoginScreen = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>
-          Welcome to <Text style={styles.span}>GoldShift</Text>
+          {t('login.title')}<Text style={styles.span}>{t('login.title_span')}</Text>
         </Text>
-        <Text style={styles.subtext}>
-          Find your next shift or hire great staff.
-        </Text>
+        <Text style={styles.subtext}>{t('login.subtitle')}</Text>
 
         {/* Email */}
-        <Text style={styles.label}>Email Address</Text>
+        <Text style={styles.label}>{t('login.label_email')}</Text>
         <TextInput
-          placeholder="Enter your email"
+          placeholder={t('login.placeholder_email')}
           placeholderTextColor="#9CA3AF"
           style={styles.input}
           keyboardType="email-address"
@@ -126,10 +124,10 @@ const LoginScreen = () => {
         />
 
         {/* Password */}
-        <Text style={styles.label}>Password</Text>
+        <Text style={styles.label}>{t('login.label_password')}</Text>
         <View style={styles.passwordWrapper}>
           <TextInput
-            placeholder="Enter your password"
+            placeholder={t('login.placeholder_password')}
             placeholderTextColor="#9CA3AF"
             style={styles.passwordInput}
             secureTextEntry={!passwordVisible}
@@ -150,7 +148,7 @@ const LoginScreen = () => {
         </View>
 
         <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={styles.forgetPassText}>Forgot Password?</Text>
+          <Text style={styles.forgetPassText}>{t('login.forgot_password')}</Text>
         </TouchableOpacity>
 
         {/* Email Login Button */}
@@ -160,14 +158,14 @@ const LoginScreen = () => {
           disabled={emailLoading || googleLoading}
         >
           <Text style={styles.loginButton}>
-            {emailLoading ? 'Loading...' : 'Log In'}
+            {emailLoading ? t('login.loading') : t('login.log_in')}
           </Text>
         </TouchableOpacity>
 
         {/* Or continue */}
         <View style={styles.orContinueWrapper}>
           <View style={styles.lineBar} />
-          <Text style={styles.orContinue}>Or continue with</Text>
+          <Text style={styles.orContinue}>{t('login.or_continue')}</Text>
           <View style={styles.lineBar} />
         </View>
 
@@ -180,13 +178,13 @@ const LoginScreen = () => {
           >
             <GoogleIcon size={24} />
             <Text style={styles.googleText}>
-              {googleLoading ? 'Please wait...' : 'Google'}
+              {googleLoading ? t('login.google_wait') : t('login.google')}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.authentication}>
             <AppleIcon size={24} />
-            <Text style={styles.googleText}>Apple</Text>
+            <Text style={styles.googleText}>{t('login.apple')}</Text>
           </TouchableOpacity>
         </View>
 

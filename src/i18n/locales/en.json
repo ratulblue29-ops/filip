@@ -662,5 +662,66 @@
     "alert_success": "Success",
     "alert_success_sub": "Payment successful!",
     "alert_generic": "Something went wrong"
+  },
+  "daily_creation": {
+    "cancel": "Cancel",
+    "title": "Daily Availability",
+    "posting": "Posting...",
+    "post": "Post",
+    "credit_banner": "Posting costs 1 credit. If no engagement is received by end of day, your credit is refunded.",
+    "section_position": "Target Position",
+    "placeholder_position": "e.g. Barista, Waiter, Event Staff",
+    "section_date": "Date",
+    "pick_date": "Pick a date",
+    "tap_to_select": "Tap to select",
+    "section_time": "Shift Hours",
+    "start": "Start",
+    "end": "End",
+    "ios_cancel": "Cancel",
+    "ios_done": "Done",
+    "section_rate": "Rate",
+    "rate_hourly": "Hourly",
+    "rate_daily": "Daily",
+    "section_city": "City",
+    "placeholder_city": "e.g. Amsterdam",
+    "section_description": "Description",
+    "description_optional": "(optional)",
+    "placeholder_description": "e.g. Experienced barista, available for evening shift...",
+    "error_date": "Select a date",
+    "error_time": "Select both start and end times",
+    "error_time_order": "End time must be after start time",
+    "error_rate": "Enter a valid rate",
+    "error_city": "City is required",
+    "error_position": "Target position is required",
+    "toast_posted": "Availability Posted",
+    "toast_posted_sub": "Your daily availability is now live.",
+    "toast_error": "Post Failed",
+    "toast_error_sub": "Something went wrong."
+  },
+  "notification_types": {
+    "ENGAGEMENT_SENT": {
+      "title": "New Engagement Request",
+      "body": "An employer wants to engage you"
+    },
+    "ENGAGEMENT_ACCEPTED": {
+      "title": "Engagement Accepted",
+      "body": "A worker has accepted your engagement request"
+    },
+    "ENGAGEMENT_DECLINED": {
+      "title": "Engagement Declined",
+      "body": "A worker has declined your engagement request"
+    },
+    "JOB_APPLY": {
+      "title": "New Job Application",
+      "body": "Someone applied for your job"
+    },
+    "OFFER_ACCEPTED": {
+      "title": "Offer Accepted",
+      "body": "Your applicant has accepted the offer"
+    },
+    "OFFER_REJECTED": {
+      "title": "Offer Rejected",
+      "body": "Your applicant has rejected the offer"
+    }
   }
 }

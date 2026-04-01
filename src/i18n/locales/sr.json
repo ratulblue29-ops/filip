@@ -699,5 +699,66 @@
     "toast_posted_sub": "Vaš oglas za puno radno vreme je uspešno objavljen.",
     "toast_error": "Greška",
     "toast_error_sub": "Došlo je do greške pri objavljivanju oglasa."
+  },
+  "daily_creation": {
+    "cancel": "Otkaži",
+    "title": "Dnevna dostupnost",
+    "posting": "Objavljivanje...",
+    "post": "Objavi",
+    "credit_banner": "Objavljivanje košta 1 kredit. Ako do kraja dana ne dobijete angažovanje, kredit se vraća.",
+    "section_position": "Ciljna pozicija",
+    "placeholder_position": "npr. Barista, Konobar, Event Staff",
+    "section_date": "Datum",
+    "pick_date": "Izaberi datum",
+    "tap_to_select": "Tapni za izbor",
+    "section_time": "Sati smene",
+    "start": "Početak",
+    "end": "Kraj",
+    "ios_cancel": "Otkaži",
+    "ios_done": "Gotovo",
+    "section_rate": "Satnica",
+    "rate_hourly": "Po satu",
+    "rate_daily": "Dnevno",
+    "section_city": "Grad",
+    "placeholder_city": "npr. Amsterdam",
+    "section_description": "Opis",
+    "description_optional": "(opciono)",
+    "placeholder_description": "npr. Iskusni barista, dostupan za večernju smenu...",
+    "error_date": "Izaberite datum",
+    "error_time": "Izaberite vreme početka i završetka",
+    "error_time_order": "Vreme završetka mora biti posle vremena početka",
+    "error_rate": "Unesite važeću satnicu",
+    "error_city": "Grad je obavezan",
+    "error_position": "Ciljna pozicija je obavezna",
+    "toast_posted": "Dostupnost objavljena",
+    "toast_posted_sub": "Vaša dnevna dostupnost je sada aktivna.",
+    "toast_error": "Objavljivanje nije uspelo",
+    "toast_error_sub": "Nešto je pošlo naopako."
+  },
+  "notification_types": {
+    "ENGAGEMENT_SENT": {
+      "title": "Novi zahtev za angažovanje",
+      "body": "Poslodavac želi da vas angažuje"
+    },
+    "ENGAGEMENT_ACCEPTED": {
+      "title": "Angažovanje prihvaćeno",
+      "body": "Radnik je prihvatio vaš zahtev za angažovanje"
+    },
+    "ENGAGEMENT_DECLINED": {
+      "title": "Angažovanje odbijeno",
+      "body": "Radnik je odbio vaš zahtev za angažovanje"
+    },
+    "JOB_APPLY": {
+      "title": "Nova prijava za posao",
+      "body": "Neko se prijavio za vaš posao"
+    },
+    "OFFER_ACCEPTED": {
+      "title": "Ponuda prihvaćena",
+      "body": "Vaš kandidat je prihvatio ponudu"
+    },
+    "OFFER_REJECTED": {
+      "title": "Ponuda odbijena",
+      "body": "Vaš kandidat je odbio ponudu"
+    }
   }
 }

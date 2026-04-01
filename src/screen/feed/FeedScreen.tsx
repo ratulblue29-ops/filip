@@ -22,7 +22,7 @@ import NotificationDot from '../../components/feed/NotificationDot';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import useRefresh from '../../hooks/useRefresh';
-import { fetchCurrentUser } from '../../services/user';
+import { fetchCurrentUser, getUserById } from '../../services/user';
 import { searchJobs } from '../../services/jobs';
 import { fetchWishlistIds } from '../../services/wishlist';
 import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
@@ -50,6 +50,8 @@ const FeedContent = ({ navigation }: any) => {
     toUserId: string;
     toUserName: string;
     role: 'employer' | 'worker';
+    toUserPhoto: string | null;
+    jobTitle: string;
   } | null>(null);
 
   // just for testing rad1pick@gmail.com & red@gmail.com
@@ -58,11 +60,15 @@ const FeedContent = ({ navigation }: any) => {
   //   toUserId: string;
   //   toUserName: string;
   //   role: 'employer' | 'worker';
+  //   toUserPhoto: string | null;
+  //   jobTitle: string;
   // } | null>({
-  //   engagementId: 't0GSOyoKkmZt1BYOs9o2',
+  //   engagementId: 'mnq3o3zSQwpb2sAXVatA',
   //   toUserId: 'rjGuO6eyqAOcyCXZTEmzyF96gZC3',
-  //   toUserName: 'Worker',
+  //   toUserName: 'Red',
   //   role: 'employer',
+  //   toUserPhoto: null,
+  //   jobTitle: 'Available in Si5sit',
   // });
 
   /* ---------------- DEBOUNCE ---------------- */
@@ -131,11 +137,16 @@ const FeedContent = ({ navigation }: any) => {
       const { engagement } = result;
       const isEmployer = engagement.fromUserId === currentUser.uid;
 
-      setReviewModal({
-        engagementId: engagement.id,
-        toUserId: isEmployer ? engagement.workerId : engagement.fromUserId,
-        toUserName: 'your colleague',
-        role: isEmployer ? 'employer' : 'worker',
+      const toUserId = isEmployer ? engagement.workerId : engagement.fromUserId;
+      getUserById(toUserId).then(userData => {
+        setReviewModal({
+          engagementId: engagement.id,
+          toUserId,
+          toUserName: userData?.profile?.name ?? 'your colleague',
+          toUserPhoto: userData?.profile?.photo ?? null,
+          jobTitle: result.jobData?.title ?? '',
+          role: isEmployer ? 'employer' : 'worker',
+        });
       });
     });
   }, [receivedEngagements, sentEngagements]);
@@ -233,6 +244,8 @@ const FeedContent = ({ navigation }: any) => {
           engagementId={reviewModal.engagementId}
           toUserId={reviewModal.toUserId}
           toUserName={reviewModal.toUserName}
+          toUserPhoto={reviewModal.toUserPhoto}
+          jobTitle={reviewModal.jobTitle}
           role={reviewModal.role}
         />
       )}

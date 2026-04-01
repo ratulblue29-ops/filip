@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { Star, X } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
@@ -20,7 +21,9 @@ type ReviewModalProps = {
   engagementId: string;
   toUserId: string;
   toUserName: string;
-  role: 'employer' | 'worker'; // current user's role
+  role: 'employer' | 'worker';
+  toUserPhoto?: string | null;
+  jobTitle?: string;
 };
 
 const ReviewModal = ({
@@ -30,6 +33,8 @@ const ReviewModal = ({
   toUserId,
   toUserName,
   role,
+  toUserPhoto,
+  jobTitle,
 }: ReviewModalProps) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -73,6 +78,19 @@ const ReviewModal = ({
           >
             <X size={20} color="#fff" />
           </TouchableOpacity>
+
+          {(toUserPhoto || jobTitle) && (
+            <View style={s.contextRow}>
+              <Image
+                source={toUserPhoto ? { uri: toUserPhoto } : require('../../../assets/images/defaultProfile.png')}
+                style={s.contextAvatar}
+              />
+              <View>
+                <Text style={s.contextName}>{toUserName}</Text>
+                {jobTitle && <Text style={s.contextJob}>{jobTitle}</Text>}
+              </View>
+            </View>
+          )}
 
           <Text style={s.heading}>{t('review.heading')}</Text>
           <Text style={s.subheading}>{t('review.subheading', { name: toUserName })}</Text>
@@ -195,6 +213,30 @@ const s = StyleSheet.create({
     color: '#555',
     fontSize: 14,
     fontFamily: 'InterDisplayRegular',
+  },
+  contextRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 20,
+    alignSelf: 'flex-start',
+  },
+  contextAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#2A2A2A',
+  },
+  contextName: {
+    color: '#fff',
+    fontSize: 15,
+    fontFamily: 'InterDisplaySemiBold',
+  },
+  contextJob: {
+    color: '#FFD900',
+    fontSize: 12,
+    fontFamily: 'InterDisplayRegular',
+    marginTop: 2,
   },
 });
 

@@ -7,6 +7,7 @@ import {
   StatusBar,
   TextInput,
   ImageBackground,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -19,6 +20,7 @@ import {
   ArrowRight,
   MessageSquareText,
   Mail,
+  Phone,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import UsersAddIcon from '../../components/svg/UsersAddIcon';
@@ -28,6 +30,8 @@ import { useTranslation } from 'react-i18next';
 
 const HelpSupportScreen = () => {
   const { t } = useTranslation();
+  const SUPPORT_EMAIL = 'support@goldshift.com';
+  const SUPPORT_PHONE = '+1234567890';
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
 
@@ -119,7 +123,7 @@ const HelpSupportScreen = () => {
         </View>
 
         {/* Common Topics */}
-        <Text style={styles.sectionTitle}>{t('help.common_topics')}</Text>
+        {/* <Text style={styles.sectionTitle}>{t('help.common_topics')}</Text>
         <View style={styles.topicsGrid}>
           {commonTopics.map(topic => {
             const IconComponent = topic.icon;
@@ -147,7 +151,7 @@ const HelpSupportScreen = () => {
               </TouchableOpacity>
             );
           })}
-        </View>
+        </View> */}
 
         {/* Frequently Asked */}
         <Text style={styles.sectionTitle}>{t('help.faq_title')}</Text>
@@ -174,10 +178,10 @@ const HelpSupportScreen = () => {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.viewAllBtn} activeOpacity={0.7}>
+        {/* <TouchableOpacity style={styles.viewAllBtn} activeOpacity={0.7}>
           <Text style={styles.viewAllText}>{t('help.view_all_faqs')}</Text>
           <ArrowRight width={20} height={20} color="#FFD900" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Support Section */}
         <View style={styles.supportSection}>
@@ -190,12 +194,12 @@ const HelpSupportScreen = () => {
           </Text>
 
           <View style={styles.supportButtons}>
-            <TouchableOpacity style={styles.liveChatBtn} activeOpacity={0.7}>
-              <MessageSquareText width={20} height={20} color="#1F2937" />
+            <TouchableOpacity style={styles.liveChatBtn} activeOpacity={0.7} onPress={() => Linking.openURL(`tel:${SUPPORT_PHONE}`)}>
+              <Phone width={20} height={20} color="#1F2937" />
               <Text style={styles.liveChatText}>{t('help.live_chat')}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.emailBtn} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.emailBtn} activeOpacity={0.7} onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}>
               <Mail width={20} height={20} color="#ffffff" />
               <Text style={styles.emailText}>{t('help.email_support')}</Text>
             </TouchableOpacity>

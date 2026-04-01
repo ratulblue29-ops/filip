@@ -370,7 +370,18 @@
     "save_roles": "Rolleri Kaydet",
     "toast_error": "Hata",
     "toast_select_role": "Lütfen en az bir rol seçin",
-    "toast_update_failed": "Roller güncellenemedi"
+    "toast_update_failed": "Roller güncellenemedi",
+    "roles": {
+      "WAITER": "Garson",
+      "BARTENDER": "Barmen",
+      "BAR_ASSISTANT": "Bar Asistanı",
+      "HOST": "Hostes",
+      "COOK": "Aşçı",
+      "ASSISTANT_COOK": "Aşçı Yardımcısı",
+      "KITCHEN_HELPER": "Mutfak Yardımcısı",
+      "MANAGER": "Yönetici",
+      "EMPLOYER": "İşveren"
+    }
   },
   "view_profile": {
     "title": "Profil",

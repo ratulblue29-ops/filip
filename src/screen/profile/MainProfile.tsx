@@ -37,6 +37,8 @@ import { useTranslation } from 'react-i18next';
 
 const MainProfile: React.FC = () => {
   const { t } = useTranslation();
+  const translateSkill = (skill: string) =>
+    t(`role_screen.roles.${skill}`, { defaultValue: skill });
   const queryClient = useQueryClient();
   const hasInitialized = useRef(false);
   const route = useRoute<any>();
@@ -260,7 +262,7 @@ const MainProfile: React.FC = () => {
                 {skills.length > 0 ? (
                   skills.map((skill, i) => (
                     <View key={i} style={styles.skillChip}>
-                      <Text style={styles.skillText}>{skill}</Text>
+                      <Text style={styles.skillText}>{translateSkill(skill)}</Text>
                     </View>
                   ))
                 ) : (
@@ -462,7 +464,7 @@ const MainProfile: React.FC = () => {
           <View style={styles.skillWrap}>
             {skills.map((skill, index) => (
               <View key={index} style={styles.skillChip}>
-                <Text style={styles.skillText}>{skill}</Text>
+                <Text style={styles.skillText}>{translateSkill(skill)}</Text>
                 <TouchableOpacity
                   onPress={() =>
                     setSkills(prev => prev.filter((_, i) => i !== index))

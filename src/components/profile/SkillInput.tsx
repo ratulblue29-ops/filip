@@ -8,6 +8,7 @@ import {
 import React from 'react';
 import { Plus } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const SkillInput = ({
   skillInput,
@@ -20,22 +21,21 @@ const SkillInput = ({
   addSkill: () => void;
   currentSkills?: string[];
 }) => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   return (
     <>
       <View style={styles.rowBetween}>
-        <Text style={[styles.label, styles.skillLabel]}>
-          Skills & Expertise
-        </Text>
+        <Text style={[styles.label, styles.skillLabel]}>{t('skill_input.label')}</Text>
         <TouchableOpacity>
-          <Text style={styles.viewAll}>View All</Text>
+          <Text style={styles.viewAll}>{t('skill_input.view_all')}</Text>
         </TouchableOpacity>
       </View>
       {/* Skill input */}
       <View style={styles.skillInputWrapper}>
         <TextInput
           style={styles.skillInput}
-          placeholder="Add A Skill (E.G. Barista)"
+          placeholder={t('skill_input.placeholder')}
           placeholderTextColor="#9CA3AF"
           value={skillInput}
           onChangeText={setSkillInput}

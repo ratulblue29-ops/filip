@@ -370,7 +370,18 @@
     "save_roles": "Sačuvaj uloge",
     "toast_error": "Greška",
     "toast_select_role": "Molimo izaberite bar jednu ulogu",
-    "toast_update_failed": "Ažuriranje uloga nije uspelo"
+    "toast_update_failed": "Ažuriranje uloga nije uspelo",
+    "roles": {
+      "WAITER": "Konobar",
+      "BARTENDER": "Barmen",
+      "BAR_ASSISTANT": "Asistent Barmena",
+      "HOST": "Domaćin/Domaćica",
+      "COOK": "Kuvar",
+      "ASSISTANT_COOK": "Pomoćnik Kuvara",
+      "KITCHEN_HELPER": "Pomoćnik u Kuhinji",
+      "MANAGER": "Menadžer",
+      "EMPLOYER": "Poslodavac"
+    }
   },
   "view_profile": {
     "title": "Profil",

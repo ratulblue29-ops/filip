@@ -370,7 +370,18 @@
     "save_roles": "Rollen speichern",
     "toast_error": "Fehler",
     "toast_select_role": "Bitte wähle mindestens eine Rolle aus",
-    "toast_update_failed": "Rollen aktualisieren fehlgeschlagen"
+    "toast_update_failed": "Rollen aktualisieren fehlgeschlagen",
+    "roles": {
+      "WAITER": "Kellner",
+      "BARTENDER": "Barmann",
+      "BAR_ASSISTANT": "Bar-Assistent",
+      "HOST": "Gastgeber/in",
+      "COOK": "Koch",
+      "ASSISTANT_COOK": "Hilfskoch",
+      "KITCHEN_HELPER": "Küchenhelfer",
+      "MANAGER": "Manager",
+      "EMPLOYER": "Arbeitgeber"
+    }
   },
   "view_profile": {
     "title": "Profil",

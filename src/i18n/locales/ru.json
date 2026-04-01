@@ -370,7 +370,18 @@
     "save_roles": "Сохранить роли",
     "toast_error": "Ошибка",
     "toast_select_role": "Пожалуйста, выберите хотя бы одну роль",
-    "toast_update_failed": "Не удалось обновить роли"
+    "toast_update_failed": "Не удалось обновить роли",
+    "roles": {
+      "WAITER": "Официант",
+      "BARTENDER": "Бармен",
+      "BAR_ASSISTANT": "Помощник Бармена",
+      "HOST": "Хозяин/Хозяйка",
+      "COOK": "Повар",
+      "ASSISTANT_COOK": "Помощник Повара",
+      "KITCHEN_HELPER": "Помощник на Кухне",
+      "MANAGER": "Менеджер",
+      "EMPLOYER": "Работодатель"
+    }
   },
   "view_profile": {
     "title": "Профиль",

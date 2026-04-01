@@ -54,15 +54,15 @@ const RoleScreen = () => {
   //   }
   // }, [currentUser]);
   const roles: Role[] = [
-    { code: 'WAITER', name: 'Waiter', icon: Utensils },
-    { code: 'BARTENDER', name: 'Bartender', icon: Martini },
-    { code: 'BAR_ASSISTANT', name: 'Bar Assistant', icon: Martini },
-    { code: 'HOST', name: 'Host/Hostess', icon: Users },
-    { code: 'COOK', name: 'Cook', icon: ChefHat },
-    { code: 'ASSISTANT_COOK', name: 'Assistant Cook', icon: ChefHat },
-    { code: 'KITCHEN_HELPER', name: 'Kitchen Helper', icon: ChefHat },
-    { code: 'MANAGER', name: 'Manager', icon: Briefcase },
-    { code: 'EMPLOYER', name: 'Employer', icon: Briefcase },
+    { code: 'WAITER', name: t('role_screen.roles.WAITER'), icon: Utensils },
+    { code: 'BARTENDER', name: t('role_screen.roles.BARTENDER'), icon: Martini },
+    { code: 'BAR_ASSISTANT', name: t('role_screen.roles.BAR_ASSISTANT'), icon: Martini },
+    { code: 'HOST', name: t('role_screen.roles.HOST'), icon: Users },
+    { code: 'COOK', name: t('role_screen.roles.COOK'), icon: ChefHat },
+    { code: 'ASSISTANT_COOK', name: t('role_screen.roles.ASSISTANT_COOK'), icon: ChefHat },
+    { code: 'KITCHEN_HELPER', name: t('role_screen.roles.KITCHEN_HELPER'), icon: ChefHat },
+    { code: 'MANAGER', name: t('role_screen.roles.MANAGER'), icon: Briefcase },
+    { code: 'EMPLOYER', name: t('role_screen.roles.EMPLOYER'), icon: Briefcase },
   ];
   // filter
   const filteredRoles = roles.filter(role =>

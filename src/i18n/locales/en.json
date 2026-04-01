@@ -17,7 +17,8 @@
     "not_specified": "Not specified",
     "date_unavailable": "Date not available",
     "no_skills": "No skills",
-    "not_set": "Not set"
+    "not_set": "Not set",
+    "error": "Error"
   },
   "status": {
     "available_now": "Available now",
@@ -269,7 +270,12 @@
     "no_chats": "No chats yet",
     "shift_ended": "This shift has ended. Chat is now closed.",
     "type_message": "Type a message...",
-    "waiting": "Waiting for acceptance..."
+    "waiting": "Waiting for acceptance...",
+    "delete_title": "Delete conversation",
+    "delete_message": "This will remove the chat from your inbox only.",
+    "delete_confirm": "Delete",
+    "delete_error": "Failed to delete chat.",
+    "deleted_banner": "User has deleted the chat"
   },
   "credit": {
     "title": "Credit score",

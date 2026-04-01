@@ -68,13 +68,14 @@ export interface Chat {
 
   engagementId?: string;
   jobId?: string;
-  jobName?: string; 
+  jobName?: string;
 
   /* ---------- OPTIONAL EXTENSIONS (UI LEVEL) ---------- */
 
   offerStatus?: 'Offer Pending' | 'Accepted' | 'Rejected';
   jobRole?: string;
   lockedAt?: FirebaseFirestoreTypes.Timestamp | null;
+  deletedFor?: Record<string, boolean>;
 }
 
 /* ================= CHAT WITH USER (ENRICHED) ================= */

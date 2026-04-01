@@ -10,6 +10,7 @@ import {
   Platform,
   StatusBar,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, MoreVertical, Send, Lock } from 'lucide-react-native';
@@ -25,6 +26,7 @@ import {
   getOtherUserInfoFromChat,
   checkChatAccess,
   getChatLockStatus,
+  deleteChat,
 } from '../../services/chat';
 import { ChatMessage } from '../../@types/Chat.type';
 import { getFirestore } from '@react-native-firebase/firestore';
@@ -35,7 +37,7 @@ const ChatDetailScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { chatId } = route.params;
+  const { chatId, otherUserId } = route.params;
   const db = getFirestore();
 
   const currentUserId = getAuth().currentUser?.uid || '';
@@ -48,6 +50,8 @@ const ChatDetailScreen = () => {
   const [engagementStatuses, setEngagementStatuses] = useState<
     Record<string, string>
   >({});
+
+  const [chatDocData, setChatDocData] = useState<any>(null);
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -119,6 +123,7 @@ const ChatDetailScreen = () => {
       const userSnap = await getDoc(doc(db, 'users', currentUserId));
       const tier = userSnap.data()?.membership?.tier ?? 'free';
       const access = await checkChatAccess(otherUser.id, tier);
+      setChatDocData(chatSnap.data());
       setChatUnlocked(access);
     });
 
@@ -168,6 +173,29 @@ const ChatDetailScreen = () => {
     }
   };
 
+  const otherUserDeleted = chatDocData?.deletedFor?.[otherUserId] === true;
+  const handleDeleteChat = () => {
+    Alert.alert(
+      t('chat.delete_title'),
+      t('chat.delete_message'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('chat.delete_confirm'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteChat(chatId);
+              navigation.goBack();
+            } catch (e) {
+              Alert.alert(t('common.cancel'), t('chat.delete_error'));
+            }
+          },
+        },
+      ],
+    );
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -201,7 +229,7 @@ const ChatDetailScreen = () => {
           </View>
         </View>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleDeleteChat}>
           <MoreVertical color="#fff" size={24} />
         </TouchableOpacity>
       </View>
@@ -292,6 +320,14 @@ const ChatDetailScreen = () => {
           </View>
         )}
       </KeyboardAvoidingView> */}
+
+      {/* Deleted banner — shown when other user has deleted this chat */}
+      {otherUserDeleted && (
+        <View style={styles.deletedBanner}>
+          <Text style={styles.deletedBannerText}>{t('chat.deleted_banner')}</Text>
+        </View>
+      )}
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}

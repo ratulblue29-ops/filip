@@ -370,3 +370,16 @@ export const getChatLockStatus = async (
 
   return { isLocked };
 };
+
+/* ================= DELETE CHAT (ONE-SIDED) ================= */
+export const deleteChat = async (chatId: string): Promise<void> => {
+  const db = getDb();
+  const currentUser = getAuth().currentUser;
+  if (!currentUser) throw new Error('Not authenticated');
+
+  const chatRef = firestoreDoc(db, 'chats', chatId);
+  await updateDoc(chatRef, {
+    [`deletedFor.${currentUser.uid}`]: true,
+    updatedAt: serverTimestamp(),
+  });
+};

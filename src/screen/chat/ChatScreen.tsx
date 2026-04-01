@@ -77,6 +77,8 @@ const ChatScreen: React.FC = () => {
     }
   };
 
+  const visibleChats = chats.filter(c => !c.deletedFor?.[currentUserId]);
+
   /* ================= LOADING ================= */
 
   if (loading) {
@@ -119,7 +121,7 @@ const ChatScreen: React.FC = () => {
 
       {/* CHAT LIST */}
       <FlatList
-        data={chats}
+        data={visibleChats}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listPadding}
         showsVerticalScrollIndicator={false}

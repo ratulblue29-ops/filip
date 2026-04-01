@@ -217,4 +217,20 @@ export const styles = StyleSheet.create({
     fontFamily: 'InterDisplayMedium',
     fontWeight: '500',
   },
+  deletedBanner: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    marginHorizontal: 16,
+    marginBottom: 4,
+    borderRadius: 12,
+    backgroundColor: '#1D1D1D',
+    borderWidth: 1,
+    borderColor: 'rgba(247, 254, 231, 0.10)',
+  },
+  deletedBannerText: {
+    color: '#9CA3AF',
+    fontSize: 13,
+    fontFamily: 'InterDisplayMedium',
+    fontWeight: '500',
+  },
 });

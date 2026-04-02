@@ -17,7 +17,8 @@
     "not_specified": "Non spécifié",
     "date_unavailable": "Date non disponible",
     "no_skills": "Aucune compétence",
-    "not_set": "Non défini"
+    "not_set": "Non défini",
+    "error": "Erreur"
   },
   "status": {
     "available_now": "Disponible Maintenant",
@@ -269,7 +270,12 @@
     "no_chats": "Aucune discussion",
     "shift_ended": "Ce quart est terminé. La discussion est maintenant fermée.",
     "type_message": "Saisir un message...",
-    "waiting": "En attente d'acceptation..."
+    "waiting": "En attente d'acceptation...",
+    "delete_title": "Supprimer la conversation",
+    "delete_message": "Cela supprimera uniquement le chat de votre boîte de réception.",
+    "delete_confirm": "Supprimer",
+    "delete_error": "Échec de la suppression du chat.",
+    "deleted_banner": "L'utilisateur a supprimé le chat"
   },
   "credit": {
     "title": "Score de Crédit",
@@ -673,6 +679,67 @@
     "alert_success": "Succès",
     "alert_success_sub": "Paiement réussi !",
     "alert_generic": "Quelque chose s'est mal passé"
+  },
+  "daily_creation": {
+    "cancel": "Annuler",
+    "title": "Disponibilité quotidienne",
+    "posting": "Publication...",
+    "post": "Publier",
+    "credit_banner": "La publication coûte 1 crédit. Si aucun engagement n'est reçu avant la fin de la journée, votre crédit est remboursé.",
+    "section_position": "Poste ciblé",
+    "placeholder_position": "ex. Barista, Serveur, Personnel événementiel",
+    "section_date": "Date",
+    "pick_date": "Choisir une date",
+    "tap_to_select": "Appuyer pour sélectionner",
+    "section_time": "Heures de quart",
+    "start": "Début",
+    "end": "Fin",
+    "ios_cancel": "Annuler",
+    "ios_done": "Terminé",
+    "section_rate": "Taux",
+    "rate_hourly": "Horaire",
+    "rate_daily": "Quotidien",
+    "section_city": "Ville",
+    "placeholder_city": "ex. Amsterdam",
+    "section_description": "Description",
+    "description_optional": "(optionnel)",
+    "placeholder_description": "ex. Barista expérimenté, disponible pour le quart du soir...",
+    "error_date": "Sélectionnez une date",
+    "error_time": "Sélectionnez les heures de début et de fin",
+    "error_time_order": "L'heure de fin doit être après l'heure de début",
+    "error_rate": "Saisissez un taux valide",
+    "error_city": "La ville est requise",
+    "error_position": "Le poste ciblé est requis",
+    "toast_posted": "Disponibilité publiée",
+    "toast_posted_sub": "Votre disponibilité quotidienne est maintenant active.",
+    "toast_error": "Échec de la publication",
+    "toast_error_sub": "Quelque chose s'est mal passé."
+  },
+  "notification_types": {
+    "ENGAGEMENT_SENT": {
+      "title": "Nouvelle demande d'engagement",
+      "body": "Un employeur souhaite vous engager"
+    },
+    "ENGAGEMENT_ACCEPTED": {
+      "title": "Engagement accepté",
+      "body": "Un travailleur a accepté votre demande d'engagement"
+    },
+    "ENGAGEMENT_DECLINED": {
+      "title": "Engagement refusé",
+      "body": "Un travailleur a refusé votre demande d'engagement"
+    },
+    "JOB_APPLY": {
+      "title": "Nouvelle candidature",
+      "body": "Quelqu'un a postulé pour votre emploi"
+    },
+    "OFFER_ACCEPTED": {
+      "title": "Offre acceptée",
+      "body": "Votre candidat a accepté l'offre"
+    },
+    "OFFER_REJECTED": {
+      "title": "Offre refusée",
+      "body": "Votre candidat a refusé l'offre"
+    }
   },
   "fulltime_creation": {
     "title": "Créer un Emploi à Temps Plein",

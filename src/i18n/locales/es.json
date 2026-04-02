@@ -17,7 +17,8 @@
     "not_specified": "No especificado",
     "date_unavailable": "Fecha no disponible",
     "no_skills": "Sin habilidades",
-    "not_set": "No establecido"
+    "not_set": "No establecido",
+    "error": "Error"
   },
   "status": {
     "available_now": "Disponible ahora",
@@ -269,7 +270,12 @@
     "no_chats": "Aún no hay chats",
     "shift_ended": "Este turno ha terminado. El chat está cerrado.",
     "type_message": "Escribe un mensaje...",
-    "waiting": "Esperando aceptación..."
+    "waiting": "Esperando aceptación...",
+    "delete_title": "Eliminar conversación",
+    "delete_message": "Esto eliminará el chat solo de tu bandeja de entrada.",
+    "delete_confirm": "Eliminar",
+    "delete_error": "Error al eliminar el chat.",
+    "deleted_banner": "El usuario ha eliminado el chat"
   },
   "credit": {
     "title": "Crédito",
@@ -673,6 +679,67 @@
     "alert_success": "Éxito",
     "alert_success_sub": "¡Pago exitoso!",
     "alert_generic": "Algo salió mal"
+  },
+  "daily_creation": {
+    "cancel": "Cancelar",
+    "title": "Disponibilidad diaria",
+    "posting": "Publicando...",
+    "post": "Publicar",
+    "credit_banner": "Publicar cuesta 1 crédito. Si no se recibe ningún compromiso antes del final del día, tu crédito será reembolsado.",
+    "section_position": "Posición objetivo",
+    "placeholder_position": "p.ej. Barista, Camarero, Personal de Eventos",
+    "section_date": "Fecha",
+    "pick_date": "Seleccionar fecha",
+    "tap_to_select": "Toca para seleccionar",
+    "section_time": "Horas del turno",
+    "start": "Inicio",
+    "end": "Fin",
+    "ios_cancel": "Cancelar",
+    "ios_done": "Hecho",
+    "section_rate": "Tarifa",
+    "rate_hourly": "Por hora",
+    "rate_daily": "Diario",
+    "section_city": "Ciudad",
+    "placeholder_city": "p.ej. Ámsterdam",
+    "section_description": "Descripción",
+    "description_optional": "(opcional)",
+    "placeholder_description": "p.ej. Barista experimentado, disponible para turno nocturno...",
+    "error_date": "Selecciona una fecha",
+    "error_time": "Selecciona las horas de inicio y fin",
+    "error_time_order": "La hora de fin debe ser posterior a la de inicio",
+    "error_rate": "Ingresa una tarifa válida",
+    "error_city": "La ciudad es obligatoria",
+    "error_position": "La posición objetivo es obligatoria",
+    "toast_posted": "Disponibilidad publicada",
+    "toast_posted_sub": "Tu disponibilidad diaria ya está activa.",
+    "toast_error": "Error al publicar",
+    "toast_error_sub": "Algo salió mal."
+  },
+  "notification_types": {
+    "ENGAGEMENT_SENT": {
+      "title": "Nueva solicitud de compromiso",
+      "body": "Un empleador quiere contratarte"
+    },
+    "ENGAGEMENT_ACCEPTED": {
+      "title": "Compromiso aceptado",
+      "body": "Un trabajador ha aceptado tu solicitud de compromiso"
+    },
+    "ENGAGEMENT_DECLINED": {
+      "title": "Compromiso rechazado",
+      "body": "Un trabajador ha rechazado tu solicitud de compromiso"
+    },
+    "JOB_APPLY": {
+      "title": "Nueva solicitud de trabajo",
+      "body": "Alguien aplicó para tu trabajo"
+    },
+    "OFFER_ACCEPTED": {
+      "title": "Oferta aceptada",
+      "body": "Tu candidato ha aceptado la oferta"
+    },
+    "OFFER_REJECTED": {
+      "title": "Oferta rechazada",
+      "body": "Tu candidato ha rechazado la oferta"
+    }
   },
   "fulltime_creation": {
     "title": "Crear trabajo de tiempo completo",

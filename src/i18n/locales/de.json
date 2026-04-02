@@ -17,7 +17,8 @@
     "not_specified": "Nicht angegeben",
     "date_unavailable": "Datum nicht verfügbar",
     "no_skills": "Keine Fähigkeiten",
-    "not_set": "Nicht festgelegt"
+    "not_set": "Nicht festgelegt",
+    "error": "Fehler"
   },
   "status": {
     "available_now": "Jetzt verfügbar",
@@ -209,7 +210,7 @@
     "saving": "Wird gespeichert...",
     "save_profile": "Profil speichern",
     "city_required": "Stadt ist erforderlich",
-    "about_required": "Das Feld Über mich ist erforderlich",
+    "about_required": "Über mich ist ein Pflichtfeld",
     "skill_required": "Bitte füge mindestens eine Fähigkeit hinzu",
     "photo_upload_failed": "Foto-Upload fehlgeschlagen",
     "profile_updated": "Profil aktualisiert",
@@ -269,7 +270,12 @@
     "no_chats": "Noch keine Chats",
     "shift_ended": "Diese Schicht ist beendet. Der Chat ist nun geschlossen.",
     "type_message": "Nachricht eingeben...",
-    "waiting": "Warte auf Bestätigung..."
+    "waiting": "Warte auf Bestätigung...",
+    "delete_title": "Gespräch löschen",
+    "delete_message": "Dadurch wird der Chat nur aus deinem Posteingang entfernt.",
+    "delete_confirm": "Löschen",
+    "delete_error": "Chat konnte nicht gelöscht werden.",
+    "deleted_banner": "Nutzer hat den Chat gelöscht"
   },
   "credit": {
     "title": "Guthaben",
@@ -594,7 +600,7 @@
     "still_need_help": "Noch Hilfe benötigt?",
     "support_sub_1": "Unser Support-Team ist rund um die Uhr erreichbar",
     "support_sub_2": "Um dein Problem schnell zu lösen.",
-    "live_chat": "Live-Chat",
+    "live_chat": "Support anrufen",
     "email_support": "E-Mail-Support"
   },
   "splash": {
@@ -673,6 +679,67 @@
     "alert_success": "Erfolg",
     "alert_success_sub": "Zahlung erfolgreich!",
     "alert_generic": "Etwas ist schiefgelaufen"
+  },
+  "daily_creation": {
+    "cancel": "Abbrechen",
+    "title": "Tägliche Verfügbarkeit",
+    "posting": "Wird veröffentlicht...",
+    "post": "Veröffentlichen",
+    "credit_banner": "Die Veröffentlichung kostet 1 Credit. Falls bis Tagesende kein Engagement eingeht, wird dein Credit erstattet.",
+    "section_position": "Zielposition",
+    "placeholder_position": "z.B. Barista, Kellner, Event-Personal",
+    "section_date": "Datum",
+    "pick_date": "Datum auswählen",
+    "tap_to_select": "Tippen zum Auswählen",
+    "section_time": "Schichtstunden",
+    "start": "Start",
+    "end": "Ende",
+    "ios_cancel": "Abbrechen",
+    "ios_done": "Fertig",
+    "section_rate": "Tarif",
+    "rate_hourly": "Stündlich",
+    "rate_daily": "Täglich",
+    "section_city": "Stadt",
+    "placeholder_city": "z.B. Amsterdam",
+    "section_description": "Beschreibung",
+    "description_optional": "(optional)",
+    "placeholder_description": "z.B. Erfahrener Barista, verfügbar für Abendschicht...",
+    "error_date": "Datum auswählen",
+    "error_time": "Start- und Endzeit auswählen",
+    "error_time_order": "Endzeit muss nach der Startzeit liegen",
+    "error_rate": "Gültigen Tarif eingeben",
+    "error_city": "Stadt ist erforderlich",
+    "error_position": "Zielposition ist erforderlich",
+    "toast_posted": "Verfügbarkeit veröffentlicht",
+    "toast_posted_sub": "Deine tägliche Verfügbarkeit ist jetzt aktiv.",
+    "toast_error": "Veröffentlichung fehlgeschlagen",
+    "toast_error_sub": "Etwas ist schiefgelaufen."
+  },
+  "notification_types": {
+    "ENGAGEMENT_SENT": {
+      "title": "Neue Engagement-Anfrage",
+      "body": "Ein Arbeitgeber möchte dich engagieren"
+    },
+    "ENGAGEMENT_ACCEPTED": {
+      "title": "Engagement angenommen",
+      "body": "Ein Arbeitnehmer hat deine Anfrage angenommen"
+    },
+    "ENGAGEMENT_DECLINED": {
+      "title": "Engagement abgelehnt",
+      "body": "Ein Arbeitnehmer hat deine Anfrage abgelehnt"
+    },
+    "JOB_APPLY": {
+      "title": "Neue Bewerbung",
+      "body": "Jemand hat sich auf deinen Job beworben"
+    },
+    "OFFER_ACCEPTED": {
+      "title": "Angebot angenommen",
+      "body": "Dein Bewerber hat das Angebot angenommen"
+    },
+    "OFFER_REJECTED": {
+      "title": "Angebot abgelehnt",
+      "body": "Dein Bewerber hat das Angebot abgelehnt"
+    }
   },
   "fulltime_creation": {
     "title": "Vollzeitstelle erstellen",

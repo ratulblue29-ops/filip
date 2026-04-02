@@ -17,7 +17,8 @@
     "not_specified": "Nije navedeno",
     "date_unavailable": "Datum nije dostupan",
     "no_skills": "Bez veština",
-    "not_set": "Nije postavljeno"
+    "not_set": "Nije postavljeno",
+    "error": "Greška"
   },
   "status": {
     "available_now": "Dostupno sada",
@@ -269,7 +270,12 @@
     "no_chats": "Još nema razgovora",
     "shift_ended": "Smena je završena. Razgovor je zatvoren.",
     "type_message": "Unesite poruku...",
-    "waiting": "Čeka se prihvatanje..."
+    "waiting": "Čeka se prihvatanje...",
+    "delete_title": "Obriši razgovor",
+    "delete_message": "Ovo će ukloniti razgovor samo iz vašeg inboxa.",
+    "delete_confirm": "Obriši",
+    "delete_error": "Brisanje razgovora nije uspelo.",
+    "deleted_banner": "Korisnik je obrisao razgovor"
   },
   "credit": {
     "title": "Kredit",

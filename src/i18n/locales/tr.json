@@ -17,7 +17,8 @@
     "not_specified": "Belirtilmedi",
     "date_unavailable": "Tarih mevcut değil",
     "no_skills": "Beceri yok",
-    "not_set": "Ayarlanmadı"
+    "not_set": "Ayarlanmadı",
+    "error": "Hata"
   },
   "status": {
     "available_now": "Şu An Müsait",
@@ -269,7 +270,12 @@
     "no_chats": "Henüz sohbet yok",
     "shift_ended": "Bu vardiya sona erdi. Sohbet artık kapalı.",
     "type_message": "Mesaj yaz...",
-    "waiting": "Kabul bekleniyor..."
+    "waiting": "Kabul bekleniyor...",
+    "delete_title": "Sohbeti sil",
+    "delete_message": "Bu, sohbeti yalnızca gelen kutunuzdan kaldıracak.",
+    "delete_confirm": "Sil",
+    "delete_error": "Sohbet silinemedi.",
+    "deleted_banner": "Kullanıcı sohbeti sildi"
   },
   "credit": {
     "title": "Kredi Puanı",
@@ -710,5 +716,66 @@
     "toast_posted_sub": "Tam zamanlı işiniz başarıyla yayınlandı.",
     "toast_error": "Hata",
     "toast_error_sub": "İşiniz yayınlanırken bir hata oluştu."
+  },
+  "daily_creation": {
+    "cancel": "İptal",
+    "title": "Günlük Müsaitlik",
+    "posting": "Yayınlanıyor...",
+    "post": "Yayınla",
+    "credit_banner": "Yayınlama 1 kredi gerektirir. Gün sonuna kadar bağlılık alınmazsa krediniz iade edilir.",
+    "section_position": "Hedef Pozisyon",
+    "placeholder_position": "örn. Barista, Garson, Etkinlik Personeli",
+    "section_date": "Tarih",
+    "pick_date": "Tarih Seçin",
+    "tap_to_select": "Seçmek için dokunun",
+    "section_time": "Vardiya Saatleri",
+    "start": "Başlangıç",
+    "end": "Bitiş",
+    "ios_cancel": "İptal",
+    "ios_done": "Tamam",
+    "section_rate": "Ücret",
+    "rate_hourly": "Saatlik",
+    "rate_daily": "Günlük",
+    "section_city": "Şehir",
+    "placeholder_city": "örn. Amsterdam",
+    "section_description": "Açıklama",
+    "description_optional": "(isteğe bağlı)",
+    "placeholder_description": "örn. Deneyimli barista, akşam vardiyası için müsait...",
+    "error_date": "Bir tarih seçin",
+    "error_time": "Başlangıç ve bitiş saatlerini seçin",
+    "error_time_order": "Bitiş saati başlangıç saatinden sonra olmalı",
+    "error_rate": "Geçerli bir ücret girin",
+    "error_city": "Şehir gerekli",
+    "error_position": "Hedef pozisyon gerekli",
+    "toast_posted": "Müsaitlik Yayınlandı",
+    "toast_posted_sub": "Günlük müsaitliğiniz artık aktif.",
+    "toast_error": "Yayınlama Başarısız",
+    "toast_error_sub": "Bir şeyler yanlış gitti."
+  },
+  "notification_types": {
+    "ENGAGEMENT_SENT": {
+      "title": "Yeni Bağlılık Talebi",
+      "body": "Bir işveren sizi bağlamak istiyor"
+    },
+    "ENGAGEMENT_ACCEPTED": {
+      "title": "Bağlılık Kabul Edildi",
+      "body": "Bir çalışan bağlılık talebinizi kabul etti"
+    },
+    "ENGAGEMENT_DECLINED": {
+      "title": "Bağlılık Reddedildi",
+      "body": "Bir çalışan bağlılık talebinizi reddetti"
+    },
+    "JOB_APPLY": {
+      "title": "Yeni İş Başvurusu",
+      "body": "Biri işinize başvurdu"
+    },
+    "OFFER_ACCEPTED": {
+      "title": "Teklif Kabul Edildi",
+      "body": "Adayınız teklifi kabul etti"
+    },
+    "OFFER_REJECTED": {
+      "title": "Teklif Reddedildi",
+      "body": "Adayınız teklifi reddetti"
+    }
   }
 }

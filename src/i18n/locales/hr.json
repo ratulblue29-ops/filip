@@ -17,7 +17,8 @@
     "not_specified": "Nije navedeno",
     "date_unavailable": "Datum nije dostupan",
     "no_skills": "Bez vještina",
-    "not_set": "Nije postavljeno"
+    "not_set": "Nije postavljeno",
+    "error": "Greška"
   },
   "status": {
     "available_now": "Dostupno sada",
@@ -269,7 +270,12 @@
     "no_chats": "Još nema razgovora",
     "shift_ended": "Smjena je završena. Razgovor je zatvoren.",
     "type_message": "Unesite poruku...",
-    "waiting": "Čeka se prihvaćanje..."
+    "waiting": "Čeka se prihvaćanje...",
+    "delete_title": "Obriši razgovor",
+    "delete_message": "Ovo će ukloniti razgovor samo iz vaše pristigle pošte.",
+    "delete_confirm": "Obriši",
+    "delete_error": "Brisanje razgovora nije uspjelo.",
+    "deleted_banner": "Korisnik je obrisao razgovor"
   },
   "credit": {
     "title": "Kredit",
@@ -562,11 +568,11 @@
   "terms": {
     "title": "Uvjeti korištenja",
     "section_1_title": "1. Uvod",
-    "section_1_body": "Dobrodošli u našu ugostiteljsku mrežu. Korištenjem ove aplikacije slažete se sa sljedećim uvjetima u pogledu dostupnosti, angažmana i oglašavanja poslova. Ovi uvjeti osiguravaju transparentno i učinkovito okruženje za sve korisnike.",
+    "section_1_body": "Dobrodošli u našu ugostiteljsku mrežu. Korištenjem ove aplikacije slažete se sa sljedećim uvjetima u pogledu dostupnosti, angažmana i oglašavanja poslova.",
     "section_2_title": "2. Uloga platforme",
-    "section_2_body": "Naša platforma djeluje isključivo kao posrednik koji povezuje ugostiteljske profesionalce (radnike) s potencijalnim poslodavcima. Mi izravno ne zapošljavamo nijednog radnika niti djelujemo kao agencija za zapošljavanje. Platforma olakšava veze, ali ne usmjerava, kontrolira ni nadzire obavljeni rad.",
+    "section_2_body": "Naša platforma djeluje isključivo kao posrednik koji povezuje ugostiteljske profesionalce (radnike) s potencijalnim poslodavcima.",
     "section_3_title": "3. Korisničke obaveze",
-    "section_3_body": "Svi ugovori o zapošljavanju, sporazumi o smjenama i angažmanima isključivo su između radnika i poslodavca. Uvjeti zapošljavanja, uključujući sate, dužnosti, stope i naknade, dogovaraju se i utvrđuju isključivo od strane uključenih stranaka bez našeg miješanja.",
+    "section_3_body": "Svi ugovori o zapošljavanju, sporazumi o smjenama i angažmanima isključivo su između radnika i poslodavca.",
     "section_4_title": "4. Odricanje od odgovornosti",
     "section_4_body": "Ne preuzimamo nikakvu odgovornost za sporazume između korisnika. Konkretno, nismo odgovorni za:",
     "bullet_1": "• Propuštena, zakašnjela ili sporna plaćanja između stranaka.",
@@ -710,5 +716,66 @@
     "toast_posted_sub": "Vaš oglas za puno radno vrijeme je uspješno objavljen.",
     "toast_error": "Greška",
     "toast_error_sub": "Došlo je do greške pri objavljivanju oglasa."
+  },
+  "daily_creation": {
+    "cancel": "Odustani",
+    "title": "Dnevna dostupnost",
+    "posting": "Objavljivanje...",
+    "post": "Objavi",
+    "credit_banner": "Objavljivanje košta 1 kredit. Ako do kraja dana ne dobijete angažman, kredit će biti vraćen.",
+    "section_position": "Ciljna pozicija",
+    "placeholder_position": "npr. Barista, Konobar, Event osoblje",
+    "section_date": "Datum",
+    "pick_date": "Odaberi datum",
+    "tap_to_select": "Tapnite za odabir",
+    "section_time": "Sati smjene",
+    "start": "Početak",
+    "end": "Kraj",
+    "ios_cancel": "Odustani",
+    "ios_done": "Gotovo",
+    "section_rate": "Satnica",
+    "rate_hourly": "Po satu",
+    "rate_daily": "Dnevno",
+    "section_city": "Grad",
+    "placeholder_city": "npr. Amsterdam",
+    "section_description": "Opis",
+    "description_optional": "(neobavezno)",
+    "placeholder_description": "npr. Iskusni barista, dostupan za večernju smjenu...",
+    "error_date": "Odaberi datum",
+    "error_time": "Odaberi početno i završno vrijeme",
+    "error_time_order": "Završno vrijeme mora biti nakon početnog",
+    "error_rate": "Unesite važeću satnicu",
+    "error_city": "Grad je obavezan",
+    "error_position": "Ciljna pozicija je obavezna",
+    "toast_posted": "Dostupnost objavljena",
+    "toast_posted_sub": "Vaša dnevna dostupnost je sada aktivna.",
+    "toast_error": "Objavljivanje nije uspjelo",
+    "toast_error_sub": "Nešto je pošlo po krivu."
+  },
+  "notification_types": {
+    "ENGAGEMENT_SENT": {
+      "title": "Novi zahtjev za angažman",
+      "body": "Poslodavac vas želi angažirati"
+    },
+    "ENGAGEMENT_ACCEPTED": {
+      "title": "Angažman prihvaćen",
+      "body": "Radnik je prihvatio vaš zahtjev za angažman"
+    },
+    "ENGAGEMENT_DECLINED": {
+      "title": "Angažman odbijen",
+      "body": "Radnik je odbio vaš zahtjev za angažman"
+    },
+    "JOB_APPLY": {
+      "title": "Nova prijava za posao",
+      "body": "Netko se prijavio za vaš posao"
+    },
+    "OFFER_ACCEPTED": {
+      "title": "Ponuda prihvaćena",
+      "body": "Vaš kandidat je prihvatio ponudu"
+    },
+    "OFFER_REJECTED": {
+      "title": "Ponuda odbijena",
+      "body": "Vaš kandidat je odbio ponudu"
+    }
   }
 }

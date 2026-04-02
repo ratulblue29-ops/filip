@@ -17,7 +17,8 @@
     "not_specified": "Non specificato",
     "date_unavailable": "Data non disponibile",
     "no_skills": "Nessuna competenza",
-    "not_set": "Non impostato"
+    "not_set": "Non impostato",
+    "error": "Errore"
   },
   "status": {
     "available_now": "Disponibile ora",
@@ -269,7 +270,12 @@
     "no_chats": "Nessuna chat ancora",
     "shift_ended": "Questo turno è terminato. La chat è ora chiusa.",
     "type_message": "Scrivi un messaggio...",
-    "waiting": "In attesa di accettazione..."
+    "waiting": "In attesa di accettazione...",
+    "delete_title": "Elimina conversazione",
+    "delete_message": "Questo rimuoverà la chat solo dalla tua casella di posta.",
+    "delete_confirm": "Elimina",
+    "delete_error": "Impossibile eliminare la chat.",
+    "deleted_banner": "L'utente ha eliminato la chat"
   },
   "credit": {
     "title": "Punteggio credito",
@@ -372,15 +378,15 @@
     "toast_select_role": "Seleziona almeno un ruolo",
     "toast_update_failed": "Aggiornamento ruoli fallito",
     "roles": {
-      "WAITER": "Camarero",
+      "WAITER": "Cameriere",
       "BARTENDER": "Barman",
-      "BAR_ASSISTANT": "Asistente de Bar",
-      "HOST": "Anfitrión/Anfitriona",
-      "COOK": "Cocinero",
-      "ASSISTANT_COOK": "Ayudante de Cocina",
-      "KITCHEN_HELPER": "Auxiliar de Cocina",
-      "MANAGER": "Gerente",
-      "EMPLOYER": "Empleador"
+      "BAR_ASSISTANT": "Assistente Bar",
+      "HOST": "Ospite/Ospitante",
+      "COOK": "Cuoco",
+      "ASSISTANT_COOK": "Aiuto Cuoco",
+      "KITCHEN_HELPER": "Aiutante di Cucina",
+      "MANAGER": "Manager",
+      "EMPLOYER": "Datore di lavoro"
     }
   },
   "view_profile": {
@@ -710,5 +716,66 @@
     "toast_posted_sub": "Il tuo lavoro a tempo pieno è stato pubblicato con successo.",
     "toast_error": "Errore",
     "toast_error_sub": "Si è verificato un errore durante la pubblicazione del lavoro."
+  },
+  "daily_creation": {
+    "cancel": "Annulla",
+    "title": "Disponibilità giornaliera",
+    "posting": "Pubblicazione...",
+    "post": "Pubblica",
+    "credit_banner": "La pubblicazione costa 1 credito. Se non ricevi impegni entro fine giornata, il credito ti verrà rimborsato.",
+    "section_position": "Posizione desiderata",
+    "placeholder_position": "es. Barista, Cameriere, Staff eventi",
+    "section_date": "Data",
+    "pick_date": "Scegli una data",
+    "tap_to_select": "Tocca per selezionare",
+    "section_time": "Orario turno",
+    "start": "Inizio",
+    "end": "Fine",
+    "ios_cancel": "Annulla",
+    "ios_done": "Fine",
+    "section_rate": "Tariffa",
+    "rate_hourly": "Orario",
+    "rate_daily": "Giornaliero",
+    "section_city": "Città",
+    "placeholder_city": "es. Amsterdam",
+    "section_description": "Descrizione",
+    "description_optional": "(opzionale)",
+    "placeholder_description": "es. Barista esperto, disponibile per turno serale...",
+    "error_date": "Seleziona una data",
+    "error_time": "Seleziona orario di inizio e fine",
+    "error_time_order": "L'orario di fine deve essere successivo a quello di inizio",
+    "error_rate": "Inserisci una tariffa valida",
+    "error_city": "La città è obbligatoria",
+    "error_position": "La posizione desiderata è obbligatoria",
+    "toast_posted": "Disponibilità pubblicata",
+    "toast_posted_sub": "La tua disponibilità giornaliera è ora attiva.",
+    "toast_error": "Pubblicazione fallita",
+    "toast_error_sub": "Qualcosa è andato storto."
+  },
+  "notification_types": {
+    "ENGAGEMENT_SENT": {
+      "title": "Nuova richiesta di impegno",
+      "body": "Un datore di lavoro vuole ingaggiarti"
+    },
+    "ENGAGEMENT_ACCEPTED": {
+      "title": "Impegno accettato",
+      "body": "Un lavoratore ha accettato la tua richiesta di impegno"
+    },
+    "ENGAGEMENT_DECLINED": {
+      "title": "Impegno rifiutato",
+      "body": "Un lavoratore ha rifiutato la tua richiesta di impegno"
+    },
+    "JOB_APPLY": {
+      "title": "Nuova candidatura",
+      "body": "Qualcuno si è candidato al tuo lavoro"
+    },
+    "OFFER_ACCEPTED": {
+      "title": "Offerta accettata",
+      "body": "Il tuo candidato ha accettato l'offerta"
+    },
+    "OFFER_REJECTED": {
+      "title": "Offerta rifiutata",
+      "body": "Il tuo candidato ha rifiutato l'offerta"
+    }
   }
 }

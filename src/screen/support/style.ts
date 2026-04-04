@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   faqSection: {
     gap: 12,
-    marginBottom: 16,
+    marginBottom: 24,
   },
   faqCard: {
     backgroundColor: COLORS.cardBg,
@@ -102,11 +102,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   faqQuestion: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 500,
     color: COLORS.white,
     fontFamily: 'InterDisplayMedium',
     flex: 1,
+    marginLeft: 10,
   },
   faqAnswer: {
     fontSize: 14,
@@ -185,8 +186,93 @@ const styles = StyleSheet.create({
   emailText: {
     fontSize: 16,
     fontWeight: 600,
-    color: COLORS.white,
+    color: COLORS.textDark,
     fontFamily: 'InterDisplaySemiBold',
+  },
+
+  // ─── Guide Section Styles ─────────────────────────────────────────────────
+
+  // Icon + title row inside accordion header
+  guideSectionIconTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+
+  // Expanded content wrapper
+  guideContentBody: {
+    marginTop: 16,
+    gap: 6,
+  },
+
+  // Bold subheading inside expanded content e.g. "Seasonal Workers"
+  guideSubheading: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: COLORS.primary,
+    fontFamily: 'InterDisplaySemiBold',
+    marginTop: 8,
+    marginBottom: 2,
+  },
+
+  // Numbered step row
+  guideStepRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  guideStepNumber: {
+    fontSize: 14,
+    color: COLORS.white,
+    fontFamily: 'InterDisplayMedium',
+    marginTop: 1,
+  },
+  guideStepText: {
+    fontSize: 14,
+    color: COLORS.white,
+    fontFamily: 'InterDisplayRegular',
+    lineHeight: 20,
+    flex: 1,
+  },
+
+  // Bullet row (indented sub-item)
+  guideBulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    paddingLeft: 8,
+  },
+  guideBulletDot: {
+    fontSize: 14,
+    color: COLORS.gray,
+    fontFamily: 'InterDisplayRegular',
+    marginTop: 1,
+  },
+  guideBulletText: {
+    fontSize: 14,
+    color: COLORS.gray,
+    fontFamily: 'InterDisplayRegular',
+    lineHeight: 20,
+    flex: 1,
+  },
+
+  // Note / description text (italic feel, gray)
+  guideNote: {
+    fontSize: 13,
+    color: COLORS.gray,
+    fontFamily: 'InterDisplayRegular',
+    lineHeight: 19,
+    paddingLeft: 8,
+    fontStyle: 'italic',
+  },
+
+  // Empty state when search returns nothing
+  guideEmptyText: {
+    fontSize: 14,
+    color: COLORS.gray,
+    fontFamily: 'InterDisplayRegular',
+    textAlign: 'center',
+    paddingVertical: 24,
   },
 });
 

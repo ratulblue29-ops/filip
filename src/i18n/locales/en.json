@@ -803,5 +803,38 @@
       "title": "Offer rejected",
       "body": "Your applicant has rejected the offer"
     }
+  },
+  "fulltime_creation": {
+    "title": "Post a full-time job",
+    "membership_title": "Membership plan",
+    "membership_premium": "You have Premium — unlimited full-time job posts.",
+    "membership_basic": "You have Basic — 1 full-time job post per month.",
+    "membership_free": "Free plan — upgrade to post full-time jobs.",
+    "membership_link": "View membership plans",
+    "section_job_details": "Job details",
+    "label_position": "Position",
+    "placeholder_position": "e.g. Head Waiter, Chef",
+    "label_city": "City",
+    "label_salary": "Monthly salary",
+    "label_days": "Days / week",
+    "section_about": "About the role",
+    "label_description": "Description",
+    "placeholder_description": "Describe the role, requirements...",
+    "section_contact": "Contact info",
+    "label_phone": "Phone number",
+    "label_email": "Email address",
+    "btn_post": "Post job",
+    "error_position": "Position required",
+    "error_position_sub": "Please enter a job position.",
+    "error_city": "City required",
+    "error_city_sub": "Please enter a city.",
+    "error_description": "Description required",
+    "error_description_sub": "Please add a job description.",
+    "error_email": "Email required",
+    "error_email_sub": "Please enter a contact email.",
+    "toast_posted": "Job posted!",
+    "toast_posted_sub": "Your full-time job is now live.",
+    "toast_error": "Error",
+    "toast_error_sub": "Something went wrong. Please try again."
   }
 }

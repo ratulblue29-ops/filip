@@ -178,7 +178,9 @@
     "engagement": "Engagement",
     "notification": "Notification",
     "help_support": "Help and support",
-    "terms": "Term and condition"
+    "terms": "Term and condition",
+    "privacy_policy": "Privacy policy",
+    "delete_account": "Delete account"
   },
   "profile": {
     "title": "Profile",

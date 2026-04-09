@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
+  Alert, Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -18,6 +19,8 @@ import {
   FileText,
   ChevronRight,
   ArrowLeft,
+  Trash2,
+  Shield,
 } from 'lucide-react-native';
 import UserProfileIcon from '../../components/svg/UserProfileIcon';
 import { useNavigation } from '@react-navigation/native';
@@ -25,6 +28,8 @@ import styles from './style';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCurrentUser } from '../../services/user';
 import { useTranslation } from 'react-i18next';
+import { deleteAccount } from '../../services/user';
+import Toast from 'react-native-toast-message';
 
 const SettingScreen = () => {
   const { t } = useTranslation();
@@ -34,6 +39,44 @@ const SettingScreen = () => {
     queryKey: ['currentUser'],
     queryFn: fetchCurrentUser,
   });
+
+  // Handles account deletion with confirmation Alert before proceeding
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete account',
+      'This will permanently delete your account and all your data. This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAccount();
+              // Navigation resets automatically — Firebase auth state listener handles redirect
+              // Hard reset to Login — clears entire navigation stack
+              navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+            } catch (err: any) {
+              // Firebase requires recent login for account deletion
+              if (err.code === 'auth/requires-recent-login') {
+                Toast.show({
+                  type: 'error',
+                  text1: 'Re-login required',
+                  text2: 'Please log out and log back in, then try again.',
+                });
+              } else {
+                Toast.show({
+                  type: 'error',
+                  text1: 'Delete failed',
+                  text2: err.message,
+                });
+              }
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const menuItems = [
     // {
@@ -98,6 +141,21 @@ const SettingScreen = () => {
         navigation.navigate('TermsConditions');
       },
     },
+    {
+      id: '9',
+      label: t('settings.privacy_policy'),
+      icon: Shield,
+      onPress: () => {
+        Linking.openURL('https://sites.google.com/view/goldshiftprivacypolicy');
+      },
+    },
+    // Delete Account — destructive action with Alert confirmation
+    {
+      id: '10',
+      label: t('settings.delete_account'),
+      icon: Trash2,
+      onPress: handleDeleteAccount,
+    },
   ];
 
   return (
@@ -148,7 +206,10 @@ const SettingScreen = () => {
                   <View style={styles.iconContainer}>
                     <IconComponent size={22} color="#FFFFFF" />
                   </View>
-                  <Text style={styles.menuLabel}>{item.label}</Text>
+                  <Text style={[
+                    styles.menuLabel,
+                    item.id === '10' && { color: '#EF4444' },
+                  ]}>{item.label}</Text>
                 </View>
                 <ChevronRight size={24} color="#ffffff" />
               </TouchableOpacity>

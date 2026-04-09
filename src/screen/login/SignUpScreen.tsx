@@ -161,7 +161,7 @@ const SignUpScreen = () => {
               {t('signup.terms_link')}
             </Text>
             {t('signup.terms_and')}
-            <Text style={styles.link} onPress={() => Linking.openURL('https://example.com/privacy')}>
+            <Text style={styles.link} onPress={() => Linking.openURL('https://sites.google.com/view/goldshiftprivacypolicy')}>
               {t('signup.privacy_link')}
             </Text>
           </Text>

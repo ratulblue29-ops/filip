@@ -15,6 +15,8 @@ import { UpdateProfilePayload, UpdateEmployerProfilePayload } from '../@types/Up
 import { UserInfo } from '../@types/userInfo.type';
 import { WorkerUser } from '../@types/WorkerUser.type';
 import { UserType } from '../@types/ViewProfile.type';
+import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
+import { getApp } from '@react-native-firebase/app';
 
 // The role of the current user
 export const fetchUserRole = async () => {
@@ -179,4 +181,21 @@ export const updateEmployerProfile = async (payload: UpdateEmployerProfilePayloa
   }
 
   await updateDoc(userRef, data);
+};
+
+// Permanently deletes current user's Firestore data + Firebase Auth account.
+// Calls Cloud Function to delete subcollections server-side, then deletes Auth user.
+export const deleteAccount = async (): Promise<void> => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not authenticated');
+
+  const functions = getFunctions(getApp());
+  const deleteUserData = httpsCallable(functions, 'deleteUserData');
+
+  // Server-side: delete all Firestore docs belonging to this user
+  await deleteUserData({ uid: user.uid });
+
+  // Delete Firebase Auth account
+  await user.delete();
 };

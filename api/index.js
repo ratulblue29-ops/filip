@@ -253,7 +253,7 @@ exports.stripeWebhook = onRequest(
             uid: uid,
             type: type || "unknown",
             stripePaymentIntentId: paymentId,
-              amount: paymentIntent.amount,
+            amount: paymentIntent.amount,
             createdAt: now,
           });
         });
@@ -439,7 +439,7 @@ exports.sendPushNotification = onCall(
       if (
         !resp.success &&
         resp.error?.code ===
-          "messaging/registration-token-not-registered"
+        "messaging/registration-token-not-registered"
       ) {
         staleTokens.push(tokens[idx]);
       }
@@ -452,5 +452,79 @@ exports.sendPushNotification = onCall(
     }
 
     return { sent: true, successCount: response.successCount };
+  }
+);
+
+/**
+ * =====================================
+ * DELETE USER DATA (Callable)
+ * =====================================
+ * Deletes all Firestore data for a user.
+ * Called by the app before deleting the Firebase Auth account.
+ */
+exports.deleteUserData = onCall(
+  { region: 'us-central1' },
+  async (request) => {
+    if (!request.auth) throw new Error('UNAUTHENTICATED');
+
+    const uid = request.auth.uid;
+    const db = admin.firestore();
+    const batch = db.batch();
+
+    // Delete user document
+    batch.delete(db.collection('users').doc(uid));
+
+    // Delete notifications sent to this user
+    const notifSnap = await db
+      .collection('notifications')
+      .where('toUserId', '==', uid)
+      .get();
+    notifSnap.forEach(d => batch.delete(d.ref));
+
+    // Delete reviews written by or to this user
+    const reviewsFrom = await db
+      .collection('reviews')
+      .where('fromUserId', '==', uid)
+      .get();
+    reviewsFrom.forEach(d => batch.delete(d.ref));
+
+    const reviewsTo = await db
+      .collection('reviews')
+      .where('toUserId', '==', uid)
+      .get();
+    reviewsTo.forEach(d => batch.delete(d.ref));
+
+    // Delete jobs posted by this user
+    const jobsSnap = await db
+      .collection('jobs')
+      .where('userId', '==', uid)
+      .get();
+    jobsSnap.forEach(d => batch.delete(d.ref));
+
+    // Delete engagements (as employer or worker)
+    const engFrom = await db
+      .collection('engagements')
+      .where('fromUserId', '==', uid)
+      .get();
+    engFrom.forEach(d => batch.delete(d.ref));
+
+    const engWorker = await db
+      .collection('engagements')
+      .where('workerId', '==', uid)
+      .get();
+    engWorker.forEach(d => batch.delete(d.ref));
+
+    // Delete credit transactions
+    const creditSnap = await db
+      .collection('creditTransactions')
+      .where('userId', '==', uid)
+      .get();
+    creditSnap.forEach(d => batch.delete(d.ref));
+
+    await batch.commit();
+
+    // Note: chats are shared — we do NOT delete them, 
+    // deletedFor flag already handles one-sided deletion
+    return { success: true };
   }
 );

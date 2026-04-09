@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Eye, EyeOff } from 'lucide-react-native';
@@ -232,6 +233,16 @@ const LoginScreen = () => {
             <Text style={styles.textStyle_text}>{t('login.sign_up')}</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Privacy Policy link — required for Play Store */}
+        <TouchableOpacity
+          onPress={() => Linking.openURL('https://sites.google.com/view/goldshiftprivacypolicy')}
+          style={{ alignItems: 'center', paddingVertical: 12 }}
+        >
+          <Text style={[styles.dontText, { textDecorationLine: 'underline' }]}>
+            Privacy Policy
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );

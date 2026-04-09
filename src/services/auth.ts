@@ -3,6 +3,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithCredential,
   GoogleAuthProvider,
+  OAuthProvider,
+  AppleAuthProvider,
 } from '@react-native-firebase/auth';
 import {
   getFirestore,
@@ -16,6 +18,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { SignUpData } from '../@types/Signup.type';
 import { registerReferral } from './referral';
 import { Platform } from 'react-native';
+import appleAuth from '@invertase/react-native-apple-authentication';
 
 // const auth = getAuth();
 // const db = getFirestore();
@@ -224,5 +227,139 @@ export const signInWithGoogle = async (referralCode?: string) => {
   } catch (error) {
     console.log('Google Signup Error:', error);
     throw error;
+  }
+};
+
+// apple signin — iOS only
+export const signInWithApple = async (referralCode?: string) => {
+  const auth = getAuth();
+  const db = getFirestore();
+
+  // Request name + email on first auth; Apple only sends them once
+  const appleAuthResponse = await appleAuth.performRequest({
+    requestedOperation: appleAuth.Operation.LOGIN,
+    requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    nonceEnabled: true,
+  });
+
+  const { identityToken, nonce, fullName, email } = appleAuthResponse;
+  if (!identityToken) throw new Error('Apple identity token not found');
+
+  const appleCredential = AppleAuthProvider.credential(identityToken, nonce ?? '');
+
+  console.log('[Apple] identityToken:', identityToken?.slice(0, 20));
+  console.log('[Apple] nonce:', nonce);
+
+  console.log('[Apple] credential object:', JSON.stringify(appleCredential));
+  try {
+    const userCredential = await signInWithCredential(auth, appleCredential);
+    const user = userCredential.user;
+
+    // Apple only provides name/email on FIRST login — cache before Firestore check
+    const finalName =
+      fullName?.givenName && fullName?.familyName
+        ? `${fullName.givenName} ${fullName.familyName}`.trim()
+        : fullName?.givenName ?? user.displayName ?? '';
+
+    // Apple may give relay email on first login; subsequent logins email is null
+    const finalEmail = (email ?? user.email ?? '').trim().toLowerCase();
+
+    const userRef = doc(collection(db, 'users'), user.uid);
+    const snap = await getDoc(userRef);
+
+    const existingData = snap.exists() ? (snap.data() as Record<string, any>) : null;
+    const existingCredits = existingData?.credits ?? null;
+    const existingProfile = existingData?.profile ?? null;
+
+    // Prefer stored name over Apple's (Apple sends name only once)
+    const resolvedName = existingProfile?.name || finalName;
+    const resolvedPhoto = existingProfile?.photo || null;
+
+    if (!snap.exists()) {
+      await setDoc(userRef, {
+        email: finalEmail,
+
+        profile: {
+          name: resolvedName,
+          aboutMe: '',
+          photo: resolvedPhoto,
+          city: '',
+          skills: [],
+          hourlyRate: null,
+          experienceYears: 0,
+          rating: 0,
+          reviewsCount: 0,
+          verified: false,
+          openToWork: true,
+        },
+
+        credits: {
+          balance: 10,
+          lifetimeEarned: 10,
+          used: 0,
+        },
+
+        terms: {
+          accepted: false,
+          acceptedAt: null,
+        },
+
+        membership: {
+          tier: 'free',
+          startedAt: null,
+          expiresAt: null,
+          monthKey: getMonthKey(),
+          fullTimeAdsPostedThisMonth: 0,
+          fullTimeAdsLimit: 0,
+        },
+
+        active: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      if (referralCode) {
+        await registerReferral(referralCode, {
+          uid: user.uid,
+          name: resolvedName,
+          photo: resolvedPhoto,
+        });
+      }
+    }
+
+    // Merge on every login — never overwrite credits or name if already set
+    await setDoc(
+      userRef,
+      {
+        updatedAt: serverTimestamp(),
+        ...(finalEmail && { email: finalEmail }),
+
+        profile: {
+          name: resolvedName,
+          photo: resolvedPhoto,
+        },
+
+        ...(!existingCredits && {
+          credits: {
+            balance: 10,
+            lifetimeEarned: 10,
+            used: 0,
+          },
+        }),
+
+        active: true,
+      },
+      { merge: true },
+    );
+
+    const isNewUser = !snap.exists();
+    console.log('[signInWithApple] isNewUser:', isNewUser, '| uid:', user.uid);
+
+    return { user, isNewUser };
+  } catch (e: any) {
+    console.log('[Apple] signInWithCredential error code:', e.code);
+    console.log('[Apple] signInWithCredential error message:', e.message);
+    console.log('[Apple] signInWithCredential full error:', JSON.stringify(e));
+    throw e;
   }
 };

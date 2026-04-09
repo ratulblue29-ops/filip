@@ -22,6 +22,8 @@ import { RootStackParamList } from '../../navigator/RootNavigator';
 import { signInWithGoogle } from '../../services/auth';
 import LanguagePicker from '../../components/LanguagePicker';
 import { useTranslation } from 'react-i18next';
+import { Platform } from 'react-native';
+import { signInWithApple } from '../../services/auth';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -36,6 +38,7 @@ const LoginScreen = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
 
   // email login
   const handleLogin = async () => {
@@ -101,6 +104,30 @@ const LoginScreen = () => {
       });
     } finally {
       setGoogleLoading(false);
+    }
+  };
+
+  // apple login — iOS only
+  const handleAppleLogin = async () => {
+    try {
+      setAppleLoading(true);
+      const { isNewUser } = await signInWithApple();
+      Toast.show({
+        type: 'success',
+        text1: isNewUser ? t('login.toast_google_new') : t('login.toast_google_existing'),
+      });
+      navigation.replace('BottomTabs');
+    } catch (error: any) {
+      // User cancelled returns error code 1001 — silently ignore
+      if (error.code !== '1001') {
+        Toast.show({
+          type: 'error',
+          text1: t('login.toast_failed'),
+          text2: error.message,
+        });
+      }
+    } finally {
+      setAppleLoading(false);
     }
   };
 
@@ -174,7 +201,7 @@ const LoginScreen = () => {
         {/* Social Login */}
         <View style={styles.authentication_wrapper}>
           <TouchableOpacity
-            style={styles.authentication}
+            style={[styles.authentication, Platform.OS === 'android' && { width: '100%' }]}
             onPress={handleGoogleLogin}
             disabled={googleLoading || emailLoading}
           >
@@ -184,10 +211,18 @@ const LoginScreen = () => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.authentication}>
-            <AppleIcon size={24} />
-            <Text style={styles.googleText}>{t('login.apple')}</Text>
-          </TouchableOpacity>
+          {Platform.OS === 'ios' && (
+            <TouchableOpacity
+              style={styles.authentication}
+              onPress={handleAppleLogin}
+              disabled={appleLoading || emailLoading || googleLoading}
+            >
+              <AppleIcon size={24} />
+              <Text style={styles.googleText}>
+                {appleLoading ? t('login.google_wait') : t('login.apple')}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Signup redirect */}

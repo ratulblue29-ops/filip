@@ -43,6 +43,7 @@ const Drawer = createDrawerNavigator();
 
 const FeedContent = ({ navigation }: any) => {
   const { t } = useTranslation();
+  const isGuest = !getAuth().currentUser;
   const [searchText, setSearchText] = useState('');
   const [debouncedText, setDebouncedText] = useState('');
   const [reviewModal, setReviewModal] = useState<{
@@ -84,12 +85,14 @@ const FeedContent = ({ navigation }: any) => {
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: fetchCurrentUser,
+    enabled: !isGuest,
   });
 
   /* ---------------- WISHLIST ---------------- */
   const { data: wishlistIds = [] } = useQuery({
     queryKey: ['wishlistIds'],
     queryFn: fetchWishlistIds,
+    enabled: !isGuest,
   });
 
   /* ---------------- SEARCH QUERY ---------------- */
@@ -116,13 +119,13 @@ const FeedContent = ({ navigation }: any) => {
   const { data: receivedEngagements = [] } = useQuery({
     queryKey: ['receivedEngagements'],
     queryFn: fetchReceivedEngagements,
-    enabled: true,
+    enabled: !isGuest,
   });
 
   const { data: sentEngagements = [] } = useQuery({
     queryKey: ['sentEngagements'],
     queryFn: fetchSentEngagements,
-    enabled: true,
+    enabled: !isGuest,
   });
 
   useEffect(() => {

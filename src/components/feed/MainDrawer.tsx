@@ -43,6 +43,7 @@ const MainDrawer = () => {
   const db = getFirestore(app);
 
   const firebaseUser = authInstance.currentUser;
+  const isGuest = !firebaseUser;
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -266,24 +267,33 @@ const MainDrawer = () => {
             <Text style={styles.footerText}>{t('drawer.settings')}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.footerItem}
-            activeOpacity={0.7}
-            onPress={async () => {
-              try {
-                await GoogleSignin.revokeAccess(); // force account picker on next login
-                await GoogleSignin.signOut(); // clear Google SDK session
-              } catch (_) {
-                // email login user — no Google session to clear, safe to ignore
-              }
-              await signOut(authInstance); // Firebase sign out
-              queryClient.clear();
-              navigation.replace('Login');
-            }}
-          >
-            <LogOut width={20} height={20} color="#EF4444" />
-            <Text style={styles.logoutText}>{t('drawer.logout')}</Text>
-          </TouchableOpacity>
+          {isGuest ? (
+            <TouchableOpacity
+              style={styles.footerItem}
+              activeOpacity={0.7}
+              onPress={() => navigation.replace('Login')}
+            >
+              <LogOut width={20} height={20} color="#FFD900" />
+              <Text style={[styles.footerText, { color: '#FFD900' }]}>Sign in</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.footerItem}
+              activeOpacity={0.7}
+              onPress={async () => {
+                try {
+                  await GoogleSignin.revokeAccess();
+                  await GoogleSignin.signOut();
+                } catch (_) { }
+                await signOut(authInstance);
+                queryClient.clear();
+                navigation.replace('Login');
+              }}
+            >
+              <LogOut width={20} height={20} color="#EF4444" />
+              <Text style={styles.logoutText}>{t('drawer.logout')}</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
       <ResumeDocsModal

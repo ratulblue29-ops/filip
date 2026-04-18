@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
@@ -85,17 +85,15 @@ type PrivateScreenProps = {
   children: React.ReactNode;
 };
 
-const PrivateScreen: React.FC<PrivateScreenProps> = ({
-  navigation,
-  children,
-}) => {
+const PrivateScreen: React.FC<PrivateScreenProps> = ({ navigation, children }) => {
   const user = getAuth().currentUser;
+  useEffect(() => {
+    if (!user) {
+      navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    }
+  }, [user, navigation]);
 
-  if (!user) {
-    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
-    return null;
-  }
-
+  if (!user) return null;
   return <>{children}</>;
 };
 
@@ -120,7 +118,7 @@ const RootNavigator: React.FC = () => {
       <Stack.Screen name="signup" component={SignUpScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
 
-      <Stack.Screen name="BottomTabs" component={withPrivate(BottomTabs)} />
+      <Stack.Screen name="BottomTabs" component={BottomTabs} />
       <Stack.Screen
         name="membership"
         component={withPrivate(MemberShipScreen)}
@@ -159,10 +157,7 @@ const RootNavigator: React.FC = () => {
       <Stack.Screen name="SendOffer" component={withPrivate(SendOfferScreen)} />
       <Stack.Screen name="referral" component={withPrivate(ReferralScreen)} />
       <Stack.Screen name="profile" component={withPrivate(SettingScreen)} />
-      <Stack.Screen
-        name="viewProfile"
-        component={withPrivate(ViewProfileScreen)}
-      />
+      <Stack.Screen name="viewProfile" component={ViewProfileScreen} />
       <Stack.Screen
         name="postAvailabilites"
         component={withPrivate(PostedAvailabilitiesScreen)}

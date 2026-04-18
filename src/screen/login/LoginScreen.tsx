@@ -243,6 +243,17 @@ const LoginScreen = () => {
             Privacy Policy
           </Text>
         </TouchableOpacity>
+
+        {/* Guest browse button — Apple requires browsable content without login */}
+        <TouchableOpacity
+          onPress={() => navigation.reset({ index: 0, routes: [{ name: 'BottomTabs' }] })}
+          activeOpacity={0.7}
+          style={{ alignItems: 'center', paddingVertical: 16 }}
+        >
+          <Text style={{ color: '#6B7280', fontSize: 14, fontFamily: 'InterDisplayRegular' }}>
+            Continue as Guest
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );

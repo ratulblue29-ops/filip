@@ -31,6 +31,8 @@ import { useUnreadNotifications } from '../../hooks/useUnreadNotifications';
 import NotificationDot from '../../components/feed/NotificationDot';
 import { fetchMyOffers } from '../../services/applyToJob';
 import { useTranslation } from 'react-i18next';
+import { getAuth } from '@react-native-firebase/auth';
+import GuestPromptModal from '../../components/modals/GuestPromptModal';
 
 const FulltimeScreen = () => {
   const { t } = useTranslation();
@@ -39,6 +41,9 @@ const FulltimeScreen = () => {
   const [selectedPosition, setSelectedPosition] = useState('All');
   const [positionDropdownOpen, setPositionDropdownOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
+
+  const isGuest = !getAuth().currentUser;
+  const [guestModalVisible, setGuestModalVisible] = useState(false);
 
   /* ---------------- PAGINATION FETCH JOBS ---------------- */
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -55,6 +60,7 @@ const FulltimeScreen = () => {
   const { data: myOffers = [] } = useQuery({
     queryKey: ['my-offers'],
     queryFn: fetchMyOffers,
+    enabled: !isGuest,
   });
 
   const appliedJobIds = useMemo(
@@ -67,6 +73,7 @@ const FulltimeScreen = () => {
   const { data: wishlistIds = [] } = useQuery({
     queryKey: ['wishlistIds'],
     queryFn: fetchWishlistIds,
+    enabled: !isGuest,
   });
 
   const wishlistSet = useMemo(() => new Set(wishlistIds), [wishlistIds]);
@@ -143,10 +150,13 @@ const FulltimeScreen = () => {
           isApplied: appliedJobIds.has(item.id),
           isWishlisted: wishlistSet.has(item.id),
         }}
-        onBookmark={() => toggleWishlist(item.id)}
+        onBookmark={() => {
+          if (isGuest) { setGuestModalVisible(true); return; }
+          toggleWishlist(item.id);
+        }}
       />
     ),
-    [appliedJobIds, wishlistSet, toggleWishlist],
+    [appliedJobIds, wishlistSet, toggleWishlist, isGuest],
   );
 
   // notification get for dot
@@ -285,6 +295,12 @@ const FulltimeScreen = () => {
             ) : null}
           </View>
         }
+      />
+      {/* Gate guestactions — Apple requires browsing free, actions behind login */}
+      <GuestPromptModal
+        visible={guestModalVisible}
+        onClose={() => setGuestModalVisible(false)}
+        message="Sign in to save jobs and apply for positions."
       />
     </SafeAreaView>
   );

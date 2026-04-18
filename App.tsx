@@ -6,7 +6,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LogBox } from 'react-native';
 
-import { StripeProvider } from '@stripe/stripe-react-native';
+import Purchases, { LOG_LEVEL } from 'react-native-purchases';
+import { Platform } from 'react-native';
+import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+// import { StripeProvider } from '@stripe/stripe-react-native';
 
 // import { getApp } from '@react-native-firebase/app';
 import {
@@ -45,6 +48,26 @@ const App = () => {
         '842815751322-fgg618jn2o3uldffnhaabi6k2se3kedm.apps.googleusercontent.com',
       iosClientId: '842815751322-js7cpvgv36j81mkvh47rjln48hdo3gre.apps.googleusercontent.com',
       offlineAccess: true,
+    });
+  }, []);
+
+  useEffect(() => {
+    // RevenueCat init — uses Firebase UID as appUserID for webhook linking
+    Purchases.setLogLevel(LOG_LEVEL.VERBOSE); // remove in production
+    Purchases.configure({
+      apiKey: Platform.OS === 'ios'
+        ? 'appl_JcVvEfpDBhpZcxOQGqjXdmanQOh'
+        : 'goog_uAKkDJTCCTTgPsysmWkyytHQqMQ',  // TODO: replace with your Android RC key
+    });
+
+    // Identify user so RC webhook knows which Firebase UID to grant credits to
+    const unsubscribeAuth = onAuthStateChanged(getAuth(), user => {
+      if (user) {
+        Purchases.logIn(user.uid).catch(err =>
+          console.warn('[RC] logIn error:', err),
+        );
+        unsubscribeAuth(); // unsubscribe after first auth state — RC only needs login once
+      }
     });
   }, []);
 
@@ -116,15 +139,20 @@ const App = () => {
   }, []);
 
   return (
-    <StripeProvider publishableKey="pk_test_51SL7SOLT7u05bl0T7ycIXtQ087oy07qqZxzYrTMR1JjpxGrs8jVcKRtZCte98moBU053lCoqt8aWoXiCT5iNUaRn00AGBjmxrR">
-      <QueryClientProvider client={queryClient}>
-        <NavigationContainer ref={navigationRef}>
-          <RootNavigator />
-        </NavigationContainer>
-
-        <Toast />
-      </QueryClientProvider>
-    </StripeProvider>
+    // <StripeProvider publishableKey="pk_test_51SL7SOLT7u05bl0T7ycIXtQ087oy07qqZxzYrTMR1JjpxGrs8jVcKRtZCte98moBU053lCoqt8aWoXiCT5iNUaRn00AGBjmxrR">
+    //   <QueryClientProvider client={queryClient}>
+    //     <NavigationContainer ref={navigationRef}>
+    //       <RootNavigator />
+    //     </NavigationContainer>
+    //     <Toast />
+    //   </QueryClientProvider>
+    // </StripeProvider>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer ref={navigationRef}>
+        <RootNavigator />
+      </NavigationContainer>
+      <Toast />
+    </QueryClientProvider>
   );
 };
 

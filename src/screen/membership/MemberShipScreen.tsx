@@ -13,11 +13,16 @@ import { useNavigation } from '@react-navigation/native';
 import styles from './style';
 import { ArrowLeft, Check } from 'lucide-react-native';
 
-import { getApp } from '@react-native-firebase/app';
-import { getAuth, getIdToken } from '@react-native-firebase/auth';
-import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
+// import { getApp } from '@react-native-firebase/app';
+// import { getAuth, getIdToken } from '@react-native-firebase/auth';
+// import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
-import { useStripe } from '@stripe/stripe-react-native';
+// import { useStripe } from '@stripe/stripe-react-native';
+
+import Purchases from 'react-native-purchases';
+import { RC_PRODUCT_IDS } from '../../services/revenueCat';
+import { useQueryClient } from '@tanstack/react-query';
+
 import Toast from 'react-native-toast-message';
 import { usePaymentFlag } from '../../hooks/usePaymentFlag';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +31,9 @@ const MemberShipScreen = () => {
   const { t } = useTranslation();
   const paymentEnabled = usePaymentFlag();
   const navigation = useNavigation<any>();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  // const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+  const queryClient = useQueryClient();
 
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>(
     'monthly',
@@ -34,68 +41,105 @@ const MemberShipScreen = () => {
 
   const [loading, setLoading] = useState(false);
 
+  // const handlePurchase = async (planType: 'standard' | 'premium') => {
+  //   try {
+  //     setLoading(true);
+
+  //     const auth = getAuth();
+  //     const user = auth.currentUser;
+
+  //     if (!user) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: t('membership.toast_login'),
+  //       });
+  //       return;
+  //     }
+
+  //     await getIdToken(user, true);
+
+  //     const app = getApp();
+  //     const functions = getFunctions(app, 'us-central1');
+
+  //     const createPaymentIntent = httpsCallable(
+  //       functions,
+  //       'createPaymentIntent',
+  //     );
+
+  //     //ONLY SEND backend supported plans
+  //     const finalPlan = planType === 'standard' ? 'basic' : 'premium';
+
+  //     const response: any = await createPaymentIntent({
+  //       plan: finalPlan,
+  //     });
+
+  //     const clientSecret = response?.data?.clientSecret;
+
+  //     if (!clientSecret) {
+  //       throw new Error('No client secret received');
+  //     }
+
+  //     const { error: initError } = await initPaymentSheet({
+  //       paymentIntentClientSecret: clientSecret,
+  //       merchantDisplayName: 'GoldShift',
+  //     });
+
+  //     if (initError) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: initError.message,
+  //       });
+  //       return;
+  //     }
+
+  //     const { error } = await presentPaymentSheet();
+
+  //     if (error) {
+  //       Alert.alert('Payment failed', error.message);
+  //       return;
+  //     }
+  //     Toast.show({
+  //       type: 'success',
+  //       text1: t('membership.toast_success'),
+  //     });
+  //   } catch (err: any) {
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: err?.message || 'Something went wrong',
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handlePurchase = async (planType: 'standard' | 'premium') => {
     try {
       setLoading(true);
 
-      const auth = getAuth();
-      const user = auth.currentUser;
+      const productId = planType === 'standard'
+        ? RC_PRODUCT_IDS.basic
+        : RC_PRODUCT_IDS.premium;
 
-      if (!user) {
-        Toast.show({
-          type: 'error',
-          text1: t('membership.toast_login'),
-        });
-        return;
-      }
-
-      await getIdToken(user, true);
-
-      const app = getApp();
-      const functions = getFunctions(app, 'us-central1');
-
-      const createPaymentIntent = httpsCallable(
-        functions,
-        'createPaymentIntent',
+      const offerings = await Purchases.getOfferings();
+      const pkg = offerings.current?.availablePackages.find(
+        p => p.product.identifier === productId,
       );
 
-      //ONLY SEND backend supported plans
-      const finalPlan = planType === 'standard' ? 'basic' : 'premium';
-
-      const response: any = await createPaymentIntent({
-        plan: finalPlan,
-      });
-
-      const clientSecret = response?.data?.clientSecret;
-
-      if (!clientSecret) {
-        throw new Error('No client secret received');
+      if (!pkg) {
+        throw new Error('Product not found. Please try again later.');
       }
 
-      const { error: initError } = await initPaymentSheet({
-        paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: 'GoldShift',
-      });
+      await Purchases.purchasePackage(pkg);
 
-      if (initError) {
-        Toast.show({
-          type: 'error',
-          text1: initError.message,
-        });
-        return;
-      }
+      // Invalidate user query — Firestore updated by RC webhook
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
 
-      const { error } = await presentPaymentSheet();
-
-      if (error) {
-        Alert.alert('Payment failed', error.message);
-        return;
-      }
       Toast.show({
         type: 'success',
         text1: t('membership.toast_success'),
       });
     } catch (err: any) {
+      // RC throws if user cancels — code 'PURCHASE_CANCELLED'
+      if (err?.userCancelled) return;
       Toast.show({
         type: 'error',
         text1: err?.message || 'Something went wrong',

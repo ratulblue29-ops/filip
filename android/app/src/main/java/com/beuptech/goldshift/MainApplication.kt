@@ -1,4 +1,4 @@
-package com.filip
+package com.beuptech.goldshift
 
 import android.app.Application
 import com.facebook.react.PackageList

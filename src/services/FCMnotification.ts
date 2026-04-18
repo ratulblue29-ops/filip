@@ -24,7 +24,7 @@
 import { getApp } from '@react-native-firebase/app';
 import { getAuth } from '@react-native-firebase/auth';
 import { getFirestore, doc, setDoc, serverTimestamp, arrayUnion } from '@react-native-firebase/firestore';
-import { getMessaging, requestPermission, getToken } from '@react-native-firebase/messaging';
+import { getMessaging, requestPermission, getToken, registerDeviceForRemoteMessages } from '@react-native-firebase/messaging';
 import { Platform } from 'react-native';
 
 export const registerFCMToken = async () => {
@@ -45,13 +45,17 @@ export const registerFCMToken = async () => {
     }
     await requestPermission(messaging);
 
+    if (Platform.OS === 'ios') {
+        await registerDeviceForRemoteMessages(messaging);
+    }
+
     const token = await getToken(messaging);
     if (!token) return null;
 
     await setDoc(
         doc(db, 'users', user.uid),
         {
-            fcmTokens: [token],
+            fcmTokens: arrayUnion(token),
             updatedAt: serverTimestamp(),
         },
         { merge: true },

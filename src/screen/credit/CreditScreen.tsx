@@ -24,11 +24,13 @@ import UsersAddIcon from '../../components/svg/UsersAddIcon';
 
 import Toast from 'react-native-toast-message';
 
-import { getApp } from '@react-native-firebase/app';
-import { getAuth, getIdToken } from '@react-native-firebase/auth';
-import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
+// import { getApp } from '@react-native-firebase/app';
+// import { getAuth, getIdToken } from '@react-native-firebase/auth';
+// import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 
-import { useStripe } from '@stripe/stripe-react-native';
+// import { useStripe } from '@stripe/stripe-react-native';
+import Purchases from 'react-native-purchases';
+import { RC_PRODUCT_IDS } from '../../services/revenueCat';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchCurrentUser } from '../../services/user';
@@ -40,7 +42,7 @@ const CreditsScreen = () => {
   const paymentEnabled = usePaymentFlag();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  // const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
 
@@ -58,74 +60,110 @@ const CreditsScreen = () => {
    * BUY CREDIT PACK (Stripe PaymentSheet)
    * =====================================
    */
+  // const handleBuyCredits = async (
+  //   pack: 'credit_1' | 'credit_5' | 'credit_12' | 'credit_30',
+  // ) => {
+  //   try {
+  //     setLoadingPack(pack);
+
+  //     const auth = getAuth();
+  //     const firebaseUser = auth.currentUser;
+
+  //     if (!firebaseUser) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: t('credit.login_required'),
+  //       });
+  //       return;
+  //     }
+
+  //     await getIdToken(firebaseUser, true);
+
+  //     const app = getApp();
+  //     const functions = getFunctions(app, 'us-central1');
+
+  //     const createCreditPackPaymentIntent = httpsCallable(
+  //       functions,
+  //       'createCreditPackPaymentIntent',
+  //     );
+
+  //     const response: any = await createCreditPackPaymentIntent({ pack });
+
+  //     const clientSecret = response?.data?.clientSecret;
+
+  //     if (!clientSecret) {
+  //       throw new Error('No client secret received from server');
+  //     }
+
+  //     // Init Payment Sheet
+  //     const { error: initError } = await initPaymentSheet({
+  //       paymentIntentClientSecret: clientSecret,
+  //       merchantDisplayName: 'GoldShift',
+  //     });
+
+  //     if (initError) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: initError.message,
+  //       });
+  //       return;
+  //     }
+
+  //     // Present Payment Sheet
+  //     const { error } = await presentPaymentSheet();
+
+  //     if (error) {
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: error.message,
+  //       });
+  //       return;
+  //     }
+
+  //     Toast.show({
+  //       type: 'success',
+  //       text1: t('credit.purchased_success'),
+  //     });
+
+  //     // Refresh Firestore user credits instantly
+  //     queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+  //   } catch (err: any) {
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: err?.message || 'Something went wrong',
+  //     });
+  //   } finally {
+  //     setLoadingPack(null);
+  //   }
+  // };
   const handleBuyCredits = async (
     pack: 'credit_1' | 'credit_5' | 'credit_12' | 'credit_30',
   ) => {
     try {
       setLoadingPack(pack);
 
-      const auth = getAuth();
-      const firebaseUser = auth.currentUser;
+      const productId = RC_PRODUCT_IDS[pack];
 
-      if (!firebaseUser) {
-        Toast.show({
-          type: 'error',
-          text1: t('credit.login_required'),
-        });
-        return;
-      }
-
-      await getIdToken(firebaseUser, true);
-
-      const app = getApp();
-      const functions = getFunctions(app, 'us-central1');
-
-      const createCreditPackPaymentIntent = httpsCallable(
-        functions,
-        'createCreditPackPaymentIntent',
+      const offerings = await Purchases.getOfferings();
+      const pkg = offerings.current?.availablePackages.find(
+        p => p.product.identifier === productId,
       );
 
-      const response: any = await createCreditPackPaymentIntent({ pack });
-
-      const clientSecret = response?.data?.clientSecret;
-
-      if (!clientSecret) {
-        throw new Error('No client secret received from server');
+      if (!pkg) {
+        throw new Error('Product not found. Please try again later.');
       }
 
-      // Init Payment Sheet
-      const { error: initError } = await initPaymentSheet({
-        paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: 'GoldShift',
-      });
+      await Purchases.purchasePackage(pkg);
 
-      if (initError) {
-        Toast.show({
-          type: 'error',
-          text1: initError.message,
-        });
-        return;
-      }
-
-      // Present Payment Sheet
-      const { error } = await presentPaymentSheet();
-
-      if (error) {
-        Toast.show({
-          type: 'error',
-          text1: error.message,
-        });
-        return;
-      }
+      // Firestore updated by RC webhook — invalidate to reflect new balance
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
 
       Toast.show({
         type: 'success',
         text1: t('credit.purchased_success'),
       });
-
-      // Refresh Firestore user credits instantly
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     } catch (err: any) {
+      if (err?.userCancelled) return;
       Toast.show({
         type: 'error',
         text1: err?.message || 'Something went wrong',

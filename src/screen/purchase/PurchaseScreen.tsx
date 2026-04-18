@@ -19,100 +19,95 @@ import PlanToggle from "../../components/purchase/PlanToggle";
 import PlanHeader from "../../components/purchase/PlanHeader";
 import CommissionIcon from "../../components/svg/CommissionIcon";
 
-import { getApp } from "@react-native-firebase/app";
-import { getAuth, getIdToken } from "@react-native-firebase/auth";
-import {
-  getFunctions,
-  httpsCallable,
-} from "@react-native-firebase/functions";
+// import { getApp } from "@react-native-firebase/app";
+// import { getAuth, getIdToken } from "@react-native-firebase/auth";
+// import { getFunctions, httpsCallable, } from "@react-native-firebase/functions";
 
-import { useStripe } from "@stripe/stripe-react-native";
+// import { useStripe } from "@stripe/stripe-react-native";
+import Purchases from 'react-native-purchases';
+import { RC_PRODUCT_IDS } from '../../services/revenueCat';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { useTranslation } from 'react-i18next';
 
 const PurchaseScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  // const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const queryClient = useQueryClient();
 
   const [selectedPlan, setSelectedPlan] =
     useState<"monthly" | "yearly">("monthly");
   const [loading, setLoading] = useState(false);
 
+  // const handleUpgrade = async () => {
+  //   try {
+  //     setLoading(true);
+
+  //     const auth = getAuth();
+  //     const user = auth.currentUser;
+
+  //     if (!user) {
+  //       Alert.alert(t('purchase.alert_error'), t('purchase.alert_not_logged'));
+  //       return;
+  //     }
+
+  //     console.log("User UID:", user.uid);
+
+  //     // 🔥 Force refresh token
+  //     await user.getIdToken(true);
+
+  //     const app = getApp();
+  //     const functions = getFunctions(app, "us-central1");
+  //     const createPaymentIntent = httpsCallable(functions, "createPaymentIntent");
+  //     const response: any = await createPaymentIntent({
+  //       plan: selectedPlan === "monthly" ? "basic" : "premium",
+  //     });
+  //     const clientSecret = response?.data?.clientSecret;
+  //     if (!clientSecret) { throw new Error("No client secret received"); }
+  //     const { error: initError } = await initPaymentSheet({
+  //       paymentIntentClientSecret: clientSecret,
+  //       merchantDisplayName: "GoldShift",
+  //     });
+  //     if (initError) { Alert.alert(t('purchase.alert_payment_failed'), initError.message); return; }
+  //     const { error } = await presentPaymentSheet();
+  //     if (error) { Alert.alert(t('purchase.alert_payment_failed'), error.message); return; }
+  //     Alert.alert(t('purchase.alert_success'), t('purchase.alert_success_sub'));
+  //     navigation.goBack();
+
+  //   } catch (error: any) {
+  //     console.log("FULL ERROR:", error);
+  //     Alert.alert(t('purchase.alert_error'), error?.message || t('purchase.alert_generic'));
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleUpgrade = async () => {
     try {
       setLoading(true);
 
-      const auth = getAuth();
-      const user = auth.currentUser;
+      const productId = selectedPlan === 'monthly'
+        ? RC_PRODUCT_IDS.basic
+        : RC_PRODUCT_IDS.premium;
 
-      if (!user) {
-        Alert.alert(t('purchase.alert_error'), t('purchase.alert_not_logged'));
-        return;
+      const offerings = await Purchases.getOfferings();
+      const pkg = offerings.current?.availablePackages.find(
+        p => p.product.identifier === productId,
+      );
+
+      if (!pkg) {
+        throw new Error('Product not found. Please try again later.');
       }
 
-      console.log("User UID:", user.uid);
+      await Purchases.purchasePackage(pkg);
 
-      // 🔥 Force refresh token
-      await user.getIdToken(true);
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
 
-      // const app = getApp();
-      // const functions = getFunctions(app, "us-central1");
-
-      // // ✅ CORRECT FUNCTION NAME
-      // const createPaymentIntent = httpsCallable(
-      //   functions,
-      //   "createPaymentIntent"
-      // );
-
-      // const response: any = await createPaymentIntent({
-      //   plan: selectedPlan === "monthly" ? "basic" : "premium",
-      // });
-
-      // const clientSecret = response?.data?.clientSecret;
-
-      // if (!clientSecret) {
-      //   throw new Error("No client secret received");
-      // }
-
-      // console.log("Client secret received");
-
-      // const { error, paymentIntent } = await confirmPayment(
-      //   clientSecret,
-      //   {
-      //     paymentMethodType: "Card",
-      //   }
-      // );
-
-      // if (error) {
-      //   Alert.alert("Payment Failed", error.message);
-      //   return;
-      // }
-
-      // if (paymentIntent) {
-      //   Alert.alert("Success", "Payment successful!");
-      //   navigation.goBack();
-      // }
-      const app = getApp();
-      const functions = getFunctions(app, "us-central1");
-      const createPaymentIntent = httpsCallable(functions, "createPaymentIntent");
-      const response: any = await createPaymentIntent({
-        plan: selectedPlan === "monthly" ? "basic" : "premium",
-      });
-      const clientSecret = response?.data?.clientSecret;
-      if (!clientSecret) { throw new Error("No client secret received"); }
-      const { error: initError } = await initPaymentSheet({
-        paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: "GoldShift",
-      });
-      if (initError) { Alert.alert(t('purchase.alert_payment_failed'), initError.message); return; }
-      const { error } = await presentPaymentSheet();
-      if (error) { Alert.alert(t('purchase.alert_payment_failed'), error.message); return; }
       Alert.alert(t('purchase.alert_success'), t('purchase.alert_success_sub'));
       navigation.goBack();
-
-    } catch (error: any) {
-      console.log("FULL ERROR:", error);
-      Alert.alert(t('purchase.alert_error'), error?.message || t('purchase.alert_generic'));
+    } catch (err: any) {
+      if (err?.userCancelled) return;
+      Alert.alert(t('purchase.alert_error'), err?.message || t('purchase.alert_generic'));
     } finally {
       setLoading(false);
     }

@@ -8,6 +8,58 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:842815751322:android:702de6802b70d40d898b23",
+        "android_client_info": {
+          "package_name": "com.beuptech.goldshift"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "842815751322-eo8vselsv2csh5d0rk5692gi5gckife0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.beuptech.goldshift",
+            "certificate_hash": "3943a88342136f8f7f8f2fdcee799912aa9a1f6a"
+          }
+        },
+        {
+          "client_id": "842815751322-mg7jei8mtc2mae6nu7lh565ggsc4noqf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.beuptech.goldshift",
+            "certificate_hash": "4ad69ea3fd125a22706804371c2c4f406d737648"
+          }
+        },
+        {
+          "client_id": "842815751322-fgg618jn2o3uldffnhaabi6k2se3kedm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzb2ZcQzPIEkTc1rPcDgv49CKudJt8AYA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "842815751322-fgg618jn2o3uldffnhaabi6k2se3kedm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "842815751322-dunk08h6avk1hnk995lsef8v7msqf0ko.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.beuptech.goldshift"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:842815751322:android:236cec75fe747ac8898b23",
         "android_client_info": {
           "package_name": "com.filip"
@@ -80,10 +132,10 @@
               "client_type": 3
             },
             {
-              "client_id": "842815751322-js7cpvgv36j81mkvh47rjln48hdo3gre.apps.googleusercontent.com",
+              "client_id": "842815751322-dunk08h6avk1hnk995lsef8v7msqf0ko.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "org.reactjs.native.example.filip"
+                "bundle_id": "com.beuptech.goldshift"
               }
             }
           ]

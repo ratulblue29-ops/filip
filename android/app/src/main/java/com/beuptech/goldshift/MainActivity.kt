@@ -1,4 +1,4 @@
-package com.filip
+package com.beuptech.goldshift
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

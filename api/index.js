@@ -1,12 +1,12 @@
 const { onCall, onRequest } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
-const Stripe = require("stripe");
-require("dotenv").config();
+// const Stripe = require("stripe");
+// require("dotenv").config();
 
 admin.initializeApp();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 /**
  * =====================================
@@ -14,37 +14,37 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
  * =====================================
  * plan: basic | premium
  */
-exports.createPaymentIntent = onCall(
-  { region: "us-central1" },
-  async (request) => {
-    if (!request.auth) {
-      throw new Error("UNAUTHENTICATED");
-    }
+// exports.createPaymentIntent = onCall(
+//   { region: "us-central1" },
+//   async (request) => {
+//     if (!request.auth) {
+//       throw new Error("UNAUTHENTICATED");
+//     }
 
-    const { plan } = request.data;
+//     const { plan } = request.data;
 
-    if (!["basic", "premium"].includes(plan)) {
-      throw new Error("Invalid plan");
-    }
+//     if (!["basic", "premium"].includes(plan)) {
+//       throw new Error("Invalid plan");
+//     }
 
-    const amount = plan === "basic" ? 799 : 2499;
+//     const amount = plan === "basic" ? 799 : 2499;
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "eur",
-      automatic_payment_methods: { enabled: true },
-      metadata: {
-        uid: request.auth.uid,
-        type: "membership",
-        tier: plan,
-      },
-    });
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount,
+//       currency: "eur",
+//       automatic_payment_methods: { enabled: true },
+//       metadata: {
+//         uid: request.auth.uid,
+//         type: "membership",
+//         tier: plan,
+//       },
+//     });
 
-    return {
-      clientSecret: paymentIntent.client_secret,
-    };
-  }
-);
+//     return {
+//       clientSecret: paymentIntent.client_secret,
+//     };
+//   }
+// );
 
 /**
  * =====================================
@@ -52,218 +52,358 @@ exports.createPaymentIntent = onCall(
  * =====================================
  * pack: credit_1 | credit_5 | credit_12 | credit_30
  */
-exports.createCreditPackPaymentIntent = onCall(
-  { region: "us-central1" },
-  async (request) => {
-    if (!request.auth) {
-      throw new Error("UNAUTHENTICATED");
-    }
+// exports.createCreditPackPaymentIntent = onCall(
+//   { region: "us-central1" },
+//   async (request) => {
+//     if (!request.auth) {
+//       throw new Error("UNAUTHENTICATED");
+//     }
 
-    const { pack } = request.data;
+//     const { pack } = request.data;
 
-    const creditPacks = {
-      credit_1: { amount: 199, credits: 1 },
-      credit_5: { amount: 799, credits: 5 },
-      credit_12: { amount: 1499, credits: 12 },
-      credit_30: { amount: 3499, credits: 30 },
-    };
+//     const creditPacks = {
+//       credit_1: { amount: 199, credits: 1 },
+//       credit_5: { amount: 799, credits: 5 },
+//       credit_12: { amount: 1499, credits: 12 },
+//       credit_30: { amount: 3499, credits: 30 },
+//     };
 
-    if (!creditPacks[pack]) {
-      throw new Error("Invalid credit pack");
-    }
+//     if (!creditPacks[pack]) {
+//       throw new Error("Invalid credit pack");
+//     }
 
-    const { amount, credits } = creditPacks[pack];
+//     const { amount, credits } = creditPacks[pack];
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "eur",
-      automatic_payment_methods: { enabled: true },
-      metadata: {
-        uid: request.auth.uid,
-        type: "credit_pack",
-        pack: pack,
-        creditsToAdd: String(credits),
-      },
-    });
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount,
+//       currency: "eur",
+//       automatic_payment_methods: { enabled: true },
+//       metadata: {
+//         uid: request.auth.uid,
+//         type: "credit_pack",
+//         pack: pack,
+//         creditsToAdd: String(credits),
+//       },
+//     });
 
-    return {
-      clientSecret: paymentIntent.client_secret,
-    };
-  }
-);
+//     return {
+//       clientSecret: paymentIntent.client_secret,
+//     };
+//   }
+// );
 
 /**
  * =====================================
  * STRIPE WEBHOOK
  * =====================================
  */
-exports.stripeWebhook = onRequest(
-  {
-    region: "us-central1",
-    rawBody: true,
-  },
-  async (req, res) => {
-    const sig = req.headers["stripe-signature"];
+// exports.stripeWebhook = onRequest(
+//   {
+//     region: "us-central1",
+//     rawBody: true,
+//   },
+//   async (req, res) => {
+//     const sig = req.headers["stripe-signature"];
 
-    let event;
+//     let event;
+
+//     try {
+//       event = stripe.webhooks.constructEvent(
+//         req.rawBody,
+//         sig,
+//         process.env.STRIPE_WEBHOOK_SECRET
+//       );
+//     } catch (err) {
+//       console.error("Webhook signature verification failed:", err.message);
+//       return res.status(400).send(`Webhook Error: ${err.message}`);
+//     }
+
+//     /**
+//      * =====================================
+//      * PAYMENT SUCCESS EVENT
+//      * =====================================
+//      */
+//     if (event.type === "payment_intent.succeeded") {
+//       const paymentIntent = event.data.object;
+
+//       const uid = paymentIntent.metadata?.uid;
+//       const type = paymentIntent.metadata?.type; // membership | credit_pack
+//       const paymentId = paymentIntent.id;
+
+//       if (!uid) {
+//         console.error("Missing uid in payment metadata");
+//         return res.status(400).send("Missing uid");
+//       }
+
+//       const now = admin.firestore.Timestamp.now();
+//       const userRef = admin.firestore().collection("users").doc(uid);
+
+//       // 🔥 Prevent duplicate processing (Stripe retries webhook sometimes)
+//       const paymentRef = admin
+//         .firestore()
+//         .collection("stripePayments")
+//         .doc(paymentId);
+
+//       try {
+//         await admin.firestore().runTransaction(async (transaction) => {
+//           const paymentDoc = await transaction.get(paymentRef);
+
+//           // Already processed
+//           if (paymentDoc.exists) {
+//             console.log("Payment already processed:", paymentId);
+//             return;
+//           }
+
+//           const userDoc = await transaction.get(userRef);
+
+//           if (!userDoc.exists) {
+//             throw new Error("User not found");
+//           }
+
+//           const userData = userDoc.data();
+
+//           const currentCredits = userData.credits || {
+//             balance: 0,
+//             lifetimeEarned: 0,
+//             used: 0,
+//           };
+
+//           /**
+//            * =====================================
+//            * MEMBERSHIP PAYMENT SUCCESS
+//            * =====================================
+//            */
+//           if (type === "membership") {
+//             const tier = paymentIntent.metadata?.tier;
+
+//             if (!["basic", "premium"].includes(tier)) {
+//               throw new Error("Invalid membership tier");
+//             }
+
+//             console.log("Membership payment success:", uid, "Tier:", tier);
+
+//             const expiresAt = admin.firestore.Timestamp.fromDate(
+//               new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+//             );
+
+//             let newBalance = currentCredits.balance;
+//             let newLifetime = currentCredits.lifetimeEarned;
+
+//             // BASIC → +50 credits
+//             if (tier === "basic") {
+//               newBalance += 50;
+//               newLifetime += 50;
+//             }
+
+//             // PREMIUM → unlimited credits
+//             if (tier === "premium") {
+//               newBalance = 999999999999;
+//             }
+
+//             transaction.update(userRef, {
+//               membership: {
+//                 tier: tier, // free | basic | premium
+//                 startedAt: now,
+//                 expiresAt: expiresAt,
+//                 fullTimeAdsLimit: tier === "basic" ? 1 : 9999,
+//                 fullTimeAdsPostedThisMonth: 0,
+//                 monthKey: new Date().toISOString().slice(0, 7),
+//               },
+//               credits: {
+//                 balance: newBalance,
+//                 lifetimeEarned: newLifetime,
+//                 used: currentCredits.used,
+//               },
+//               updatedAt: now,
+//             });
+//           }
+
+//           /**
+//            * =====================================
+//            * CREDIT PACK PAYMENT SUCCESS
+//            * =====================================
+//            */
+//           if (type === "credit_pack") {
+//             const creditsToAdd = parseInt(
+//               paymentIntent.metadata?.creditsToAdd || "0"
+//             );
+
+//             if (!creditsToAdd || creditsToAdd <= 0) {
+//               throw new Error("Invalid creditsToAdd");
+//             }
+
+//             console.log("Credit pack purchase success:", uid, "Credits:", creditsToAdd);
+
+//             transaction.update(userRef, {
+//               credits: {
+//                 balance: currentCredits.balance + creditsToAdd,
+//                 lifetimeEarned: currentCredits.lifetimeEarned + creditsToAdd,
+//                 used: currentCredits.used,
+//               },
+//               updatedAt: now,
+//             });
+//           }
+
+//           /**
+//            * =====================================
+//            * SAVE PAYMENT RECORD (Idempotency)
+//            * =====================================
+//            */
+//           transaction.set(paymentRef, {
+//             uid: uid,
+//             type: type || "unknown",
+//             stripePaymentIntentId: paymentId,
+//             amount: paymentIntent.amount,
+//             createdAt: now,
+//           });
+//         });
+//       } catch (err) {
+//         console.error("Webhook transaction failed:", err.message);
+//         return res.status(500).send("Webhook transaction failed");
+//       }
+//     }
+
+//     res.status(200).json({ received: true });
+//   }
+// );
+
+/**
+ * =====================================
+ * REVENUECAT WEBHOOK (HTTP)
+ * =====================================
+ * RevenueCat → this endpoint → Firestore update
+ * Mirrors exact same credit/membership logic as old stripeWebhook
+ * Set this URL in RC Dashboard → Project Settings → Webhooks
+ */
+exports.revenueCatWebhook = onRequest(
+  { region: "us-central1" },
+  async (req, res) => {
+    // Verify RC webhook authorization header
+    const authHeader = req.headers.authorization;
+    if (authHeader !== `Bearer ${process.env.RC_WEBHOOK_SECRET}`) {
+      console.error("Unauthorized RC webhook call");
+      return res.status(401).send("Unauthorized");
+    }
+
+    const event = req.body;
+    const eventType = event?.event?.type;
+    const uid = event?.event?.app_user_id; // Firebase UID — set via Purchases.logIn(uid)
+    const productId = event?.event?.product_id; // e.g. credit_1, membership_basic
+    const transactionId = event?.event?.id;
+
+    if (!uid || !productId || !transactionId) {
+      return res.status(400).send("Missing required fields");
+    }
+
+    // Only process successful purchase events
+    const successEvents = [
+      "INITIAL_PURCHASE",
+      "RENEWAL",
+      "PRODUCT_CHANGE",
+    ];
+    if (!successEvents.includes(eventType)) {
+      return res.status(200).json({ received: true, skipped: true });
+    }
+
+    const db = admin.firestore();
+    const now = admin.firestore.Timestamp.now();
+    const userRef = db.collection("users").doc(uid);
+
+    // Idempotency — prevent double grant on RC retry
+    const purchaseRef = db.collection("rcPurchases").doc(transactionId);
 
     try {
-      event = stripe.webhooks.constructEvent(
-        req.rawBody,
-        sig,
-        process.env.STRIPE_WEBHOOK_SECRET
-      );
-    } catch (err) {
-      console.error("Webhook signature verification failed:", err.message);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
+      await db.runTransaction(async (tx) => {
+        const purchaseDoc = await tx.get(purchaseRef);
+        if (purchaseDoc.exists) {
+          console.log("RC purchase already processed:", transactionId);
+          return;
+        }
 
-    /**
-     * =====================================
-     * PAYMENT SUCCESS EVENT
-     * =====================================
-     */
-    if (event.type === "payment_intent.succeeded") {
-      const paymentIntent = event.data.object;
+        const userDoc = await tx.get(userRef);
+        if (!userDoc.exists) throw new Error("User not found");
 
-      const uid = paymentIntent.metadata?.uid;
-      const type = paymentIntent.metadata?.type; // membership | credit_pack
-      const paymentId = paymentIntent.id;
+        const userData = userDoc.data();
+        const currentCredits = userData.credits || {
+          balance: 0,
+          lifetimeEarned: 0,
+          used: 0,
+        };
 
-      if (!uid) {
-        console.error("Missing uid in payment metadata");
-        return res.status(400).send("Missing uid");
-      }
+        // ─── CREDIT PACKS ───────────────────────────────
+        const creditPacks = {
+          credit_1_pack: 1,
+          credit_5: 5,
+          credit_12: 12,
+          credit_30: 30,
+        };
 
-      const now = admin.firestore.Timestamp.now();
-      const userRef = admin.firestore().collection("users").doc(uid);
-
-      // 🔥 Prevent duplicate processing (Stripe retries webhook sometimes)
-      const paymentRef = admin
-        .firestore()
-        .collection("stripePayments")
-        .doc(paymentId);
-
-      try {
-        await admin.firestore().runTransaction(async (transaction) => {
-          const paymentDoc = await transaction.get(paymentRef);
-
-          // Already processed
-          if (paymentDoc.exists) {
-            console.log("Payment already processed:", paymentId);
-            return;
-          }
-
-          const userDoc = await transaction.get(userRef);
-
-          if (!userDoc.exists) {
-            throw new Error("User not found");
-          }
-
-          const userData = userDoc.data();
-
-          const currentCredits = userData.credits || {
-            balance: 0,
-            lifetimeEarned: 0,
-            used: 0,
-          };
-
-          /**
-           * =====================================
-           * MEMBERSHIP PAYMENT SUCCESS
-           * =====================================
-           */
-          if (type === "membership") {
-            const tier = paymentIntent.metadata?.tier;
-
-            if (!["basic", "premium"].includes(tier)) {
-              throw new Error("Invalid membership tier");
-            }
-
-            console.log("Membership payment success:", uid, "Tier:", tier);
-
-            const expiresAt = admin.firestore.Timestamp.fromDate(
-              new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-            );
-
-            let newBalance = currentCredits.balance;
-            let newLifetime = currentCredits.lifetimeEarned;
-
-            // BASIC → +50 credits
-            if (tier === "basic") {
-              newBalance += 50;
-              newLifetime += 50;
-            }
-
-            // PREMIUM → unlimited credits
-            if (tier === "premium") {
-              newBalance = 999999999999;
-            }
-
-            transaction.update(userRef, {
-              membership: {
-                tier: tier, // free | basic | premium
-                startedAt: now,
-                expiresAt: expiresAt,
-                fullTimeAdsLimit: tier === "basic" ? 1 : 9999,
-                fullTimeAdsPostedThisMonth: 0,
-                monthKey: new Date().toISOString().slice(0, 7),
-              },
-              credits: {
-                balance: newBalance,
-                lifetimeEarned: newLifetime,
-                used: currentCredits.used,
-              },
-              updatedAt: now,
-            });
-          }
-
-          /**
-           * =====================================
-           * CREDIT PACK PAYMENT SUCCESS
-           * =====================================
-           */
-          if (type === "credit_pack") {
-            const creditsToAdd = parseInt(
-              paymentIntent.metadata?.creditsToAdd || "0"
-            );
-
-            if (!creditsToAdd || creditsToAdd <= 0) {
-              throw new Error("Invalid creditsToAdd");
-            }
-
-            console.log("Credit pack purchase success:", uid, "Credits:", creditsToAdd);
-
-            transaction.update(userRef, {
-              credits: {
-                balance: currentCredits.balance + creditsToAdd,
-                lifetimeEarned: currentCredits.lifetimeEarned + creditsToAdd,
-                used: currentCredits.used,
-              },
-              updatedAt: now,
-            });
-          }
-
-          /**
-           * =====================================
-           * SAVE PAYMENT RECORD (Idempotency)
-           * =====================================
-           */
-          transaction.set(paymentRef, {
-            uid: uid,
-            type: type || "unknown",
-            stripePaymentIntentId: paymentId,
-            amount: paymentIntent.amount,
-            createdAt: now,
+        if (creditPacks[productId] !== undefined) {
+          const creditsToAdd = creditPacks[productId];
+          tx.update(userRef, {
+            "credits.balance": currentCredits.balance + creditsToAdd,
+            "credits.lifetimeEarned": currentCredits.lifetimeEarned + creditsToAdd,
+            updatedAt: now,
           });
+        }
+
+        // ─── MEMBERSHIPS ────────────────────────────────
+        const membershipTiers = {
+          membership_basic_v2: "basic",
+          membership_premium: "premium",
+        };
+
+        if (membershipTiers[productId]) {
+          const tier = membershipTiers[productId];
+
+          const expiresAt = admin.firestore.Timestamp.fromDate(
+            new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          );
+
+          let newBalance = currentCredits.balance;
+          let newLifetime = currentCredits.lifetimeEarned;
+
+          if (tier === "basic") {
+            newBalance += 50;
+            newLifetime += 50;
+          }
+          if (tier === "premium") {
+            newBalance = 999999999999;
+          }
+
+          tx.update(userRef, {
+            membership: {
+              tier,
+              startedAt: now,
+              expiresAt,
+              fullTimeAdsLimit: tier === "basic" ? 1 : 9999,
+              fullTimeAdsPostedThisMonth: 0,
+              monthKey: new Date().toISOString().slice(0, 7),
+            },
+            credits: {
+              balance: newBalance,
+              lifetimeEarned: newLifetime,
+              used: currentCredits.used,
+            },
+            updatedAt: now,
+          });
+        }
+
+        // Save idempotency record
+        tx.set(purchaseRef, {
+          uid,
+          productId,
+          eventType,
+          transactionId,
+          createdAt: now,
         });
-      } catch (err) {
-        console.error("Webhook transaction failed:", err.message);
-        return res.status(500).send("Webhook transaction failed");
-      }
+      });
+    } catch (err) {
+      console.error("RC webhook transaction failed:", err.message);
+      return res.status(500).send("Transaction failed");
     }
 
-    res.status(200).json({ received: true });
+    return res.status(200).json({ received: true });
   }
 );
 

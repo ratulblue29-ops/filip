@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "842815751322-0m3meiiirdr8cvjsseohjscu16r8kv3m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.beuptech.goldshift",
+            "certificate_hash": "60e061c5b14310b40161483ddff66bf6eb85ca09"
+          }
+        },
+        {
           "client_id": "842815751322-eo8vselsv2csh5d0rk5692gi5gckife0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -28,90 +36,6 @@
           "android_info": {
             "package_name": "com.beuptech.goldshift",
             "certificate_hash": "4ad69ea3fd125a22706804371c2c4f406d737648"
-          }
-        },
-        {
-          "client_id": "842815751322-fgg618jn2o3uldffnhaabi6k2se3kedm.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAzb2ZcQzPIEkTc1rPcDgv49CKudJt8AYA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "842815751322-fgg618jn2o3uldffnhaabi6k2se3kedm.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "842815751322-dunk08h6avk1hnk995lsef8v7msqf0ko.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.beuptech.goldshift"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:842815751322:android:236cec75fe747ac8898b23",
-        "android_client_info": {
-          "package_name": "com.filip"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "842815751322-52ktphmkrfpu0pn9soaei73kesou1lpl.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.filip",
-            "certificate_hash": "ab77e1f1cfab9d23d1555fb36c47d12f3d3bda3f"
-          }
-        },
-        {
-          "client_id": "842815751322-6vmu6u5ohafkr2b3fsqkd9f70l4vrctg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.filip",
-            "certificate_hash": "3943a88342136f8f7f8f2fdcee799912aa9a1f6a"
-          }
-        },
-        {
-          "client_id": "842815751322-jf0hhgl50884vqgrsco27rm1pun7bqvd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.filip",
-            "certificate_hash": "12b8c0675b8747559d3237229bbfb8356b6ddb9a"
-          }
-        },
-        {
-          "client_id": "842815751322-khednneajkoh3ofun3iq9laua7ipmfps.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.filip",
-            "certificate_hash": "4ad69ea3fd125a22706804371c2c4f406d737648"
-          }
-        },
-        {
-          "client_id": "842815751322-kresu8jmn54hjnvt8nohr9pd67bvbd52.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.filip",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
-        {
-          "client_id": "842815751322-ouc1m5oe3admojar81kauvdajgeo170p.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.filip",
-            "certificate_hash": "ef2f25c67e1f94883685cde59161fcacdc2c4f57"
           }
         },
         {

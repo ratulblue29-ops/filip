@@ -46,14 +46,13 @@ const App = () => {
     GoogleSignin.configure({
       webClientId:
         '842815751322-fgg618jn2o3uldffnhaabi6k2se3kedm.apps.googleusercontent.com',
-      iosClientId: '842815751322-js7cpvgv36j81mkvh47rjln48hdo3gre.apps.googleusercontent.com',
+      iosClientId: '842815751322-dunk08h6avk1hnk995lsef8v7msqf0ko.apps.googleusercontent.com',
       offlineAccess: true,
     });
   }, []);
 
   useEffect(() => {
     // RevenueCat init — uses Firebase UID as appUserID for webhook linking
-    Purchases.setLogLevel(LOG_LEVEL.VERBOSE); // remove in production
     Purchases.configure({
       apiKey: Platform.OS === 'ios'
         ? 'appl_JcVvEfpDBhpZcxOQGqjXdmanQOh'

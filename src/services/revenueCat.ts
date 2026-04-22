@@ -9,10 +9,11 @@ import Purchases, { PurchasesPackage } from 'react-native-purchases';
 export const RC_PRODUCT_IDS = {
     // Credit packs (consumable)
     credit_1_pack: 'credit_1_pack',
+    credit_1: 'credit_1_pack',      // alias used by CreditScreen
     credit_5: 'credit_5',
     credit_12: 'credit_12',
     credit_30: 'credit_30',
-    // Memberships (subscription)
+    // Memberships (subscription) — matched via startsWith due to :base-plan-id suffix
     basic: 'membership_basic_v2',
     premium: 'membership_premium',
 } as const;

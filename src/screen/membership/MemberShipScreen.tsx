@@ -121,7 +121,7 @@ const MemberShipScreen = () => {
 
       const offerings = await Purchases.getOfferings();
       const pkg = offerings.current?.availablePackages.find(
-        p => p.product.identifier === productId,
+        p => p.product.identifier === productId || p.product.identifier.startsWith(productId + ':'),
       );
 
       if (!pkg) {
